@@ -17,10 +17,11 @@ just_fix_windows_console()
 )
 def cli():
     """
-    Find the unused parts of your robot.
+    Robotframework-find-unused finds easily and fast unused keywords, variables, returns and 
+    other arguments in your entire project. This cleans up your work and makes life easy. 
 
-    Your robot will be happier without extra limbs, old heads, rusty parts, etc. Find them
-    easily with this script.
+    Have fun!
+
     """
 
 
