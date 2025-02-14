@@ -1,10 +1,24 @@
-# Find unused
+# Robot Framework Find Unused
 
-This tool has been written for the sole purpose to find and remove unused parts of your robot, like keywords, keyword return values, variables and unchanged default keyword arguments.
-So be like Lakitna and clean your robot on a regular basis. 
+Find unused parts of your Robot Framework project.
 
+[Robocop](https://github.com/MarketSquare/robotframework-robocop) is great at finding unused parts
+in a single file. Find unused finds unused parts across all your project files.
 
-## Getting started
+Allows you to find unused:
+
+- Keywords
+- Keyword arguments
+- Keyword return statements
+- Global variables
+
+## Installation
+
+Install with pip
+
+```shell
+pip install robotframework-find-unused
+```
 
 ## How to use
 

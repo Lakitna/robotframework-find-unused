@@ -1,12 +1,16 @@
 [project]
 name = "robotframework-find-unused"
 version = "0.1.0"
-# TODO: Add description
-description = ""
+description = "Find unused parts of your Robot Framework project"
 readme = "./README.md"
 authors = [{ name = "Sander van Beek" }]
 license = "./LICENSE"
-classifiers = ["Framework :: Robot Framework", "Private :: Do Not Publish"]
+classifiers = [
+    "Framework :: Robot Framework",
+    "Framework :: Robot Framework :: Tool",
+    "Development Status :: 4 - Beta",
+    "Typing :: Typed",
+]
 requires-python = ">=3.10"
 dependencies = [
     "click (>=8.1.7,<9.0.0)",
@@ -15,6 +19,10 @@ dependencies = [
     "ruff[dev] (>=0.9.1,<0.10.0)",
     "pytest[dev] (>=8.3.4,<9.0.0)",
 ]
+
+[project.urls]
+Homepage = "https://github.com/Lakitna/robotframework-find-unused"
+Repository = "https://github.com/Lakitna/robotframework-find-unused"
 
 [project.scripts]
 robotunused = "robotframework_find_unused.cli:cli"
