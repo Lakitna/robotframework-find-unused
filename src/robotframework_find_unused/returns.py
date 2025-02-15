@@ -15,7 +15,7 @@ from robotframework_find_unused.common.cli import (
     cli_step_get_keyword_definitions,
     pretty_kw_name,
 )
-from robotframework_find_unused.common.const import KeywordData, keyword_filter_option
+from robotframework_find_unused.common.const import KeywordData, KeywordFilterOption
 
 
 @dataclass
@@ -25,10 +25,10 @@ class ReturnOptions:
     """
 
     show_all_count: bool
-    deprecated_keywords: keyword_filter_option
-    private_keywords: keyword_filter_option
-    library_keywords: keyword_filter_option
-    unused_keywords: keyword_filter_option
+    deprecated_keywords: KeywordFilterOption
+    private_keywords: KeywordFilterOption
+    library_keywords: KeywordFilterOption
+    unused_keywords: KeywordFilterOption
     keyword_filter_glob: str | None
     verbose: bool
 
@@ -40,8 +40,8 @@ def cli_returns(file_path: str, options: ReturnOptions):
     robocop_config = Config()
     robocop_config.paths = [file_path]
 
-    files = cli_step_gather_files(robocop_config, options.verbose)
-    keywords = cli_step_get_keyword_definitions(files, options.verbose)
+    files = cli_step_gather_files(robocop_config, verbose=options.verbose)
+    keywords = cli_step_get_keyword_definitions(files, verbose=options.verbose)
     counted_keywords = cli_count_keyword_uses(
         robocop_config,
         keywords,
@@ -49,10 +49,10 @@ def cli_returns(file_path: str, options: ReturnOptions):
         verbose=options.verbose,
     )
 
-    cli_log_results(counted_keywords, options)
+    _cli_log_results(counted_keywords, options)
 
 
-def cli_log_results(keywords: list[KeywordData], options: ReturnOptions):
+def _cli_log_results(keywords: list[KeywordData], options: ReturnOptions) -> None:
     keywords = cli_filter_keywords_by_option(
         keywords,
         options.deprecated_keywords,
@@ -100,12 +100,12 @@ def cli_log_results(keywords: list[KeywordData], options: ReturnOptions):
     click.echo()
 
     if options.show_all_count:
-        cli_log_results_show_count(keywords)
+        _cli_log_results_show_count(keywords)
     else:
-        cli_log_results_unused(keywords)
+        _cli_log_results_unused(keywords)
 
 
-def cli_log_results_unused(keywords: list[KeywordData]):
+def _cli_log_results_unused(keywords: list[KeywordData]) -> None:
     unused_returns = [kw for kw in keywords if kw.return_use_count == 0]
 
     click.echo(f"Found {len(unused_returns)} unused keyword returns:")
@@ -113,7 +113,7 @@ def cli_log_results_unused(keywords: list[KeywordData]):
         click.echo("  " + pretty_kw_name(kw))
 
 
-def cli_log_results_show_count(keywords: list[KeywordData]):
+def _cli_log_results_show_count(keywords: list[KeywordData]) -> None:
     click.echo("return_use_count\tkeyword_name")
 
     sorted_keywords = sorted(keywords, key=lambda kw: kw.return_use_count)

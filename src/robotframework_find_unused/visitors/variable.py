@@ -15,6 +15,8 @@ from robotframework_find_unused.common.const import VariableData
 
 class VariableVisitor(VisitorChecker):
     """
+    Visit and count variable usage.
+
     A Robocop visitor. Will never log a lint issue, unlike a normal Robocop visitor. We use it here
     as a convenient way of working with Robotframework files.
 
@@ -24,19 +26,22 @@ class VariableVisitor(VisitorChecker):
     Counts variable usage
     """
 
-    variables: dict[str, VariableData] = {}
+    variables: dict[str, VariableData]
 
-    _patterns = {
-        "variable": re.compile(r"[@$&](\{[^{].+?[^}]\})"),
-        # Details: https://robotframework.org/robotframework/latest/RobotFrameworkUserGuide.html#special-variable-syntax
-        "eval_variable": re.compile(r"\$(\w+)"),
-        # Details: https://robotframework.org/robotframework/latest/RobotFrameworkUserGuide.html#inline-python-evaluation
-        "inline_eval": re.compile(r"\${{(.+?)}}"),
-    }
+    _pattern_variable = re.compile(r"[@$&](\{[^{].+?[^}]\})")
+    # Details: https://robotframework.org/robotframework/latest/RobotFrameworkUserGuide.html#special-variable-syntax
+    _pattern_eval_variable = re.compile(r"\$(\w+)")
+    # Details: https://robotframework.org/robotframework/latest/RobotFrameworkUserGuide.html#inline-python-evaluation
+    _pattern_inline_eval = re.compile(r"\${{(.+?)}}")
 
-    def visit_VariableSection(self, node: VariableSection):
+    def __init__(self) -> None:
+        self.variables = {}
+        super().__init__()
+
+    def visit_VariableSection(self, node: VariableSection):  # noqa: N802
         """
         Look for variable declarations in the variables section.
+
         Look for used variables in variable definitions.
         """
         for var_node in node.body:
@@ -44,7 +49,7 @@ class VariableVisitor(VisitorChecker):
                 continue
 
             name = self._normalize_var_name(var_node.name)
-            if name not in self.variables.keys():
+            if name not in self.variables:
                 # Set defined variable to be unused
                 self.variables[name] = VariableData(
                     name=var_node.name,
@@ -63,7 +68,7 @@ class VariableVisitor(VisitorChecker):
 
         return self.generic_visit(node)
 
-    def visit_Arguments(self, node: Arguments):
+    def visit_Arguments(self, node: Arguments):  # noqa: N802
         """
         Look for used variables in the default value of keyword arguments.
         """
@@ -79,7 +84,7 @@ class VariableVisitor(VisitorChecker):
 
         return self.generic_visit(node)
 
-    def visit_KeywordCall(self, node: KeywordCall):
+    def visit_KeywordCall(self, node: KeywordCall):  # noqa: N802
         """
         Look for used variables called keyword arguments.
         """
@@ -90,7 +95,7 @@ class VariableVisitor(VisitorChecker):
 
         return self.generic_visit(node)
 
-    def visit_For(self, node: For):
+    def visit_For(self, node: For):  # noqa: N802
         """
         Look for used variables in for loop conditions.
         """
@@ -98,7 +103,7 @@ class VariableVisitor(VisitorChecker):
 
         return self.generic_visit(node)
 
-    def visit_If(self, node: If):
+    def visit_If(self, node: If):  # noqa: N802
         """
         Look for used variables in if/else/elseif statement conditions.
         """
@@ -107,31 +112,31 @@ class VariableVisitor(VisitorChecker):
 
         return self.generic_visit(node)
 
-    def _count_used_vars_in_eval(self, eval: str):
+    def _count_used_vars_in_eval(self, eval_str: str) -> None:
         """
-        Counts used variables found in a python evaluation context
+        Count used variables found in a python evaluation context
         """
-        used_vars = self._get_used_vars_in_eval(eval)
+        used_vars = self._get_used_vars_in_eval(eval_str)
         used_vars = self._filter_supported_vars(used_vars)
         for name, formatted_name in used_vars:
             self._count_variable_use(name, formatted_name)
 
-    def _get_used_vars_in_eval(self, eval: str) -> list[str]:
+    def _get_used_vars_in_eval(self, eval_str: str) -> list[str]:
         """
-        Returns a list of used variables in a given evaluated Python expression
+        Return a list of used variables in a given evaluated Python expression
         """
-        eval = eval.strip()
-        used_vars = self._get_used_vars_in_args([eval])
+        eval_str = eval_str.strip()
+        used_vars = self._get_used_vars_in_args([eval_str])
 
-        match = self._patterns["eval_variable"].findall(eval)
+        match = self._pattern_eval_variable.findall(eval_str)
         for var in match:
             used_vars.append(self._normalize_var_name("${" + var + "}"))
 
         return used_vars
 
-    def _count_used_vars_in_args(self, args: list[str]):
+    def _count_used_vars_in_args(self, args: list[str]) -> None:
         """
-        Counts used variables found in a list of arguments
+        Count used variables found in a list of arguments
         """
         used_vars = self._get_used_vars_in_args(args)
         used_vars = self._filter_supported_vars(used_vars)
@@ -140,25 +145,25 @@ class VariableVisitor(VisitorChecker):
 
     def _get_used_vars_in_args(self, args: list[str]) -> list[str]:
         """
-        Returns a list of used variables in a given list of strings
+        Return a list of used variables in a given list of strings
         """
         used_vars = []
         for arg in args:
-            var_match = self._patterns["variable"].findall(arg)
+            var_match = self._pattern_variable.findall(arg)
             used_vars += var_match
 
-            eval_match = self._patterns["inline_eval"].findall(arg)
+            eval_match = self._pattern_inline_eval.findall(arg)
             for inline_eval in eval_match:
                 used_vars += self._get_used_vars_in_eval(inline_eval)
 
         return used_vars
 
-    def _filter_supported_vars(self, vars: list[str]) -> list[tuple[str, str]]:
+    def _filter_supported_vars(self, variables: list[str]) -> list[tuple[str, str]]:
         """
         Filter out unsupported variables and some Robot builtin stuff.
         """
         filtered = []
-        for formatted_var in vars:
+        for formatted_var in variables:
             var = self._normalize_var_name(formatted_var)
 
             if "${" in var or "@{" in var or "&{" in var:
@@ -174,33 +179,22 @@ class VariableVisitor(VisitorChecker):
             except ValueError:
                 pass
 
-            if (
-                var == "{true}"
-                or var == "{false}"
-                or var == "{none}"
-                or var == "{empty}"
-                or var == "{space}"
-            ):
+            if var in ("{true}", "{false}", "{none}", "{empty}", "{space}"):
                 continue
 
             filtered.append(
-                (
-                    var,
-                    formatted_var,
-                ),
+                (var, formatted_var),
             )
 
         return filtered
 
     def _normalize_var_name(self, name: str) -> str:
-        name = name.lstrip("$@&").replace(" ", "").replace("_", "").lower()
-        return name
+        return name.lstrip("$@&").replace(" ", "").replace("_", "").lower()
 
     def _var_name_without_brackets(self, name: str) -> str:
-        name = name.lstrip("$@&").strip("{}")
-        return name
+        return name.lstrip("$@&").strip("{}")
 
-    def _count_variable_use(self, normalized_name: str, name: str):
+    def _count_variable_use(self, normalized_name: str, name: str) -> None:
         """
         Count the variable.
         """

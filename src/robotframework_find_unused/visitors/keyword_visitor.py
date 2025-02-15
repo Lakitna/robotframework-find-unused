@@ -21,6 +21,10 @@ from robotframework_find_unused.visitors.library_import import LibraryData
 
 @dataclass
 class KeywordCallData:
+    """
+    Simplified keyword call data structure
+    """
+
     keyword: str
     args: tuple[str, ...]
 
@@ -39,15 +43,17 @@ class KeywordVisitor(VisitorChecker):
     Counts keyword argument usage
     """
 
-    keywords: dict[str, KeywordData] = {}
-    downloaded_libraries: list[LibraryData] = {}
-    normalized_keyword_names: set[str] = set()
+    keywords: dict[str, KeywordData]
+    downloaded_libraries: list[LibraryData]
+    normalized_keyword_names: set[str]
 
     def __init__(
         self,
         custom_keywords: list[KeywordData],
         downloaded_library_keywords: list[LibraryData],
-    ):
+    ) -> None:
+        self.normalized_keyword_names = set()
+        self.keywords = {}
         for kw in custom_keywords:
             self.keywords[kw.normalized_name] = kw
             self.normalized_keyword_names.add(kw.normalized_name)
@@ -75,22 +81,26 @@ class KeywordVisitor(VisitorChecker):
 
         return self.generic_visit(node)
 
-    def visit_TestSetup(self, node: TestSetup):
+    def visit_TestSetup(self, node: TestSetup):  # noqa: N802
+        """Count keyword use in test setup"""
         self._count_keyword_call(node.name, node.args)
 
         return self.generic_visit(node)
 
-    def visit_SuiteSetup(self, node: SuiteSetup):
+    def visit_SuiteSetup(self, node: SuiteSetup):  # noqa: N802
+        """Count keyword use in suite setup"""
         self._count_keyword_call(node.name, node.args)
 
         return self.generic_visit(node)
 
-    def visit_TestTeardown(self, node: TestTeardown):
+    def visit_TestTeardown(self, node: TestTeardown):  # noqa: N802
+        """Count keyword use in test teardown"""
         self._count_keyword_call(node.name, node.args)
 
         return self.generic_visit(node)
 
-    def visit_SuiteTeardown(self, node: SuiteTeardown):
+    def visit_SuiteTeardown(self, node: SuiteTeardown):  # noqa: N802
+        """Count keyword use in suite teardown"""
         self._count_keyword_call(node.name, node.args)
 
         return self.generic_visit(node)
@@ -100,7 +110,7 @@ class KeywordVisitor(VisitorChecker):
             name = name.split(".", 1)[1]
         return name
 
-    def _get_keyword_data(self, name: str):
+    def _get_keyword_data(self, name: str) -> KeywordData:
         name = self._remove_lib_from_name(name)
         normalized_name = normalize_robot_name(name)
 
@@ -124,7 +134,7 @@ class KeywordVisitor(VisitorChecker):
         args: tuple[str],
         *,
         return_value_assigned: bool = False,
-    ):
+    ) -> None:
         """
         Count the keyword.
 
@@ -140,7 +150,7 @@ class KeywordVisitor(VisitorChecker):
         for inner in inner_keywords:
             self._count_keyword_call(inner.keyword, inner.args)
 
-        if keyword.argument_use_count == None:
+        if keyword.argument_use_count is None:
             # This is a downloaded library keyword. We don't care about the args
             return
         self._count_keyword_call_args(keyword, args)
@@ -229,16 +239,17 @@ class KeywordVisitor(VisitorChecker):
 
     def _get_deduped_arguments(
         self,
-        input: KeywordCallData,
+        call: KeywordCallData,
         duplicate_call: KeywordCallData,
     ) -> tuple[str]:
         """
-        Deduplicates arguments of the first keyword call. Used to prevent counting a keyword
-        multiple times.
+        Deduplicate arguments of the first keyword call.
+
+        Used to prevent counting a keyword multiple times.
         """
         args_to_remove = (duplicate_call.keyword, *duplicate_call.args)
 
-        output = [*input.args]
+        output = [*call.args]
         for i in range(len(args_to_remove)):
             remove_val = args_to_remove[-i - 1]
             if "=" in remove_val:
@@ -249,13 +260,12 @@ class KeywordVisitor(VisitorChecker):
                 (_, actual_val) = actual_val.split("=", 1)
 
             if remove_val != actual_val:
-                raise ValueError(
-                    f"Expected list to end with '{remove_val}', but found '{actual_val}' instead",
-                )
+                msg = f"Expected list to end with '{remove_val}', but found '{actual_val}' instead"
+                raise ValueError(msg)
 
         return tuple(output)
 
-    def _register_downloaded_library_keyword(self, name: str, normalized_name: str):
+    def _register_downloaded_library_keyword(self, name: str, normalized_name: str) -> None:
         """
         Register as a downloaded library keyword.
         """
@@ -265,8 +275,9 @@ class KeywordVisitor(VisitorChecker):
                 library = lib
                 break
 
-        if library == None:
-            raise Exception(f"Can't find library for keyword '{name}'")
+        if library is None:
+            msg = f"Can't find library for keyword '{name}'"
+            raise Exception(msg)
 
         library_keyword = None
         for kw in library.keywords:
@@ -274,12 +285,13 @@ class KeywordVisitor(VisitorChecker):
                 library_keyword = kw
                 break
 
-        if library_keyword == None:
-            raise Exception(f"Can't find keyword '{name}' in library '{library.name}'")
+        if library_keyword is None:
+            msg = f"Can't find keyword '{name}' in library '{library.name}'"
+            raise Exception(msg)
 
         self.keywords[library_keyword.normalized_name] = library_keyword
 
-    def _register_unknown_keyword(self, name: str, normalized_name: str):
+    def _register_unknown_keyword(self, name: str, normalized_name: str) -> None:
         """
         Register as an unknown keyword with minimum data that does not look weird.
         """
@@ -297,7 +309,7 @@ class KeywordVisitor(VisitorChecker):
             library="",
         )
 
-    def _count_keyword_call_args(self, kw: KeywordData, call_args: tuple[str]):
+    def _count_keyword_call_args(self, kw: KeywordData, call_args: tuple[str]) -> None:
         positional_args: list[str] = []
         named_args: list[tuple[str, Any]] = []
 
@@ -328,7 +340,7 @@ class KeywordVisitor(VisitorChecker):
                 continue
 
             if position >= len(kw_arg_names):
-                position = len(kw_arg_names) - 1
+                position = len(kw_arg_names) - 1  # noqa: PLW2901
 
             arg_name = kw_arg_names[position]
             kw.argument_use_count[arg_name] += 1
@@ -362,7 +374,7 @@ class KeywordVisitor(VisitorChecker):
                 continue
 
             if token.type == Token.KEYWORD:
-                # Special return keywords `Return From Keyword` and `Return From Keyword If`
+                # Node is special return keywords `Return From Keyword` and `Return From Keyword If`
                 called_keyword_name = token.get_token(Token.KEYWORD)
                 keyword_name_normalized = normalize_robot_name(
                     called_keyword_name.value,
@@ -377,7 +389,7 @@ class KeywordVisitor(VisitorChecker):
                 argument_count = len(token.get_tokens(Token.ARGUMENT))
                 if keyword_name_normalized == "returnfromkeyword" and argument_count >= 1:
                     return True
-                if keyword_name_normalized == "returnfromkeywordif" and argument_count >= 2:
+                if keyword_name_normalized == "returnfromkeywordif" and argument_count >= 2:  # noqa: PLR2004
                     return True
                 continue
 

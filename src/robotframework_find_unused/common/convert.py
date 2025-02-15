@@ -8,7 +8,7 @@ from robotframework_find_unused.common.const import KeywordData
 
 def libdoc_keyword_to_keyword_data(
     libdoc: KeywordDoc,
-    type: Literal["CUSTOM_SUITE", "CUSTOM_LIBRARY", "CUSTOM_RESOURCE", "LIBRARY"],
+    keyword_type: Literal["CUSTOM_SUITE", "CUSTOM_LIBRARY", "CUSTOM_RESOURCE", "LIBRARY"],
 ):
     """
     Convert a Libdoc keyword to the internally used data structure
@@ -28,5 +28,5 @@ def libdoc_keyword_to_keyword_data(
         use_count=0,
         returns=None,
         return_use_count=0,
-        type=type,
+        type=keyword_type,
     )

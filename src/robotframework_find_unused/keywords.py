@@ -16,7 +16,7 @@ from robotframework_find_unused.common.cli import (
     cli_step_get_keyword_definitions,
     pretty_kw_name,
 )
-from robotframework_find_unused.common.const import KeywordData, keyword_filter_option
+from robotframework_find_unused.common.const import KeywordData, KeywordFilterOption
 
 
 @dataclass
@@ -26,9 +26,9 @@ class KeywordOptions:
     """
 
     show_all_count: bool
-    deprecated_keywords: keyword_filter_option
-    private_keywords: keyword_filter_option
-    library_keywords: keyword_filter_option
+    deprecated_keywords: KeywordFilterOption
+    private_keywords: KeywordFilterOption
+    library_keywords: KeywordFilterOption
     keyword_filter_glob: str | None
     verbose: bool
 
@@ -40,23 +40,23 @@ def cli_keywords(file_path: str, options: KeywordOptions):
     robocop_config = Config()
     robocop_config.paths = [file_path]
 
-    files = cli_step_gather_files(robocop_config, options.verbose)
-    keywords = cli_step_get_keyword_definitions(files, options.verbose)
+    files = cli_step_gather_files(robocop_config, verbose=options.verbose)
+    keywords = cli_step_get_keyword_definitions(files, verbose=options.verbose)
     downloaded_library_keywords = cli_step_get_downloaded_lib_keywords(
         robocop_config,
-        options.verbose,
+        verbose=options.verbose,
     )
     counted_keywords = cli_count_keyword_uses(
         robocop_config,
         keywords,
         downloaded_library_keywords,
-        options.verbose,
+        verbose=options.verbose,
     )
 
-    cli_log_results(counted_keywords, options)
+    _cli_log_results(counted_keywords, options)
 
 
-def cli_log_results(keywords: list[KeywordData], options: KeywordOptions):
+def _cli_log_results(keywords: list[KeywordData], options: KeywordOptions) -> None:
     keywords = cli_filter_keywords_by_option(
         keywords,
         options.deprecated_keywords,

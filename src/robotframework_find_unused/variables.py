@@ -30,12 +30,12 @@ def cli_variables(file_path: str, option: VariableOptions):
     robocop_config = Config()
     robocop_config.paths = [file_path]
 
-    variables = cli_count_variable_uses(robocop_config, option.verbose)
+    variables = cli_count_variable_uses(robocop_config, verbose=option.verbose)
 
-    cli_log_results(variables, option)
+    _cli_log_results(variables, option)
 
 
-def cli_log_results(variables: list[VariableData], options: VariableOptions):
+def _cli_log_results(variables: list[VariableData], options: VariableOptions) -> None:
     click.echo()
 
     if options.filter_glob:

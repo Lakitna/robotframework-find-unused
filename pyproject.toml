@@ -50,7 +50,7 @@ ignore = [
 
     # Ruleset: pydocstyle
     # Docstring presence
-    # "D100",
+    "D100",
     # "D101",
     # "D102",
     # "D103",

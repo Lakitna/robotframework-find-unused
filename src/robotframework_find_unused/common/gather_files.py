@@ -11,7 +11,7 @@ def find_files_with_libdoc(robocop_config: Config):
 
     Libdoc supports .robot, .resource, .py, and downloaded libs
     """
-    file_paths = [p for p in get_files(robocop_config)]
+    file_paths = list(get_files(robocop_config))
 
     files: list[LibraryDoc] = []
     for file in file_paths:

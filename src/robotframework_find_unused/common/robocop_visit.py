@@ -4,8 +4,9 @@ from robocop.checkers import VisitorChecker
 
 def visit_files_with_robocop(robocop_config: Config, visitor: VisitorChecker):
     """
-    Use Robocop to traverse files with a visitor. See Robocop/Robotframework docs on Visitor
-    details.
+    Use Robocop to traverse files with a visitor.
+
+    See Robocop/Robotframework docs on Visitor details.
     """
     robocop = Robocop(config=robocop_config)
     robocop.recognize_file_types()
