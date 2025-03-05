@@ -8,7 +8,7 @@ import pytest
 
 
 class AcceptanceTest:
-    def test(self, cli_options: list[str], expected_output_path: str, test_file_path: str):
+    def run_test(self, cli_options: list[str], expected_output_path: str, test_file_path: str):
         test_folder = Path(test_file_path).parent
         expected_output_path: Path = test_folder.joinpath(expected_output_path)
 
@@ -31,17 +31,21 @@ class AcceptanceTest:
         self._assert_logs(actual, expected)
 
     def _assert_logs(self, actual: str, expected: str) -> None:
-        actual_lines = actual.splitlines()
-        expected_lines = expected.splitlines()
+        actual_lines = actual.strip().splitlines()
+        expected_lines = expected.strip().splitlines()
         diff = difflib.ndiff(actual_lines, expected_lines)
 
-        error = ["Actual output does not match expected output. Diff:"]
+        error_msg = ["Actual output does not match expected output. Diff:"]
+        error = False
         for diff_line in diff:
             if diff_line.startswith("- "):
-                error.append(click.style(diff_line, fg="red"))
+                error_msg.append(click.style(diff_line, fg="red"))
+                error = True
             elif diff_line.startswith("+ "):
-                error.append(click.style(diff_line, fg="green"))
+                error_msg.append(click.style(diff_line, fg="green"))
+                error = True
             else:
-                error.append(diff_line)
+                error_msg.append(diff_line)
 
-        pytest.fail("\n".join(error), pytrace=False)
+        if error:
+            pytest.fail("\n".join(error_msg), pytrace=False)
