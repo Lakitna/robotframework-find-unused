@@ -7,15 +7,21 @@ from robot.libdocpkg.model import ArgumentSpec
 DONE_MARKER = "[ " + click.style("DONE", fg="green") + " ]"
 INDENT = "    "
 
-keyword_filter_option: TypeAlias = Literal["include", "exclude", "only"]
+KeywordFilterOption: TypeAlias = Literal["include", "exclude", "only"]
 
 
 @dataclass
 class KeywordData:
+    """Data structure for Keywords"""
+
     name: str
     normalized_name: str
     type: Literal[
-        "CUSTOM_SUITE", "CUSTOM_LIBRARY", "CUSTOM_RESOURCE", "LIBRARY", "UNKNOWN",
+        "CUSTOM_SUITE",
+        "CUSTOM_LIBRARY",
+        "CUSTOM_RESOURCE",
+        "LIBRARY",
+        "UNKNOWN",
     ]
     argument_use_count: None | dict[str, int]
     deprecated: None | bool
@@ -29,6 +35,8 @@ class KeywordData:
 
 @dataclass
 class VariableData:
+    """Data structure for Variables"""
+
     name: str
     normalized_name: str
     name_without_brackets: str
@@ -38,6 +46,8 @@ class VariableData:
 
 @dataclass
 class LibraryData:
+    """Data structure for Library keywords"""
+
     name: str
     name_normalized: str
     keywords: list[KeywordData]

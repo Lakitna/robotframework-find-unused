@@ -11,5 +11,4 @@ def count_variable_uses(robocop_config: Config):
     visitor = VariableVisitor()
     visit_files_with_robocop(robocop_config, visitor)
 
-    variables = [v for v in visitor.variables.values() if v.defined_in_variables_section == True]
-    return variables
+    return [v for v in visitor.variables.values() if v.defined_in_variables_section is True]

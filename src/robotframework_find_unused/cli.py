@@ -1,3 +1,9 @@
+"""
+CLI entry point
+"""
+
+# ruff: noqa: FBT001,D301
+
 import click
 from colorama import just_fix_windows_console
 
@@ -17,11 +23,7 @@ just_fix_windows_console()
 )
 def cli():
     """
-    Robotframework-find-unused finds easily and fast unused keywords, variables, returns and 
-    other arguments in your entire project. This cleans up your work and makes life easy. 
-
-    Have fun!
-
+    Find unused parts of your Robot Framework project.
     """
 
 
@@ -72,16 +74,17 @@ def cli():
     help="Show more log output",
 )
 @click.argument("file_path", default=".")
-def keywords(
+def keywords(  # noqa: PLR0913
     show_count: bool,
-    filter: str | None,
+    filter: str | None,  # noqa: A002
     deprecated: str,
     private: str,
     library: str,
     verbose: bool,
     file_path: str,
 ):
-    """Find unused keywords
+    """
+    Find unused keywords
 
     Traverse files in the given file path. In those files, count how often each keyword is used.
     Keywords with 0 uses are logged.
@@ -148,7 +151,10 @@ def keywords(
     "--filter",
     default=None,
     metavar="<GLOB>",
-    help="Only show variables who's name match the glob pattern. Matching without {brackets} and $@& prefixes",
+    help=(
+        "Only show variables who's name match the glob pattern. "
+        "Matching without {brackets} and $@& prefixes"
+    ),
 )
 @click.option(
     "-v",
@@ -158,8 +164,14 @@ def keywords(
     help="Show more log output",
 )
 @click.argument("file_path", default=".")
-def variables(show_count: bool, filter: str | None, verbose: bool, file_path: str):
-    """Find unused variables defined in a variables section
+def variables(
+    show_count: bool,
+    filter: str | None,  # noqa: A002
+    verbose: bool,
+    file_path: str,
+):
+    """
+    Find unused variables defined in a variables section
 
     Traverse files in the given file path. In those files, count how often each variable is used.
     Variables defined in a variables section with 0 uses are logged.
@@ -255,7 +267,10 @@ def variables(show_count: bool, filter: str | None, verbose: bool, file_path: st
     "--filter",
     default=None,
     metavar="<GLOB>",
-    help="Only output arguments for keywords who's name match the glob pattern. Match without library prefix",
+    help=(
+        "Only output arguments for keywords who's name match the glob pattern. "
+        "Match without library prefix"
+    ),
 )
 @click.option(
     "-d",
@@ -289,16 +304,17 @@ def variables(show_count: bool, filter: str | None, verbose: bool, file_path: st
     help="Show more log output",
 )
 @click.argument("file_path", default=".")
-def arguments(
+def arguments(  # noqa: PLR0913
     show_count: bool,
-    filter: str | None,
+    filter: str | None,  # noqa: A002
     deprecated: str,
     private: str,
     unused: str,
     verbose: bool,
     file_path: str,
 ):
-    """Find unchanged default keyword arguments
+    """
+    Find unchanged default keyword arguments
 
     Traverse files in the given file path. In those files, count how often each argument is used
     during a keyword call. Arguments with 0 uses are logged.
@@ -399,16 +415,17 @@ def arguments(
     help="Show more log output",
 )
 @click.argument("file_path", default=".")
-def returns(
+def returns(  # noqa: PLR0913
     show_count: bool,
-    filter: str | None,
+    filter: str | None,  # noqa: A002
     deprecated: str,
     private: str,
     unused: str,
     verbose: bool,
     file_path: str,
 ):
-    """Find unused keyword return values
+    """
+    Find unused keyword return values
 
     Traverse files in the given file path. In those files, count how often each keyword return
     value is used. Keywords whose return value is never useds are logged.

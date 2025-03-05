@@ -4,7 +4,7 @@ from robot.libdocpkg.model import LibraryDoc
 from robotframework_find_unused.common.const import KeywordData, LibraryData
 from robotframework_find_unused.common.convert import libdoc_keyword_to_keyword_data
 from robotframework_find_unused.common.robocop_visit import visit_files_with_robocop
-from robotframework_find_unused.visitors.keyword import KeywordVisitor
+from robotframework_find_unused.visitors.keyword_visitor import KeywordVisitor
 
 
 def get_keyword_definitions_from_files(files: list[LibraryDoc]):

@@ -15,7 +15,7 @@ from robotframework_find_unused.common.cli import (
     cli_step_get_keyword_definitions,
     pretty_kw_name,
 )
-from robotframework_find_unused.common.const import INDENT, KeywordData, keyword_filter_option
+from robotframework_find_unused.common.const import INDENT, KeywordData, KeywordFilterOption
 
 
 @dataclass
@@ -24,10 +24,10 @@ class ArgumentsOptions:
     Command line options for the 'arguments' command
     """
 
-    deprecated_keywords: keyword_filter_option
-    private_keywords: keyword_filter_option
-    library_keywords: keyword_filter_option
-    unused_keywords: keyword_filter_option
+    deprecated_keywords: KeywordFilterOption
+    private_keywords: KeywordFilterOption
+    library_keywords: KeywordFilterOption
+    unused_keywords: KeywordFilterOption
     keyword_filter_glob: str | None
     show_all_count: bool
     verbose: bool
@@ -40,8 +40,8 @@ def cli_arguments(file_path: str, options: ArgumentsOptions):
     robocop_config = Config()
     robocop_config.paths = [file_path]
 
-    files = cli_step_gather_files(robocop_config, options.verbose)
-    keywords = cli_step_get_keyword_definitions(files, options.verbose)
+    files = cli_step_gather_files(robocop_config, verbose=options.verbose)
+    keywords = cli_step_get_keyword_definitions(files, verbose=options.verbose)
     counted_keywords = cli_count_keyword_uses(
         robocop_config,
         keywords,
@@ -49,10 +49,10 @@ def cli_arguments(file_path: str, options: ArgumentsOptions):
         verbose=options.verbose,
     )
 
-    cli_log_results(counted_keywords, options)
+    _cli_log_results(counted_keywords, options)
 
 
-def cli_log_results(keywords: list[KeywordData], options: ArgumentsOptions):
+def _cli_log_results(keywords: list[KeywordData], options: ArgumentsOptions) -> None:
     keywords = cli_filter_keywords_by_option(
         keywords,
         options.deprecated_keywords,
@@ -93,7 +93,7 @@ def cli_log_results(keywords: list[KeywordData], options: ArgumentsOptions):
     click.echo()
 
     for kw in keywords:
-        if kw.argument_use_count == None:
+        if kw.argument_use_count is None:
             continue
 
         if options.show_all_count:
@@ -124,9 +124,9 @@ def cli_log_results_unused(kw: KeywordData):
     )
     for arg in unused_args:
         if arg in kw.arguments.defaults:
-            arg = f"{arg}={kw.arguments.defaults[arg]}"
-
-        click.echo(f"{INDENT}{INDENT}{arg}")
+            click.echo(f"{INDENT}{INDENT}{arg}={kw.arguments.defaults[arg]}")
+        else:
+            click.echo(f"{INDENT}{INDENT}{arg}")
 
     click.echo()
 
@@ -146,8 +146,8 @@ def cli_log_results_show_count(kw: KeywordData):
 
     for arg, use_count in arguments.items():
         if arg in kw.arguments.defaults:
-            arg = f"{arg}={kw.arguments.defaults[arg]}"
-
-        click.echo(f"{INDENT}{use_count}\t\t{arg}")
+            click.echo(f"{INDENT}{use_count}\t\t{arg}={kw.arguments.defaults[arg]}")
+        else:
+            click.echo(f"{INDENT}{use_count}\t\t{arg}")
 
     click.echo()

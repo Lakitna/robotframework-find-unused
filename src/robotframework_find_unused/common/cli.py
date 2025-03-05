@@ -4,7 +4,7 @@ import click
 from robocop import Config
 from robot.libdocpkg.model import LibraryDoc
 
-from robotframework_find_unused.common.const import DONE_MARKER, INDENT, keyword_filter_option
+from robotframework_find_unused.common.const import DONE_MARKER, INDENT, KeywordFilterOption
 from robotframework_find_unused.common.gather_files import find_files_with_libdoc
 from robotframework_find_unused.common.gather_keywords import (
     KeywordData,
@@ -16,7 +16,7 @@ from robotframework_find_unused.common.robocop_visit import visit_files_with_rob
 from robotframework_find_unused.visitors.library_import import LibraryData, LibraryImportVisitor
 
 
-def cli_step_gather_files(robocop_config: Config, verbose: bool):
+def cli_step_gather_files(robocop_config: Config, *, verbose: bool):
     """
     Gather files with libdoc and keep the user up-to-date on progress
     """
@@ -32,7 +32,7 @@ def cli_step_gather_files(robocop_config: Config, verbose: bool):
     return files
 
 
-def cli_step_get_keyword_definitions(files: list[LibraryDoc], verbose: bool):
+def cli_step_get_keyword_definitions(files: list[LibraryDoc], *, verbose: bool):
     """
     Gather keyword definitions from already processed files and keep the user up-to-date on progress
     """
@@ -46,10 +46,9 @@ def cli_step_get_keyword_definitions(files: list[LibraryDoc], verbose: bool):
     return keywords
 
 
-def cli_step_get_downloaded_lib_keywords(robocop_config: Config, verbose: bool):
+def cli_step_get_downloaded_lib_keywords(robocop_config: Config, *, verbose: bool):
     """
-    Gather keyword definitions from imported downloaded libraries using Libdoc and keep the user
-    up-to-date on progress
+    Gather keyword definitions from imported downloaded libraries and show progress
 
     Will only resolve libraries that are actually imported in an in-scope .robot or .resource file.
     """
@@ -72,6 +71,7 @@ def cli_count_keyword_uses(
     robocop_config: Config,
     keywords: list[KeywordData],
     downloaded_library_keywords: list[LibraryData],
+    *,
     verbose: bool,
 ):
     """
@@ -101,11 +101,11 @@ def cli_count_keyword_uses(
 
 def cli_count_variable_uses(
     robocop_config: Config,
+    *,
     verbose: bool,
 ):
     """
-    Gather variable definitions and count variable uses with RoboCop and keep the user up-to-date
-    on progress
+    Gather variable definitions and count variable uses with RoboCop and show progress
     """
     click.echo("Gathering variables usage with RoboCop...")
     variables = count_variable_uses(robocop_config)
@@ -148,7 +148,7 @@ def pretty_kw_name(keyword: KeywordData) -> str:
     if keyword.library:
         name = click.style(keyword.library + ".", fg="bright_black") + name
 
-    if keyword.deprecated == True:
+    if keyword.deprecated is True:
         name += " " + click.style("[DEPRECATED]", fg="red")
 
     return name
@@ -164,8 +164,8 @@ def log_keyword_stats(keywords: list[KeywordData]):
             kw_type_count[kw.type] = 0
         kw_type_count[kw.type] += 1
 
-    for type in sorted(kw_type_count, key=kw_type_count.get, reverse=True):
-        click.echo(f"{INDENT}{kw_type_count[type]} keyword definitions of type {type}")
+    for kw_type in sorted(kw_type_count, key=kw_type_count.get, reverse=True):
+        click.echo(f"{INDENT}{kw_type_count[kw_type]} keyword definitions of type {kw_type}")
 
 
 def log_keyword_call_stats(keywords: list[KeywordData]):
@@ -178,9 +178,9 @@ def log_keyword_call_stats(keywords: list[KeywordData]):
             type_call_count[kw.type] = 0
         type_call_count[kw.type] += kw.use_count
 
-    for type in sorted(type_call_count, key=type_call_count.get, reverse=True):
+    for kw_type in sorted(type_call_count, key=type_call_count.get, reverse=True):
         click.echo(
-            f"{INDENT}{type_call_count[type]} keyword calls of keyword type {type}",
+            f"{INDENT}{type_call_count[kw_type]} keyword calls of keyword type {kw_type}",
         )
 
 
@@ -194,13 +194,13 @@ def log_file_stats(files: list[LibraryDoc]):
             file_type_count[file.type] = 0
         file_type_count[file.type] += 1
 
-    for type in sorted(file_type_count, key=file_type_count.get, reverse=True):
-        click.echo(f"{INDENT}{file_type_count[type]} files of type {type}")
+    for file_type in sorted(file_type_count, key=file_type_count.get, reverse=True):
+        click.echo(f"{INDENT}{file_type_count[file_type]} files of type {file_type}")
 
 
 def cli_filter_keywords_by_option(
     keywords: list[KeywordData],
-    option: keyword_filter_option,
+    option: KeywordFilterOption,
     matcher_fn: Callable[[KeywordData], bool],
     descriptor: str,
 ) -> list[KeywordData]:
@@ -214,10 +214,11 @@ def cli_filter_keywords_by_option(
 
     if option == "exclude":
         click.echo(f"Excluding {descriptor} keywords")
-        return filter(lambda kw: matcher_fn(kw) == False, keywords)
+        return filter(lambda kw: matcher_fn(kw) is False, keywords)
 
     if option == "only":
         click.echo(f"Only showing {descriptor} keywords")
-        return filter(lambda kw: matcher_fn(kw) == True, keywords)
+        return filter(lambda kw: matcher_fn(kw) is True, keywords)
 
-    raise TypeError(f"Unexpected value '{option}' when filtering {descriptor} keywords")
+    msg = f"Unexpected value '{option}' when filtering {descriptor} keywords"
+    raise TypeError(msg)
