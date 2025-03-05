@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import Any
+from typing import Any, Literal
 
 from robocop.checkers import VisitorChecker
 from robocop.utils import normalize_robot_name
@@ -170,35 +170,11 @@ class KeywordVisitor(VisitorChecker):
         """
         inner_keywords: list[KeywordCallData] = []
         for i, arg in enumerate(args):
-            arg_name = None
-            arg_val = arg
-            if "=" in arg:
-                # Is a named arg
-                (arg_name, arg_val) = arg.split("=", 1)
-
-            normalized_name = normalize_robot_name(arg_val)
-            if normalized_name not in self.normalized_keyword_names:
-                # arg val is not a known keyword name
+            arg_value = self._argument_is_keyword_reference(arg, i, keyword)
+            if arg_value is False:
                 continue
 
-            if "keyword" in keyword.normalized_name:
-                inner_keywords.append(
-                    KeywordCallData(keyword=arg_val, args=args[i + 1 :]),
-                )
-                continue
-
-            if arg_name is None:
-                # Argument is positional. Named arg can't get here.
-                arg_name = self._get_keyword_arg_name_by_position_index(
-                    keyword,
-                    position_index=i,
-                )
-            if arg_name is None:
-                continue
-
-            arg_name = arg_name.lower()
-            if "keyword" in arg_name:
-                inner_keywords.append(KeywordCallData(keyword=arg, args=args[i + 1 :]))
+            inner_keywords.append(KeywordCallData(keyword=arg_value, args=args[i + 1 :]))
 
         if len(inner_keywords) > 1:
             for i in range(1, len(inner_keywords)):
@@ -211,6 +187,45 @@ class KeywordVisitor(VisitorChecker):
                 )
 
         return inner_keywords
+
+    def _argument_is_keyword_reference(
+        self,
+        arg: str,
+        position_index: int,
+        keyword: KeywordData,
+    ) -> Literal[False] | str:
+        arg_name = None
+        arg_val = arg
+        if "=" in arg:
+            # Is a named arg
+            (arg_name, arg_val) = arg.split("=", 1)
+
+        if "." in arg_val:
+            # Remove library prefix
+            arg_val = arg_val.split(".", 1)[1]
+
+        normalized_name = normalize_robot_name(arg_val)
+        if normalized_name not in self.normalized_keyword_names:
+            # Not a known keyword name
+            return False
+
+        if "keyword" in keyword.normalized_name:
+            return arg_val
+
+        if arg_name is None:
+            # Argument is positional. Named arg can't get here.
+            arg_name = self._get_keyword_arg_name_by_position_index(
+                keyword,
+                position_index=position_index,
+            )
+        if arg_name is None:
+            return False
+
+        arg_name = arg_name.lower()
+        if "keyword" in arg_name:
+            return arg_val
+
+        return False
 
     def _get_keyword_arg_name_by_position_index(
         self,
