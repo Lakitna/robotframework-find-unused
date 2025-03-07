@@ -2,7 +2,6 @@
 __pycache__/
 .ruff_cache
 
-*.log
 *.untracked.*
 
 .hypothesis

@@ -1,0 +1,17 @@
+Gathering files with LibDoc...
+[ DONE ] Found and processed 2 files
+Gathering keyword definitions from files...
+[ DONE ] Found 2 keyword definitions
+Gathering downloaded library keyword names...
+[ DONE ] Found 1 downloaded libraries
+Counting keyword usage with RoboCop...
+[ DONE ] Found 6 unique keywords
+[ DONE ] Processed 21 keyword calls
+
+use_count	keyword_name
+1	BuiltIn.Log
+1	BuiltIn.Run Keywords
+2	BuiltIn.No Operation
+4	keywords.Used as inner kw by Beautiful
+6	BuiltIn.Skip
+7	keywords.Beautiful
