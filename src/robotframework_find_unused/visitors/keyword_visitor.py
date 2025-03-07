@@ -274,9 +274,15 @@ class KeywordVisitor(VisitorChecker):
             if "=" in actual_val:
                 (_, actual_val) = actual_val.split("=", 1)
 
-            if remove_val != actual_val:
-                msg = f"Expected list to end with '{remove_val}', but found '{actual_val}' instead"
-                raise ValueError(msg)
+            if remove_val == actual_val:
+                continue
+            if "." in remove_val and remove_val.endswith("." + actual_val):
+                continue
+            if "." in actual_val and actual_val.endswith("." + remove_val):
+                continue
+
+            msg = f"Expected list to end with '{remove_val}', but found '{actual_val}' instead"
+            raise ValueError(msg)
 
         return tuple(output)
 
@@ -292,7 +298,7 @@ class KeywordVisitor(VisitorChecker):
 
         if library is None:
             msg = f"Can't find library for keyword '{name}'"
-            raise Exception(msg)
+            raise Exception(msg)  # noqa: TRY002
 
         library_keyword = None
         for kw in library.keywords:
@@ -302,7 +308,7 @@ class KeywordVisitor(VisitorChecker):
 
         if library_keyword is None:
             msg = f"Can't find keyword '{name}' in library '{library.name}'"
-            raise Exception(msg)
+            raise Exception(msg)  # noqa: TRY002
 
         self.keywords[library_keyword.normalized_name] = library_keyword
 

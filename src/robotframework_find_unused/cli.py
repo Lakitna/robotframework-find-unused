@@ -5,15 +5,11 @@ CLI entry point
 # ruff: noqa: FBT001,D301
 
 import click
-from colorama import just_fix_windows_console
 
 from robotframework_find_unused.arguments import ArgumentsOptions, cli_arguments
 from robotframework_find_unused.keywords import KeywordOptions, cli_keywords
 from robotframework_find_unused.returns import ReturnOptions, cli_returns
 from robotframework_find_unused.variables import VariableOptions, cli_variables
-
-# Enable console colors on Windows
-just_fix_windows_console()
 
 
 @click.group(

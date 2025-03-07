@@ -18,12 +18,18 @@ class AcceptanceTest:
         command = [sys.executable, "-m", "robotframework_find_unused"]
         command.extend(cli_options)
 
-        p = subprocess.run(  # noqa: S603
-            command,
-            capture_output=True,
-            cwd=test_folder,
-            check=True,
-        )
+        try:
+            p = subprocess.run(  # noqa: S603
+                command,
+                capture_output=True,
+                cwd=test_folder,
+                check=True,
+            )
+        except subprocess.CalledProcessError as e:
+            pytest.fail(
+                f"Subprocess failed with non-zero exit code {e.returncode}. "
+                "Subprocess stderr below:\n" + e.stderr.decode(),
+            )
 
         actual = p.stdout.decode()
         expected = expected_output
