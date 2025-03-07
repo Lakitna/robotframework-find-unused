@@ -16,9 +16,11 @@ dependencies = [
     "click (>=8.1.7,<9.0.0)",
     "robotframework (>=6.1.1)",
     "robotframework-robocop (>=5.6.0)",
-    "ruff[dev] (>=0.9.1,<0.10.0)",
-    "pytest[dev] (>=8.3.4,<9.0.0)",
 ]
+
+[tool.poetry.group.dev.dependencies]
+ruff = ">=0.9.1,<0.10.0"
+pytest = ">=8.3.4,<9.0.0"
 
 [project.urls]
 Homepage = "https://github.com/Lakitna/robotframework-find-unused"
