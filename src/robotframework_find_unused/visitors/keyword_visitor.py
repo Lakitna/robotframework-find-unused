@@ -298,7 +298,7 @@ class KeywordVisitor(VisitorChecker):
 
         if library is None:
             msg = f"Can't find library for keyword '{name}'"
-            raise Exception(msg)
+            raise Exception(msg)  # noqa: TRY002
 
         library_keyword = None
         for kw in library.keywords:
@@ -308,7 +308,7 @@ class KeywordVisitor(VisitorChecker):
 
         if library_keyword is None:
             msg = f"Can't find keyword '{name}' in library '{library.name}'"
-            raise Exception(msg)
+            raise Exception(msg)  # noqa: TRY002
 
         self.keywords[library_keyword.normalized_name] = library_keyword
 
