@@ -179,18 +179,18 @@ def variables(
     All of the following variables are ignored:
 
     \b
-        Variables only defined in a variables file
-        Variables only provided via the command line
-        Environment variables
-        BuiltIn variables
-        Variables only set with `Set Global Variable`
-        Variables only set with `VAR  ...  scope=GLOBAL`
-        Variables only set with `Set Suite Variable`
-        Variables only set with `VAR  ...  scope=SUITE` are ignored
-        Variables only set with `Set Test Variable`
-        Variables only set with `VAR  ...  scope=TEST` are ignored
-        Variables only set with `Set Task Variable`
-        Variables only set with `VAR  ...  scope=TASK` are ignored
+    - Variables only defined in a variables file
+    - Variables only provided via the command line
+    - Environment variables
+    - BuiltIn variables
+    - Variables only set with `Set Global Variable`
+    - Variables only set with `VAR  ...  scope=GLOBAL`
+    - Variables only set with `Set Suite Variable`
+    - Variables only set with `VAR  ...  scope=SUITE`
+    - Variables only set with `Set Test Variable`
+    - Variables only set with `VAR  ...  scope=TEST`
+    - Variables only set with `Set Task Variable`
+    - Variables only set with `VAR  ...  scope=TASK`
 
     ----------
 
