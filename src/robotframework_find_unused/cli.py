@@ -124,9 +124,9 @@ def keywords(  # noqa: PLR0913
     \b     Amazing    ${True}    inner_keyword=Beautiful keyword
     """
     options = KeywordOptions(
-        deprecated_keywords=deprecated,
-        private_keywords=private,
-        library_keywords=library,
+        deprecated_keywords=deprecated,  # pyright: ignore[reportArgumentType]
+        private_keywords=private,  # pyright: ignore[reportArgumentType]
+        library_keywords=library,  # pyright: ignore[reportArgumentType]
         keyword_filter_glob=filter,
         show_all_count=show_count,
         verbose=verbose,
@@ -353,10 +353,10 @@ def arguments(  # noqa: PLR0913
     'Beautiful keyword'.
     """
     options = ArgumentsOptions(
-        deprecated_keywords=deprecated,
-        private_keywords=private,
+        deprecated_keywords=deprecated,  # pyright: ignore[reportArgumentType]
+        private_keywords=private,  # pyright: ignore[reportArgumentType]
         library_keywords="exclude",
-        unused_keywords=unused,
+        unused_keywords=unused,  # pyright: ignore[reportArgumentType]
         keyword_filter_glob=filter,
         show_all_count=show_count,
         verbose=verbose,
@@ -445,10 +445,10 @@ def returns(  # noqa: PLR0913
     Any keyword defined in a Python file is ignored.
     """
     options = ReturnOptions(
-        deprecated_keywords=deprecated,
-        private_keywords=private,
+        deprecated_keywords=deprecated,  # pyright: ignore[reportArgumentType]
+        private_keywords=private,  # pyright: ignore[reportArgumentType]
         library_keywords="exclude",
-        unused_keywords=unused,
+        unused_keywords=unused,  # pyright: ignore[reportArgumentType]
         keyword_filter_glob=filter,
         show_all_count=show_count,
         verbose=verbose,
