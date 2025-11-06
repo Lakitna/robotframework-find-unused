@@ -91,7 +91,8 @@ def keywords(  # noqa: PLR0913
 
     Example: This keyword is never counted because it contains the embedded argument ${something}:
 
-    \b     Do ${something} amazing
+    \b
+        Do ${something} amazing
 
     ----------
 
@@ -99,7 +100,8 @@ def keywords(  # noqa: PLR0913
 
     Example: The following keywords are counted as a single keyword:
 
-    \b     SeleniumLibrary.Get Text
+    \b
+        SeleniumLibrary.Get Text
         AppiumLibrary.Get Text
 
     ----------
@@ -109,19 +111,22 @@ def keywords(  # noqa: PLR0913
 
     Example: 'Beautiful keyword' is not counted.
 
-    \b     Do Something Amazing    ${True}    Beautiful keyword
+    \b
+        Do Something Amazing    ${True}    Beautiful keyword
 
     To ensure that your keyword in an argument is counted, your keyword name or argument name
     must include the literal word 'keyword' (case insensitive).
 
     Example: 'Beautiful keyword' is counted, because 'Run Keyword' includes the word 'keyword'
 
-    \b     Run Keyword    Beautiful keyword
+    \b
+        Run Keyword    Beautiful keyword
 
     Example: 'Beautiful keyword' is counted, because the argument ${inner_keyword} includes the word
     'keyword'
 
-    \b     Amazing    ${True}    inner_keyword=Beautiful keyword
+    \b
+        Amazing    ${True}    inner_keyword=Beautiful keyword
     """
     options = KeywordOptions(
         deprecated_keywords=deprecated,  # pyright: ignore[reportArgumentType]

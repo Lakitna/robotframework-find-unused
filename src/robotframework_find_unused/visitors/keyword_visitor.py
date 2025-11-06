@@ -89,6 +89,20 @@ class KeywordVisitor(VisitorChecker):
 
         return self.generic_visit(node)
 
+    def visit_Setup(self, node: Setup):
+        keyword_name_token = node.get_token(Token.NAME)
+        if keyword_name_token:
+            self._count_keyword_call(str(keyword_name_token), args=[])
+
+        return self.generic_visit(node)
+
+    def visit_Teardown(self, node: Teardown):
+        keyword_name_token = node.get_token(Token.NAME)
+        if keyword_name_token:
+            self._count_keyword_call(str(keyword_name_token), args=[])
+
+        return self.generic_visit(node)
+
     def visit_TestSetup(self, node: TestSetup):  # noqa: N802
         """Count keyword use in test setup"""
         self._count_keyword_call(node.name, node.args)
@@ -110,6 +124,25 @@ class KeywordVisitor(VisitorChecker):
     def visit_SuiteTeardown(self, node: SuiteTeardown):  # noqa: N802
         """Count keyword use in suite teardown"""
         self._count_keyword_call(node.name, node.args)
+
+    def visit_TestCase(self, node: TestCase):  # noqa: N802
+        """Count templated test cases"""
+        template_keyword = None
+        template_args_set = []
+        for child in node.body:
+            if isinstance(child, Template):
+                template_keyword = str(child.get_token(Token.NAME))
+                continue
+            if isinstance(child, TemplateArguments):
+                args = child.get_tokens(Token.ARGUMENT)
+                args = [str(arg) for arg in args]
+                template_args_set.append(args)
+                continue
+
+        if template_keyword is not None:
+            self._count_keyword_call(template_keyword, ())
+            for args in template_args_set:
+                self._count_keyword_call(template_keyword, args, count_keyword=False)
 
         return self.generic_visit(node)
 

@@ -8,3 +8,10 @@ class TestCommandAcceptance(AcceptanceTest):
             "./expected_output.log",
             __file__,
         )
+
+    def test_keywords_command_with_count(self):
+        self.run_test(
+            ["keywords", "./robot", "--show-count"],
+            "./expected_output_count.log",
+            __file__,
+        )

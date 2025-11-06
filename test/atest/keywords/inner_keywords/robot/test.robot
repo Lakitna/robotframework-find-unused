@@ -1,5 +1,4 @@
 *** Settings ***
-Library     BuiltIn
 Resource    ./keywords.resource
 
 

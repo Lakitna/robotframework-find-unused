@@ -28,6 +28,9 @@ class LibraryImportVisitor(VisitorChecker):
         self.downloaded_libraries = {}
         super().__init__()
 
+        # Is always imported automatically by Robot
+        self._register_downloaded_library("BuiltIn")
+
     def visit_LibraryImport(self, node: LibraryImport):  # noqa: N802
         """Find out which libraries are actually used"""
         lib_name = node.name
@@ -36,6 +39,9 @@ class LibraryImportVisitor(VisitorChecker):
             # Not a downloaded lib. We already discovered this.
             return
 
+        self._register_downloaded_library(lib_name)
+
+    def _register_downloaded_library(self, lib_name: str) -> None:
         normalized_lib_name = normalize_robot_name(lib_name)
 
         if normalized_lib_name in self.downloaded_libraries:
