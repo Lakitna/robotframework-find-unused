@@ -6,7 +6,7 @@ Gathering downloaded library keyword names...
 [ DONE ] Found 1 downloaded libraries
 Counting keyword usage with RoboCop...
 [ DONE ] Found 9 unique keywords
-[ DONE ] Processed 17 keyword calls
+[ DONE ] Processed 19 keyword calls
 Excluding downloaded library keywords
 
 Found 1 unused keywords:

@@ -15,3 +15,10 @@ class TestCommandAcceptance(AcceptanceTest):
             "./expected_output_count.log",
             __file__,
         )
+
+    def test_keywords_command_with_verbose(self):
+        self.run_test(
+            ["keywords", "./robot", "--verbose"],
+            "./expected_output_verbose.log",
+            __file__,
+        )
