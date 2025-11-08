@@ -10,9 +10,9 @@ import pytest
 class AcceptanceTest:
     def run_test(self, cli_options: list[str], expected_output_path: str, test_file_path: str):
         test_folder = Path(test_file_path).parent
-        expected_output_path: Path = test_folder.joinpath(expected_output_path)
+        expected_output_path_absolute: Path = test_folder.joinpath(expected_output_path)
 
-        with expected_output_path.open() as f:
+        with expected_output_path_absolute.open() as f:
             expected_output = f.read()
 
         command = [sys.executable, "-m", "robotframework_find_unused"]

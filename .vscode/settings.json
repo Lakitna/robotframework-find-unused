@@ -4,7 +4,7 @@
         "editor.defaultFormatter": "charliermarsh.ruff"
     },
     "[markdown]": {
-        "editor.defaultFormatter": "DavidAnson.vscode-markdownlint",
+        "editor.defaultFormatter": "yzhang.markdown-all-in-one",
         "editor.codeActionsOnSave": {
             "source.fixAll.markdownlint": "always",
         },

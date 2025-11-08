@@ -3,21 +3,21 @@ Gathering files with LibDoc...
     1 files of type RESOURCE
     1 files of type SUITE
 Gathering keyword definitions from files...
-[ DONE ] Found 7 keyword definitions
-    6 keyword definitions of type CUSTOM_RESOURCE
+[ DONE ] Found 9 keyword definitions
+    8 keyword definitions of type CUSTOM_RESOURCE
     1 keyword definitions of type CUSTOM_SUITE
 Gathering downloaded library keyword names...
 [ DONE ] Found 1 downloaded libraries
     BuiltIn: 107 keywords
 Counting keyword usage with RoboCop...
-[ DONE ] Found 9 unique keywords
-    6 keyword definitions of type CUSTOM_RESOURCE
+[ DONE ] Found 11 unique keywords
+    8 keyword definitions of type CUSTOM_RESOURCE
     1 keyword definitions of type CUSTOM_SUITE
     1 keyword definitions of type LIBRARY
     1 keyword definitions of type UNKNOWN
-[ DONE ] Processed 19 keyword calls
-    10 keyword calls of keyword type CUSTOM_RESOURCE
-    7 keyword calls of keyword type LIBRARY
+[ DONE ] Processed 23 keyword calls
+    12 keyword calls of keyword type CUSTOM_RESOURCE
+    9 keyword calls of keyword type LIBRARY
     1 keyword calls of keyword type CUSTOM_SUITE
     1 keyword calls of keyword type UNKNOWN
 Excluding downloaded library keywords
