@@ -2,6 +2,8 @@
 
 from typing import TYPE_CHECKING
 
+import click
+import robot.errors
 from robocop.linter.utils.misc import normalize_robot_name
 from robot.api.parsing import LibraryImport, ModelVisitor
 from robot.libdoc import LibraryDocumentation
@@ -49,7 +51,21 @@ class LibraryImportVisitor(ModelVisitor):
             # Already found it
             return
 
-        lib: LibraryDoc = LibraryDocumentation(lib_name)
+        try:
+            lib: LibraryDoc = LibraryDocumentation(lib_name)
+        except robot.errors.DataError:
+            click.echo(
+                f"{ERROR_MARKER} Could not gather keywords from library {lib_name}",
+                err=True,
+            )
+
+            self.downloaded_libraries[normalized_lib_name] = LibraryData(
+                name=lib_name,
+                name_normalized=normalized_lib_name,
+                keywords=[],
+                keyword_names_normalized=set(),
+            )
+            return
 
         keywords = [libdoc_keyword_to_keyword_data(kw, "LIBRARY") for kw in lib.keywords]
         keyword_names_normalized = {kw.normalized_name for kw in keywords}

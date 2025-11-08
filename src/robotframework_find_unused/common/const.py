@@ -5,6 +5,7 @@ import click
 from robot.libdocpkg.model import ArgumentSpec
 
 DONE_MARKER = "[ " + click.style("DONE", fg="green") + " ]"
+ERROR_MARKER = "[ " + click.style("ERROR", fg="red") + " ]"
 INDENT = "    "
 
 KeywordFilterOption: TypeAlias = Literal["include", "exclude", "only"]

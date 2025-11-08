@@ -69,7 +69,11 @@ def cli_step_get_downloaded_lib_keywords(robocop_config: ConfigManager, *, verbo
     click.echo(f"{DONE_MARKER} Found {len(downloaded_library)} downloaded libraries")
     if verbose:
         for lib in downloaded_library:
-            click.echo(f"{INDENT}{lib.name}: {len(lib.keywords)} keywords")
+            if len(lib.keywords) == 0:
+                # Import error
+                click.echo(f"{INDENT}{lib.name}: {ERROR_MARKER}")
+            else:
+                click.echo(f"{INDENT}{lib.name}: {len(lib.keywords)} keywords")
 
     return downloaded_library
 
