@@ -1,16 +1,18 @@
 Gathering files with LibDoc...
 [ DONE ] Found and processed 2 files
 Gathering keyword definitions from files...
-[ DONE ] Found 7 keyword definitions
+[ DONE ] Found 9 keyword definitions
 Gathering downloaded library keyword names...
 [ DONE ] Found 1 downloaded libraries
 Counting keyword usage with RoboCop...
-[ DONE ] Found 9 unique keywords
-[ DONE ] Processed 19 keyword calls
+[ DONE ] Found 11 unique keywords
+[ DONE ] Processed 23 keyword calls
 Excluding downloaded library keywords
 
 use_count	keyword_name
 0	keywords.Beautiful Keyword
+1	keywords.Keyword Setup Keyword
+1	keywords.Keyword Teardown Keyword
 1	keywords.Suite Setup Keyword
 1	keywords.Suite Teardown Keyword
 1	Test.Test Template Keyword

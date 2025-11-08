@@ -11,8 +11,16 @@ Test Teardown Keyword
 Suite Teardown Keyword
     No Operation
 
-Amazing Keyword
+Keyword Setup Keyword
     No Operation
+
+Keyword Teardown Keyword
+    No Operation
+
+Amazing Keyword
+    [Setup]  Keyword Setup Keyword
+    No Operation
+    [Teardown]  Keyword Teardown Keyword
 
 Beautiful Keyword
     Amazing Keyword
