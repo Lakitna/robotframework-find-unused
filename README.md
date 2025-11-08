@@ -52,7 +52,7 @@ robotunused keywords --help
 #### Available options
 
 | flag                 | option                         | default   | description                                                                          |
-|----------------------|--------------------------------|-----------|--------------------------------------------------------------------------------------|
+| -------------------- | ------------------------------ | --------- | ------------------------------------------------------------------------------------ |
 | `-c`, `--show-count` |                                |           | Output usage count for all keywords instead of only unused keywords                  |
 | `-f`, `--filter`     | Globlike pattern               |           | Only output keywords who's name match the glob pattern. Match without library prefix |
 | `-d`, `--deprecated` | `include` / `exclude` / `only` | `include` | How to output deprecated keywords                                                    |
@@ -81,7 +81,7 @@ robotunused arguments --help
 #### Available options
 
 | flag                 | option                         | default   | description                                                                                        |
-|----------------------|--------------------------------|-----------|----------------------------------------------------------------------------------------------------|
+| -------------------- | ------------------------------ | --------- | -------------------------------------------------------------------------------------------------- |
 | `-c`, `--show-count` |                                |           | Show usage count for all arguments instead of only unused arguments                                |
 | `-f`, `--filter`     | Globlike pattern               |           | Only output arguments for keywords who's name match the glob pattern. Match without library prefix |
 | `-d`, `--deprecated` | `include` / `exclude` / `only` | `include` | How to output deprecated keywords                                                                  |
@@ -111,7 +111,7 @@ robotunused returns --help
 #### Available options
 
 | flag                 | option                         | default   | description                                                                          |
-|----------------------|--------------------------------|-----------|--------------------------------------------------------------------------------------|
+| -------------------- | ------------------------------ | --------- | ------------------------------------------------------------------------------------ |
 | `-c`, `--show-count` |                                |           | Output usage count for all keywords instead of only keywords with unused returns     |
 | `-f`, `--filter`     | Globlike pattern               |           | Only output keywords who's name match the glob pattern. Match without library prefix |
 | `-d`, `--deprecated` | `include` / `exclude` / `only` | `include` | How to output deprecated keywords                                                    |
@@ -138,7 +138,7 @@ robotunused variables --help
 #### Available options
 
 | flag                 | option           | default | description                                                                                         |
-|----------------------|------------------|---------|-----------------------------------------------------------------------------------------------------|
+| -------------------- | ---------------- | ------- | --------------------------------------------------------------------------------------------------- |
 | `-c`, `--show-count` |                  |         | Show usage count for all variables instead of only unused variables                                 |
 | `-f`, `--filter`     | Globlike pattern |         | Only show variables who's name match the glob pattern. Matching without {brackets} and $@& prefixes |
 | `-v`, `--verbose`    |                  |         | Show more log output                                                                                |
