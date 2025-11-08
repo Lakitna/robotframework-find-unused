@@ -89,14 +89,16 @@ class KeywordVisitor(ModelVisitor):
 
         return self.generic_visit(node)
 
-    def visit_Setup(self, node: Setup):
+    def visit_Setup(self, node: Setup):  # noqa: N802
+        """Count keyword use in test/task/keyword setup"""
         keyword_name_token = node.get_token(Token.NAME)
         if keyword_name_token:
             self._count_keyword_call(str(keyword_name_token), args=[])
 
         return self.generic_visit(node)
 
-    def visit_Teardown(self, node: Teardown):
+    def visit_Teardown(self, node: Teardown):  # noqa: N802
+        """Count keyword use in test/task/keyword teardown"""
         keyword_name_token = node.get_token(Token.NAME)
         if keyword_name_token:
             self._count_keyword_call(str(keyword_name_token), args=[])
