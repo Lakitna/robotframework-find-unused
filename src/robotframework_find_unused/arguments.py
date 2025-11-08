@@ -6,7 +6,7 @@ import fnmatch
 from dataclasses import dataclass
 
 import click
-from robocop import Config
+from robocop.config import ConfigManager
 
 from robotframework_find_unused.common.cli import (
     cli_count_keyword_uses,
@@ -37,8 +37,7 @@ def cli_arguments(file_path: str, options: ArgumentsOptions):
     """
     Entry point for the CLI command
     """
-    robocop_config = Config()
-    robocop_config.paths = [file_path]
+    robocop_config = ConfigManager(sources=[file_path])
 
     files = cli_step_gather_files(robocop_config, verbose=options.verbose)
     keywords = cli_step_get_keyword_definitions(files, verbose=options.verbose)

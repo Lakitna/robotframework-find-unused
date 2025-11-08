@@ -2,19 +2,18 @@
 
 from typing import TYPE_CHECKING
 
-from robocop.checkers import VisitorChecker
-from robocop.utils import normalize_robot_name
-from robot.api.parsing import LibraryImport
+from robocop.linter.utils.misc import normalize_robot_name
+from robot.api.parsing import LibraryImport, ModelVisitor
 from robot.libdoc import LibraryDocumentation
 
-from robotframework_find_unused.common.const import LibraryData
+from robotframework_find_unused.common.const import ERROR_MARKER, LibraryData
 from robotframework_find_unused.common.convert import libdoc_keyword_to_keyword_data
 
 if TYPE_CHECKING:
     from robot.libdocpkg.model import LibraryDoc
 
 
-class LibraryImportVisitor(VisitorChecker):
+class LibraryImportVisitor(ModelVisitor):
     """
     Gather downloaded library imports
 

@@ -1,10 +1,15 @@
 from collections.abc import Callable
 
 import click
-from robocop import Config
+from robocop.config import ConfigManager
 from robot.libdocpkg.model import LibraryDoc
 
-from robotframework_find_unused.common.const import DONE_MARKER, INDENT, KeywordFilterOption
+from robotframework_find_unused.common.const import (
+    DONE_MARKER,
+    ERROR_MARKER,
+    INDENT,
+    KeywordFilterOption,
+)
 from robotframework_find_unused.common.gather_files import find_files_with_libdoc
 from robotframework_find_unused.common.gather_keywords import (
     KeywordData,
@@ -16,13 +21,14 @@ from robotframework_find_unused.common.robocop_visit import visit_files_with_rob
 from robotframework_find_unused.visitors.library_import import LibraryData, LibraryImportVisitor
 
 
-def cli_step_gather_files(robocop_config: Config, *, verbose: bool):
+def cli_step_gather_files(robocop_config: ConfigManager, *, verbose: bool):
     """
     Gather files with libdoc and keep the user up-to-date on progress
     """
     click.echo("Gathering files with LibDoc...")
 
-    robocop_config.filetypes = {".robot", ".resource", ".py"}
+    # TODO:
+    # robocop_config.filetypes = {".robot", ".resource", ".py"}
     files = find_files_with_libdoc(robocop_config)
 
     click.echo(f"{DONE_MARKER} Found and processed {len(files)} files")
@@ -46,7 +52,7 @@ def cli_step_get_keyword_definitions(files: list[LibraryDoc], *, verbose: bool):
     return keywords
 
 
-def cli_step_get_downloaded_lib_keywords(robocop_config: Config, *, verbose: bool):
+def cli_step_get_downloaded_lib_keywords(robocop_config: ConfigManager, *, verbose: bool):
     """
     Gather keyword definitions from imported downloaded libraries and show progress
 
@@ -54,7 +60,8 @@ def cli_step_get_downloaded_lib_keywords(robocop_config: Config, *, verbose: boo
     """
     click.echo("Gathering downloaded library keyword names...")
 
-    robocop_config.filetypes = {".robot", ".resource"}
+    # TODO:
+    # robocop_config.filetypes = {".robot", ".resource"}
     visitor = LibraryImportVisitor()
     visit_files_with_robocop(robocop_config, visitor)
     downloaded_library = list(visitor.downloaded_libraries.values())
@@ -68,7 +75,7 @@ def cli_step_get_downloaded_lib_keywords(robocop_config: Config, *, verbose: boo
 
 
 def cli_count_keyword_uses(
-    robocop_config: Config,
+    robocop_config: ConfigManager,
     keywords: list[KeywordData],
     downloaded_library_keywords: list[LibraryData],
     *,
@@ -100,7 +107,7 @@ def cli_count_keyword_uses(
 
 
 def cli_count_variable_uses(
-    robocop_config: Config,
+    robocop_config: ConfigManager,
     *,
     verbose: bool,
 ):

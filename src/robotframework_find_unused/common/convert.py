@@ -1,6 +1,6 @@
 from typing import Any, Literal, cast
 
-from robocop.utils import normalize_robot_name
+from robocop.linter.utils.misc import normalize_robot_name
 from robot.libdocpkg.model import KeywordDoc
 
 from robotframework_find_unused.common.const import KeywordData

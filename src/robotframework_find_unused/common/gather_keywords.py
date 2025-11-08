@@ -1,4 +1,4 @@
-from robocop import Config
+from robocop.config import ConfigManager
 from robot.libdocpkg.model import LibraryDoc
 
 from robotframework_find_unused.common.const import KeywordData, LibraryData
@@ -24,7 +24,7 @@ def get_keyword_definitions_from_files(files: list[LibraryDoc]):
 
 
 def count_keyword_uses(
-    robocop_config: Config,
+    robocop_config: ConfigManager,
     keywords: list[KeywordData],
     downloaded_library_keywords: list[LibraryData],
 ):
