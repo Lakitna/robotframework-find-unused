@@ -1,7 +1,7 @@
 from collections.abc import Callable
 
 import click
-from robocop.config import ConfigManager
+from robocop.config import ConfigManager, FileFiltersOptions
 from robot.libdocpkg.model import LibraryDoc
 
 from robotframework_find_unused.common.const import (
@@ -27,8 +27,10 @@ def cli_step_gather_files(robocop_config: ConfigManager, *, verbose: bool):
     """
     click.echo("Gathering files with LibDoc...")
 
-    # TODO:
-    # robocop_config.filetypes = {".robot", ".resource", ".py"}
+    robocop_config = _update_robocop_config_file_extensions(
+        robocop_config,
+        {"*.resource", "*.robot", "*.py"},
+    )
     files = find_files_with_libdoc(robocop_config)
 
     click.echo(f"{DONE_MARKER} Found and processed {len(files)} files")
@@ -60,8 +62,10 @@ def cli_step_get_downloaded_lib_keywords(robocop_config: ConfigManager, *, verbo
     """
     click.echo("Gathering downloaded library keyword names...")
 
-    # TODO:
-    # robocop_config.filetypes = {".robot", ".resource"}
+    robocop_config = _update_robocop_config_file_extensions(
+        robocop_config,
+        {"*.resource", "*.robot"},
+    )
     visitor = LibraryImportVisitor()
     visit_files_with_robocop(robocop_config, visitor)
     downloaded_library = list(visitor.downloaded_libraries.values())
@@ -233,3 +237,15 @@ def cli_filter_keywords_by_option(
 
     msg = f"Unexpected value '{option}' when filtering {descriptor} keywords"
     raise TypeError(msg)
+
+
+def _update_robocop_config_file_extensions(
+    config: ConfigManager, extensions: set[str]
+) -> ConfigManager:
+    """Set includes file extensions in Robocop config"""
+    if config.default_config.file_filters:
+        config.default_config.file_filters.default_include = extensions
+    else:
+        config.default_config.file_filters = FileFiltersOptions(default_include=extensions)
+
+    return config
