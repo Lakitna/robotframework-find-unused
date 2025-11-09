@@ -1,0 +1,15 @@
+Gathering variables usage with RoboCop...
+[ DONE ] Found 10 unique variables defined in a variables section
+    5 unused variables (50.0%)
+Variables section variables usage metrics:
+    Total	5 times
+    Average	0.5 times per variable
+
+Found 5 unused variables:
+  ${string_unused}
+  ${int_unused}
+  ${float_unused}
+  @{list_unused}
+  &{dict_unused}
+
+Found 5 unused variables

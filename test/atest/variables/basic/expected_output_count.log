@@ -1,0 +1,14 @@
+Gathering variables usage with RoboCop...
+[ DONE ] Found 10 unique variables defined in a variables section
+
+use_count	variable
+0	${string_unused}
+0	${int_unused}
+0	${float_unused}
+0	@{list_unused}
+0	&{dict_unused}
+1	${string_used}
+1	${int_used}
+1	${float_used}
+1	@{list_used}
+1	&{dict_used}
