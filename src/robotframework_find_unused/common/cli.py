@@ -240,7 +240,8 @@ def cli_filter_keywords_by_option(
 
 
 def _update_robocop_config_file_extensions(
-    config: ConfigManager, extensions: set[str]
+    config: ConfigManager,
+    extensions: set[str],
 ) -> ConfigManager:
     """Set includes file extensions in Robocop config"""
     if config.default_config.file_filters:
