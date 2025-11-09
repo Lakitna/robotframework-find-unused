@@ -20,6 +20,7 @@ from robot.api.parsing import (
     TestTeardown,
     Token,
 )
+from robot.libdocpkg.model import ArgumentSpec
 from robot.parsing.model.blocks import Block
 from robot.running.arguments.argumentmapper import DefaultValue
 
@@ -89,14 +90,16 @@ class KeywordVisitor(VisitorChecker):
 
         return self.generic_visit(node)
 
-    def visit_Setup(self, node: Setup):
+    def visit_Setup(self, node: Setup):  # noqa: N802
+        """Count keyword use in test/task/keyword setup"""
         keyword_name_token = node.get_token(Token.NAME)
         if keyword_name_token:
             self._count_keyword_call(str(keyword_name_token), args=[])
 
         return self.generic_visit(node)
 
-    def visit_Teardown(self, node: Teardown):
+    def visit_Teardown(self, node: Teardown):  # noqa: N802
+        """Count keyword use in test/task/keyword teardown"""
         keyword_name_token = node.get_token(Token.NAME)
         if keyword_name_token:
             self._count_keyword_call(str(keyword_name_token), args=[])
@@ -372,23 +375,33 @@ class KeywordVisitor(VisitorChecker):
             library="",
         )
 
-    def _count_keyword_call_args(self, kw: KeywordData, call_args: Iterable[str]) -> None:
-        if not kw.arguments or kw.argument_use_count is None:
-            # This is a downloaded library keyword. We don't care about the args
-            return
-
+    def _parse_args(
+        self,
+        call_args: Iterable[str],
+        kw_args: ArgumentSpec,
+    ) -> tuple[list[str], list[tuple[str, Any]]]:
         positional_args: list[str] = []
         named_args: list[tuple[str, Any]] = []
 
         for arg in call_args:
-            if "=" in arg:
-                (named_arg_name, named_arg_val) = arg.split("=", 1)
-                if named_arg_name in kw.arguments.argument_names:
-                    # It's a correct named argument
-                    named_args.append((named_arg_name, named_arg_val))
-                    continue
+            if "=" not in arg:
+                positional_args.append(arg)
+                continue
 
-            positional_args.append(arg)
+            (named_arg_name, named_arg_val) = arg.split("=", 1)
+            if named_arg_name in kw_args.argument_names:
+                # It's a correct named argument
+                named_args.append((named_arg_name, named_arg_val))
+            else:
+                positional_args.append(arg)
+
+        return (positional_args, named_args)
+
+    def _count_keyword_call_args(self, kw: KeywordData, call_args: Iterable[str]) -> None:
+        if not kw.arguments or kw.argument_use_count is None:
+            # This is a downloaded library keyword. We don't care about the args
+            return
+        (positional_args, named_args) = self._parse_args(call_args, kw.arguments)
 
         (called_with_args, called_with_kwargs) = kw.arguments.map(
             positional_args,
@@ -417,7 +430,7 @@ class KeywordVisitor(VisitorChecker):
                 continue
             kw.argument_use_count[name] += 1
 
-    def _get_keyword_returns(self, node: Keyword | Block) -> bool:
+    def _get_keyword_returns(self, node: Keyword | Block) -> bool:  # noqa: C901
         """
         Return if keyword returns a value or not.
 

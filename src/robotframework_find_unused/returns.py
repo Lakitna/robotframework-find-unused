@@ -96,7 +96,7 @@ def _cli_log_results(keywords: list[KeywordData], options: ReturnOptions) -> Non
             filter(
                 lambda kw: fnmatch.fnmatchcase(kw.name.lower(), pattern),
                 keywords,
-            )
+            ),
         )
 
     click.echo()
