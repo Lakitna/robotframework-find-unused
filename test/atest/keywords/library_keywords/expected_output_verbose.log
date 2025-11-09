@@ -1,0 +1,19 @@
+Gathering files with LibDoc...
+[ DONE ] Found and processed 1 files
+    1 files of type SUITE
+Gathering keyword definitions from files...
+[ DONE ] Found 0 keyword definitions
+Gathering downloaded library keyword names...
+[ DONE ] Found 3 downloaded libraries
+    BuiltIn: 107 keywords
+    Collections: 43 keywords
+    String: 32 keywords
+Counting keyword usage with RoboCop...
+[ DONE ] Found 2 unique keywords
+    1 keyword definitions of type LIBRARY
+    1 keyword definitions of type UNKNOWN
+[ DONE ] Processed 2 keyword calls
+    1 keyword calls of keyword type LIBRARY
+    1 keyword calls of keyword type UNKNOWN
+
+Found 0 unused keywords:

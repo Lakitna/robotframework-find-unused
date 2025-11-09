@@ -1,5 +1,5 @@
 *** Settings ***
-Resource    ./keywords.resource
+Library    ./keywords.py
 
 
 *** Test Cases ***

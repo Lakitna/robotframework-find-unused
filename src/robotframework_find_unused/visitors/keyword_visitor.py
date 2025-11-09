@@ -1,3 +1,6 @@
+# pyright: reportPrivateImportUsage=false
+
+from collections.abc import Iterable
 from dataclasses import dataclass
 from typing import Any, Literal
 
@@ -6,12 +9,18 @@ from robocop.utils import normalize_robot_name
 from robot.api.parsing import (
     Keyword,
     KeywordCall,
+    Setup,
     SuiteSetup,
     SuiteTeardown,
+    Teardown,
+    Template,
+    TemplateArguments,
+    TestCase,
     TestSetup,
     TestTeardown,
     Token,
 )
+from robot.libdocpkg.model import ArgumentSpec
 from robot.parsing.model.blocks import Block
 from robot.running.arguments.argumentmapper import DefaultValue
 
@@ -81,6 +90,22 @@ class KeywordVisitor(VisitorChecker):
 
         return self.generic_visit(node)
 
+    def visit_Setup(self, node: Setup):  # noqa: N802
+        """Count keyword use in test/task/keyword setup"""
+        keyword_name_token = node.get_token(Token.NAME)
+        if keyword_name_token:
+            self._count_keyword_call(str(keyword_name_token), args=[])
+
+        return self.generic_visit(node)
+
+    def visit_Teardown(self, node: Teardown):  # noqa: N802
+        """Count keyword use in test/task/keyword teardown"""
+        keyword_name_token = node.get_token(Token.NAME)
+        if keyword_name_token:
+            self._count_keyword_call(str(keyword_name_token), args=[])
+
+        return self.generic_visit(node)
+
     def visit_TestSetup(self, node: TestSetup):  # noqa: N802
         """Count keyword use in test setup"""
         self._count_keyword_call(node.name, node.args)
@@ -102,6 +127,25 @@ class KeywordVisitor(VisitorChecker):
     def visit_SuiteTeardown(self, node: SuiteTeardown):  # noqa: N802
         """Count keyword use in suite teardown"""
         self._count_keyword_call(node.name, node.args)
+
+    def visit_TestCase(self, node: TestCase):  # noqa: N802
+        """Count templated test cases"""
+        template_keyword = None
+        template_args_set = []
+        for child in node.body:
+            if isinstance(child, Template):
+                template_keyword = str(child.get_token(Token.NAME))
+                continue
+            if isinstance(child, TemplateArguments):
+                args = child.get_tokens(Token.ARGUMENT)
+                args = [str(arg) for arg in args]
+                template_args_set.append(args)
+                continue
+
+        if template_keyword is not None:
+            self._count_keyword_call(template_keyword, ())
+            for args in template_args_set:
+                self._count_keyword_call(template_keyword, args, count_keyword=False)
 
         return self.generic_visit(node)
 
@@ -131,9 +175,10 @@ class KeywordVisitor(VisitorChecker):
     def _count_keyword_call(
         self,
         name: str,
-        args: tuple[str],
+        args: Iterable[str],
         *,
         return_value_assigned: bool = False,
+        count_keyword: bool = True,
     ) -> None:
         """
         Count the keyword.
@@ -141,7 +186,8 @@ class KeywordVisitor(VisitorChecker):
         For keywords that take other keywords as arguments: Recursively handle inner keyword.
         """
         keyword = self._get_keyword_data(name)
-        keyword.use_count += 1
+        if count_keyword:
+            keyword.use_count += 1
 
         if return_value_assigned:
             keyword.return_use_count += 1
@@ -150,14 +196,11 @@ class KeywordVisitor(VisitorChecker):
         for inner in inner_keywords:
             self._count_keyword_call(inner.keyword, inner.args)
 
-        if keyword.argument_use_count is None:
-            # This is a downloaded library keyword. We don't care about the args
-            return
         self._count_keyword_call_args(keyword, args)
 
     def _get_keyword_reference_in_argument(
         self,
-        args: tuple[str],
+        args: Iterable[str],
         keyword: KeywordData,
     ) -> list[KeywordCallData]:
         """
@@ -169,6 +212,8 @@ class KeywordVisitor(VisitorChecker):
         Returns a list of tuples where (inner_keywor_name, inner_keyword_arguments)
         """
         inner_keywords: list[KeywordCallData] = []
+
+        args = tuple(a for a in args)
         for i, arg in enumerate(args):
             arg_value = self._argument_is_keyword_reference(arg, i, keyword)
             if arg_value is False:
@@ -256,7 +301,7 @@ class KeywordVisitor(VisitorChecker):
         self,
         call: KeywordCallData,
         duplicate_call: KeywordCallData,
-    ) -> tuple[str]:
+    ) -> tuple[str, ...]:
         """
         Deduplicate arguments of the first keyword call.
 
@@ -330,19 +375,33 @@ class KeywordVisitor(VisitorChecker):
             library="",
         )
 
-    def _count_keyword_call_args(self, kw: KeywordData, call_args: tuple[str]) -> None:
+    def _parse_args(
+        self,
+        call_args: Iterable[str],
+        kw_args: ArgumentSpec,
+    ) -> tuple[list[str], list[tuple[str, Any]]]:
         positional_args: list[str] = []
         named_args: list[tuple[str, Any]] = []
 
         for arg in call_args:
-            if "=" in arg:
-                (named_arg_name, named_arg_val) = arg.split("=", 1)
-                if named_arg_name in kw.arguments.argument_names:
-                    # It's a correct named argument
-                    named_args.append((named_arg_name, named_arg_val))
-                    continue
+            if "=" not in arg:
+                positional_args.append(arg)
+                continue
 
-            positional_args.append(arg)
+            (named_arg_name, named_arg_val) = arg.split("=", 1)
+            if named_arg_name in kw_args.argument_names:
+                # It's a correct named argument
+                named_args.append((named_arg_name, named_arg_val))
+            else:
+                positional_args.append(arg)
+
+        return (positional_args, named_args)
+
+    def _count_keyword_call_args(self, kw: KeywordData, call_args: Iterable[str]) -> None:
+        if not kw.arguments or kw.argument_use_count is None:
+            # This is a downloaded library keyword. We don't care about the args
+            return
+        (positional_args, named_args) = self._parse_args(call_args, kw.arguments)
 
         (called_with_args, called_with_kwargs) = kw.arguments.map(
             positional_args,
@@ -371,7 +430,7 @@ class KeywordVisitor(VisitorChecker):
                 continue
             kw.argument_use_count[name] += 1
 
-    def _get_keyword_returns(self, node: Keyword) -> bool:
+    def _get_keyword_returns(self, node: Keyword | Block) -> bool:  # noqa: C901
         """
         Return if keyword returns a value or not.
 
@@ -395,12 +454,15 @@ class KeywordVisitor(VisitorChecker):
                 continue
 
             if token.type == Token.KEYWORD:
-                # Node is special return keywords `Return From Keyword` and `Return From Keyword If`
                 called_keyword_name = token.get_token(Token.KEYWORD)
+                if not called_keyword_name:
+                    continue
+
+                # Node is special return keywords `Return From Keyword` and `Return From Keyword If`
+
                 keyword_name_normalized = normalize_robot_name(
                     called_keyword_name.value,
                 )
-
                 if keyword_name_normalized not in (
                     "returnfromkeyword",
                     "returnfromkeywordif",

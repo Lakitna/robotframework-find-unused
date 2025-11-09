@@ -56,7 +56,7 @@ def _cli_log_results(keywords: list[KeywordData], options: ArgumentsOptions) -> 
     keywords = cli_filter_keywords_by_option(
         keywords,
         options.deprecated_keywords,
-        lambda kw: kw.deprecated,
+        lambda kw: kw.deprecated or False,
         "deprecated",
     )
 
@@ -85,9 +85,11 @@ def _cli_log_results(keywords: list[KeywordData], options: ArgumentsOptions) -> 
         click.echo(f"Only showing keywords matching '{options.keyword_filter_glob}'")
 
         pattern = options.keyword_filter_glob.lower()
-        keywords = filter(
-            lambda kw: fnmatch.fnmatchcase(kw.name.lower(), pattern),
-            keywords,
+        keywords = list(
+            filter(
+                lambda kw: fnmatch.fnmatchcase(kw.name.lower(), pattern),
+                keywords,
+            ),
         )
 
     click.echo()
@@ -106,7 +108,7 @@ def cli_log_results_unused(kw: KeywordData):
     """
     Output a keywords arguments if they're unused
     """
-    if len(kw.arguments.argument_names) == 0:
+    if not kw.arguments or len(kw.arguments.argument_names) == 0 or not kw.argument_use_count:
         return
 
     unused_args = {}
@@ -139,14 +141,17 @@ def cli_log_results_show_count(kw: KeywordData):
 
     click.echo(pretty_kw_name(kw))
 
-    if len(arguments) == 0:
+    if not arguments or len(arguments) == 0:
         click.echo(INDENT + click.style("Keyword has 0 arguments", fg="bright_black"))
-    else:
-        click.echo(f"{INDENT}use_count\targument")
+        click.echo()
+        return
+
+    click.echo(f"{INDENT}use_count\targument")
 
     for arg, use_count in arguments.items():
-        if arg in kw.arguments.defaults:
-            click.echo(f"{INDENT}{use_count}\t\t{arg}={kw.arguments.defaults[arg]}")
+        kw_args = kw.arguments
+        if kw_args is not None and arg in kw_args.defaults:
+            click.echo(f"{INDENT}{use_count}\t\t{arg}={kw_args.defaults[arg]}")
         else:
             click.echo(f"{INDENT}{use_count}\t\t{arg}")
 

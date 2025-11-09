@@ -60,7 +60,7 @@ def _cli_log_results(keywords: list[KeywordData], options: KeywordOptions) -> No
     keywords = cli_filter_keywords_by_option(
         keywords,
         options.deprecated_keywords,
-        lambda kw: kw.deprecated,
+        lambda kw: kw.deprecated or False,
         "deprecated",
     )
 
@@ -82,9 +82,11 @@ def _cli_log_results(keywords: list[KeywordData], options: KeywordOptions) -> No
         click.echo(f"Only showing keywords matching '{options.keyword_filter_glob}'")
 
         pattern = options.keyword_filter_glob.lower()
-        keywords = filter(
-            lambda kw: fnmatch.fnmatchcase(kw.name.lower(), pattern),
-            keywords,
+        keywords = list(
+            filter(
+                lambda kw: fnmatch.fnmatchcase(kw.name.lower(), pattern),
+                keywords,
+            ),
         )
 
     click.echo()

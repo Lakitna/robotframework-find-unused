@@ -1,4 +1,7 @@
+# pyright: reportPrivateImportUsage=false
+
 import re
+from collections.abc import Iterable
 
 from robocop.checkers import VisitorChecker
 from robot.api.parsing import (
@@ -95,7 +98,7 @@ class VariableVisitor(VisitorChecker):
 
         return self.generic_visit(node)
 
-    def visit_For(self, node: For):  # noqa: N802
+    def visit_For(self, node: For):  # pyright: ignore[reportIncompatibleMethodOverride] # noqa: N802
         """
         Look for used variables in for loop conditions.
         """
@@ -103,7 +106,7 @@ class VariableVisitor(VisitorChecker):
 
         return self.generic_visit(node)
 
-    def visit_If(self, node: If):  # noqa: N802
+    def visit_If(self, node: If):  # pyright: ignore[reportIncompatibleMethodOverride] # noqa: N802
         """
         Look for used variables in if/else/elseif statement conditions.
         """
@@ -134,7 +137,7 @@ class VariableVisitor(VisitorChecker):
 
         return used_vars
 
-    def _count_used_vars_in_args(self, args: list[str]) -> None:
+    def _count_used_vars_in_args(self, args: Iterable[str]) -> None:
         """
         Count used variables found in a list of arguments
         """
@@ -143,7 +146,7 @@ class VariableVisitor(VisitorChecker):
         for name, formatted_name in used_vars:
             self._count_variable_use(name, formatted_name)
 
-    def _get_used_vars_in_args(self, args: list[str]) -> list[str]:
+    def _get_used_vars_in_args(self, args: Iterable[str]) -> list[str]:
         """
         Return a list of used variables in a given list of strings
         """

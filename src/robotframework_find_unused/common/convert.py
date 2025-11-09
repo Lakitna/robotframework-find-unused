@@ -1,4 +1,4 @@
-from typing import Literal
+from typing import Any, Literal, cast
 
 from robocop.utils import normalize_robot_name
 from robot.libdocpkg.model import KeywordDoc
@@ -20,7 +20,7 @@ def libdoc_keyword_to_keyword_data(
     return KeywordData(
         normalized_name=normalize_robot_name(libdoc.name),
         name=libdoc.name,
-        library=libdoc.parent.name,
+        library=cast(Any, libdoc.parent).name,
         deprecated=(libdoc.deprecated is True),
         private=("robot:private" in libdoc.tags),
         argument_use_count=argument_use_count,

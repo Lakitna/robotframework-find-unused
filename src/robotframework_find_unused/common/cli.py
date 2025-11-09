@@ -22,7 +22,7 @@ def cli_step_gather_files(robocop_config: Config, *, verbose: bool):
     """
     click.echo("Gathering files with LibDoc...")
 
-    robocop_config.filetypes = [".robot", ".resource", ".py"]
+    robocop_config.filetypes = {".robot", ".resource", ".py"}
     files = find_files_with_libdoc(robocop_config)
 
     click.echo(f"{DONE_MARKER} Found and processed {len(files)} files")
@@ -54,7 +54,7 @@ def cli_step_get_downloaded_lib_keywords(robocop_config: Config, *, verbose: boo
     """
     click.echo("Gathering downloaded library keyword names...")
 
-    robocop_config.filetypes = [".robot", ".resource"]
+    robocop_config.filetypes = {".robot", ".resource"}
     visitor = LibraryImportVisitor()
     visit_files_with_robocop(robocop_config, visitor)
     downloaded_library = list(visitor.downloaded_libraries.values())
@@ -158,14 +158,14 @@ def log_keyword_stats(keywords: list[KeywordData]):
     """
     Output details on the given keywords to the user
     """
-    kw_type_count = {}
+    kw_type_count: dict[str, int] = {}
     for kw in keywords:
         if kw.type not in kw_type_count:
             kw_type_count[kw.type] = 0
         kw_type_count[kw.type] += 1
 
-    for kw_type in sorted(kw_type_count, key=kw_type_count.get, reverse=True):
-        click.echo(f"{INDENT}{kw_type_count[kw_type]} keyword definitions of type {kw_type}")
+    for kw_type, count in sorted(kw_type_count.items(), key=lambda x: x[1], reverse=True):
+        click.echo(f"{INDENT}{count} keyword definitions of type {kw_type}")
 
 
 def log_keyword_call_stats(keywords: list[KeywordData]):
@@ -178,9 +178,9 @@ def log_keyword_call_stats(keywords: list[KeywordData]):
             type_call_count[kw.type] = 0
         type_call_count[kw.type] += kw.use_count
 
-    for kw_type in sorted(type_call_count, key=type_call_count.get, reverse=True):
+    for kw_type, count in sorted(type_call_count.items(), key=lambda x: x[1], reverse=True):
         click.echo(
-            f"{INDENT}{type_call_count[kw_type]} keyword calls of keyword type {kw_type}",
+            f"{INDENT}{count} keyword calls of keyword type {kw_type}",
         )
 
 
@@ -194,8 +194,8 @@ def log_file_stats(files: list[LibraryDoc]):
             file_type_count[file.type] = 0
         file_type_count[file.type] += 1
 
-    for file_type in sorted(file_type_count, key=file_type_count.get, reverse=True):
-        click.echo(f"{INDENT}{file_type_count[file_type]} files of type {file_type}")
+    for file_type, count in sorted(file_type_count.items(), key=lambda x: x[1], reverse=True):
+        click.echo(f"{INDENT}{count} files of type {file_type}")
 
 
 def cli_filter_keywords_by_option(
@@ -207,18 +207,18 @@ def cli_filter_keywords_by_option(
     """
     Filter keywords on given condition function. Let the user know what was filtered.
     """
-    option = option.lower()
+    opt = option.lower()
 
-    if option == "include":
+    if opt == "include":
         return keywords
 
-    if option == "exclude":
+    if opt == "exclude":
         click.echo(f"Excluding {descriptor} keywords")
-        return filter(lambda kw: matcher_fn(kw) is False, keywords)
+        return list(filter(lambda kw: matcher_fn(kw) is False, keywords))
 
-    if option == "only":
+    if opt == "only":
         click.echo(f"Only showing {descriptor} keywords")
-        return filter(lambda kw: matcher_fn(kw) is True, keywords)
+        return list(filter(lambda kw: matcher_fn(kw) is True, keywords))
 
     msg = f"Unexpected value '{option}' when filtering {descriptor} keywords"
     raise TypeError(msg)

@@ -1,6 +1,6 @@
 *** Keywords ***
-Used as inner kw by Beautiful
-    No Operation
+Amazing Keyword With Return
+    RETURN    hello
 
 Beautiful
     [Arguments]    ${inner_keyword}    @{args}

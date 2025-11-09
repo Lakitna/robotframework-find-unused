@@ -9,5 +9,14 @@ Counting keyword usage with RoboCop...
 [ DONE ] Processed 23 keyword calls
 Excluding downloaded library keywords
 
-Found 1 unused keywords:
-  keywords.Beautiful Keyword
+use_count	keyword_name
+0	keywords.Beautiful Keyword
+1	keywords.Keyword Setup Keyword
+1	keywords.Keyword Teardown Keyword
+1	keywords.Suite Setup Keyword
+1	keywords.Suite Teardown Keyword
+1	Test.Test Template Keyword
+1	Undefined keyword
+2	keywords.Test Setup Keyword
+2	keywords.Test Teardown Keyword
+4	keywords.Amazing Keyword

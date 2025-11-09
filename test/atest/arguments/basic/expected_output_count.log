@@ -1,0 +1,15 @@
+Gathering files with LibDoc...
+[ DONE ] Found and processed 1 files
+Gathering keyword definitions from files...
+[ DONE ] Found 1 keyword definitions
+Counting keyword usage with RoboCop...
+[ DONE ] Found 2 unique keywords
+[ DONE ] Processed 3 keyword calls
+Excluding downloaded library keywords
+Excluding unused keywords
+
+Test.Keyword With Arguments
+    use_count	argument
+    2		required
+    0		optional_unsed=${True}
+    1		optional_used=${True}
