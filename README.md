@@ -147,7 +147,7 @@ robotunused variables --help
 
 I'm open to contributions. Please contact me in the issues.
 
-When contibuting, you'll need [Poetry](https://python-poetry.org/) to manage dependencies.
+When contributing, you'll need [Poetry](https://python-poetry.org/) to manage dependencies.
 
 Please ensure that you install the develop dependencies as well as the regular dependencies by
 running the following command:
