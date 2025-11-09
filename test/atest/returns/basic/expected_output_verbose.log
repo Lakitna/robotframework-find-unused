@@ -1,0 +1,20 @@
+Gathering files with LibDoc...
+[ DONE ] Found and processed 2 files
+    1 files of type RESOURCE
+    1 files of type SUITE
+Gathering keyword definitions from files...
+[ DONE ] Found 3 keyword definitions
+    3 keyword definitions of type CUSTOM_RESOURCE
+Counting keyword usage with RoboCop...
+[ DONE ] Found 5 unique keywords
+    3 keyword definitions of type CUSTOM_RESOURCE
+    2 keyword definitions of type UNKNOWN
+[ DONE ] Processed 8 keyword calls
+    6 keyword calls of keyword type CUSTOM_RESOURCE
+    2 keyword calls of keyword type UNKNOWN
+Excluding downloaded library keywords
+Excluding unused keywords
+Only showing returning keywords
+
+Found 1 unused keyword returns:
+  keywords.Beautiful Keyword With Unused Return

@@ -88,7 +88,7 @@ def _cli_log_results(keywords: list[KeywordData], options: ArgumentsOptions) -> 
             filter(
                 lambda kw: fnmatch.fnmatchcase(kw.name.lower(), pattern),
                 keywords,
-            )
+            ),
         )
 
     click.echo()
