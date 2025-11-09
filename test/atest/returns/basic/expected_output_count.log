@@ -1,0 +1,14 @@
+Gathering files with LibDoc...
+[ DONE ] Found and processed 2 files
+Gathering keyword definitions from files...
+[ DONE ] Found 3 keyword definitions
+Counting keyword usage with RoboCop...
+[ DONE ] Found 5 unique keywords
+[ DONE ] Processed 8 keyword calls
+Excluding downloaded library keywords
+Excluding unused keywords
+Only showing returning keywords
+
+return_use_count	keyword_name
+0	keywords.Beautiful Keyword With Unused Return
+2	keywords.Amazing Keyword With Used Return
