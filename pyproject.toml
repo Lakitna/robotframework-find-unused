@@ -15,7 +15,7 @@ requires-python = ">=3.10"
 dependencies = [
     "click (>=8.1.7,<9.0.0)",
     "robotframework (>=6.1.1)",
-    "robotframework-robocop (>=5.6.0)",
+    "robotframework-robocop (>=6.0.0)",
 ]
 
 [tool.poetry.group.dev.dependencies]

@@ -3,12 +3,12 @@
 import re
 from collections.abc import Iterable
 
-from robocop.checkers import VisitorChecker
 from robot.api.parsing import (
     Arguments,
     For,
     If,
     KeywordCall,
+    ModelVisitor,
     Variable,
     VariableSection,
 )
@@ -16,7 +16,7 @@ from robot.api.parsing import (
 from robotframework_find_unused.common.const import VariableData
 
 
-class VariableVisitor(VisitorChecker):
+class VariableVisitor(ModelVisitor):
     """
     Visit and count variable usage.
 

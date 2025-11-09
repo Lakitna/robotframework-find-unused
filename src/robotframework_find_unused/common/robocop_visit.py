@@ -1,16 +1,18 @@
-from robocop import Config, Robocop
-from robocop.checkers import VisitorChecker
+import robot.parsing
+from robocop.config import ConfigManager
 
 
-def visit_files_with_robocop(robocop_config: Config, visitor: VisitorChecker):
+def visit_files_with_robocop(
+    robocop_config: ConfigManager,
+    visitor: robot.parsing.model.ModelVisitor,
+):
     """
     Use Robocop to traverse files with a visitor.
 
     See Robocop/Robotframework docs on Visitor details.
     """
-    robocop = Robocop(config=robocop_config)
-    robocop.recognize_file_types()
+    file_paths = (path for path, _config in robocop_config.paths)
 
-    for file, file_model in robocop.files.items():
-        ast_node = file_model[1]
-        visitor.scan_file(ast_node, file, None)
+    for file_path in file_paths:
+        model = robot.parsing.get_model(file_path, data_only=True)
+        visitor.visit(model)

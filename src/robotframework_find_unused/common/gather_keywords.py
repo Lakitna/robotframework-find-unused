@@ -1,4 +1,4 @@
-from robocop import Config
+from robocop.config import ConfigManager
 from robot.libdocpkg.model import LibraryDoc
 
 from robotframework_find_unused.common.const import KeywordData, LibraryData
@@ -15,7 +15,14 @@ def get_keyword_definitions_from_files(files: list[LibraryDoc]):
     """
     keywords: list[KeywordData] = []
     for file in files:
-        file_type = "CUSTOM_" + file.type
+        if file.type == "SUITE":
+            file_type = "CUSTOM_SUITE"
+        elif file.type == "LIBRARY":
+            file_type = "CUSTOM_LIBRARY"
+        elif file.type == "RESOURCE":
+            file_type = "CUSTOM_RESOURCE"
+        else:
+            raise ValueError("Unexpected file type " + file.type)
 
         for keyword in file.keywords:
             keywords.append(libdoc_keyword_to_keyword_data(keyword, file_type))
@@ -24,7 +31,7 @@ def get_keyword_definitions_from_files(files: list[LibraryDoc]):
 
 
 def count_keyword_uses(
-    robocop_config: Config,
+    robocop_config: ConfigManager,
     keywords: list[KeywordData],
     downloaded_library_keywords: list[LibraryData],
 ):

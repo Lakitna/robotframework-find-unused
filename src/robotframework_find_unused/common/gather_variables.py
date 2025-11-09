@@ -1,10 +1,10 @@
-from robocop import Config
+from robocop.config import ConfigManager
 
 from robotframework_find_unused.common.robocop_visit import visit_files_with_robocop
 from robotframework_find_unused.visitors.variable import VariableVisitor
 
 
-def count_variable_uses(robocop_config: Config):
+def count_variable_uses(robocop_config: ConfigManager):
     """
     Walk through all robot files with RoboCop to count keyword uses.
     """

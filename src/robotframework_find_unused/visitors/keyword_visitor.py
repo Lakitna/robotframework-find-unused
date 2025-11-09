@@ -4,11 +4,11 @@ from collections.abc import Iterable
 from dataclasses import dataclass
 from typing import Any, Literal
 
-from robocop.checkers import VisitorChecker
-from robocop.utils import normalize_robot_name
+from robocop.linter.utils.misc import normalize_robot_name
 from robot.api.parsing import (
     Keyword,
     KeywordCall,
+    ModelVisitor,
     Setup,
     SuiteSetup,
     SuiteTeardown,
@@ -38,7 +38,7 @@ class KeywordCallData:
     args: tuple[str, ...]
 
 
-class KeywordVisitor(VisitorChecker):
+class KeywordVisitor(ModelVisitor):
     """
     A Robocop visitor.
 
