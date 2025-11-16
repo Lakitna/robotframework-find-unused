@@ -54,5 +54,5 @@ def cli_hard_exit(verbose: int) -> None:
     """
     if verbose < VERBOSE_DOUBLE:
         click.echo(f"{NOTE_MARKER} Run with `--verbose --verbose` or `-vv` for more details")
-    sys.exit(1_000_000)
-    return 1_000_000
+    sys.exit(255)
+    return 255

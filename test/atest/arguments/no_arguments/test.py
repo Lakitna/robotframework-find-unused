@@ -7,5 +7,5 @@ class TestCommandAcceptance(AcceptanceTest):
             ["arguments", "./robot"],
             "./expected_output.log",
             __file__,
-            expected_exit_code=1_000_000,
+            expected_exit_code=255,
         )

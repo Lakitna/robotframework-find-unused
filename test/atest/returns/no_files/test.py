@@ -7,7 +7,7 @@ class TestCommandAcceptance(AcceptanceTest):
             ["returns", "./robot"],
             "./expected_output.log",
             __file__,
-            expected_exit_code=1_000_000,
+            expected_exit_code=255,
         )
 
     def test_returns_command_no_files_verbose(self):
@@ -15,7 +15,7 @@ class TestCommandAcceptance(AcceptanceTest):
             ["returns", "./robot", "--verbose"],
             "./expected_output_verbose.log",
             __file__,
-            expected_exit_code=1_000_000,
+            expected_exit_code=255,
         )
 
     def test_returns_command_no_files_verbose_verbose(self):
@@ -23,5 +23,5 @@ class TestCommandAcceptance(AcceptanceTest):
             ["returns", "./robot", "--verbose", "--verbose"],
             "./expected_output_verbose_verbose.log",
             __file__,
-            expected_exit_code=1_000_000,
+            expected_exit_code=255,
         )
