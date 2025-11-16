@@ -55,7 +55,7 @@ class LibraryImportVisitor(ModelVisitor):
             lib: LibraryDoc = LibraryDocumentation(lib_name)
         except robot.errors.DataError:
             click.echo(
-                f"{ERROR_MARKER} Could not gather keywords from library {lib_name}",
+                f"{ERROR_MARKER} Failed to gather keywords from library `{lib_name}`",
                 err=True,
             )
 

@@ -6,16 +6,19 @@ import fnmatch
 from dataclasses import dataclass
 
 import click
-from robocop.config import ConfigManager
 
+from robotframework_find_unused.commands.step.discover_files import cli_discover_file_paths
 from robotframework_find_unused.common.cli import (
-    cli_count_keyword_uses,
     cli_filter_keywords_by_option,
-    cli_step_gather_files,
-    cli_step_get_keyword_definitions,
+    cli_hard_exit,
     pretty_kw_name,
 )
 from robotframework_find_unused.common.const import INDENT, KeywordData, KeywordFilterOption
+
+from .step.keyword_count_uses import cli_count_keyword_uses
+from .step.keyword_definitions import cli_step_get_custom_keyword_definitions
+from .step.lib_keyword_definitions import cli_step_get_downloaded_lib_keywords
+from .step.parse_files import cli_step_parse_files
 
 
 @dataclass
@@ -30,25 +33,44 @@ class ArgumentsOptions:
     unused_keywords: KeywordFilterOption
     keyword_filter_glob: str | None
     show_all_count: bool
-    verbose: bool
+    verbose: int
+    source_path: str
 
 
-def cli_arguments(file_path: str, options: ArgumentsOptions):
+def cli_arguments(options: ArgumentsOptions):
     """
     Entry point for the CLI command
     """
-    robocop_config = ConfigManager(sources=[file_path])
+    file_paths = cli_discover_file_paths(options.source_path, verbose=options.verbose)
+    if len(file_paths) == 0:
+        return cli_hard_exit(options.verbose)
 
-    files = cli_step_gather_files(robocop_config, verbose=options.verbose)
-    keywords = cli_step_get_keyword_definitions(files, verbose=options.verbose)
+    files = cli_step_parse_files(
+        file_paths,
+        verbose=options.verbose,
+    )
+
+    keywords = cli_step_get_custom_keyword_definitions(
+        files,
+        verbose=options.verbose,
+    )
+    if len(keywords) == 0:
+        return cli_hard_exit(options.verbose)
+
+    downloaded_library_keywords = cli_step_get_downloaded_lib_keywords(
+        file_paths,
+        verbose=options.verbose,
+    )
+
     counted_keywords = cli_count_keyword_uses(
-        robocop_config,
+        file_paths,
         keywords,
-        downloaded_library_keywords=[],
+        downloaded_library_keywords=downloaded_library_keywords,
         verbose=options.verbose,
     )
 
     _cli_log_results(counted_keywords, options)
+    return 0
 
 
 def _cli_log_results(keywords: list[KeywordData], options: ArgumentsOptions) -> None:
@@ -98,12 +120,12 @@ def _cli_log_results(keywords: list[KeywordData], options: ArgumentsOptions) -> 
             continue
 
         if options.show_all_count:
-            cli_log_results_show_count(kw)
+            _cli_log_results_show_count(kw)
         else:
-            cli_log_results_unused(kw)
+            _cli_log_results_unused(kw)
 
 
-def cli_log_results_unused(kw: KeywordData):
+def _cli_log_results_unused(kw: KeywordData) -> None:
     """
     Output a keywords arguments if they're unused
     """
@@ -132,7 +154,7 @@ def cli_log_results_unused(kw: KeywordData):
     click.echo()
 
 
-def cli_log_results_show_count(kw: KeywordData):
+def _cli_log_results_show_count(kw: KeywordData) -> None:
     """
     Output a keyword and all it's argument counts
     """

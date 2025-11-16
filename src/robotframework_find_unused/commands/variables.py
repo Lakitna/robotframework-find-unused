@@ -3,13 +3,15 @@ Implementation of the 'variables' command
 """
 
 import fnmatch
+import sys
 from dataclasses import dataclass
 
 import click
-from robocop.config import ConfigManager
 
-from robotframework_find_unused.common.cli import cli_count_variable_uses
-from robotframework_find_unused.common.const import VariableData
+from robotframework_find_unused.commands.step.discover_files import cli_discover_file_paths
+from robotframework_find_unused.commands.step.variables_count_uses import cli_count_variable_uses
+from robotframework_find_unused.common.cli import cli_hard_exit
+from robotframework_find_unused.common.const import INDENT, VariableData
 
 
 @dataclass
@@ -20,18 +22,27 @@ class VariableOptions:
 
     show_all_count: bool
     filter_glob: str | None
-    verbose: bool
+    verbose: int
+    source_path: str
 
 
-def cli_variables(file_path: str, option: VariableOptions):
+def cli_variables(options: VariableOptions):
     """
     Entry point for the CLI command
     """
-    robocop_config = ConfigManager(sources=[file_path])
+    file_paths = cli_discover_file_paths(options.source_path, verbose=options.verbose)
+    if len(file_paths) == 0:
+        return cli_hard_exit(options.verbose)
 
-    variables = cli_count_variable_uses(robocop_config, verbose=option.verbose)
+    variables = cli_count_variable_uses(
+        file_paths,
+        verbose=options.verbose,
+    )
+    if len(variables) == 0:
+        return cli_hard_exit(options.verbose)
 
-    _cli_log_results(variables, option)
+    _cli_log_results(variables, options)
+    return 0
 
 
 def _cli_log_results(variables: list[VariableData], options: VariableOptions) -> None:
@@ -59,7 +70,4 @@ def _cli_log_results(variables: list[VariableData], options: VariableOptions) ->
 
         click.echo(f"Found {len(unused_variables)} unused variables:")
         for name in unused_variables:
-            click.echo("  " + name)
-
-        click.echo()
-        click.echo(f"Found {len(unused_variables)} unused variables")
+            click.echo(INDENT + name)
