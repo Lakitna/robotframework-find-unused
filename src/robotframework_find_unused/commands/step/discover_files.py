@@ -9,6 +9,7 @@ from robotframework_find_unused.common.const import (
     ERROR_MARKER,
     INDENT,
     NOTE_MARKER,
+    VERBOSE_DOUBLE,
     VERBOSE_NO,
     VERBOSE_SINGLE,
 )
@@ -43,7 +44,7 @@ def _log_file_stats(file_paths: list[Path], input_path: str, verbose: int) -> No
         click.echo(f"{NOTE_MARKER} All files in Robocop config `exclude` are ignored")
         click.echo(f"{NOTE_MARKER} All files listed in `.gitignore` files are ignored")
 
-        if verbose == VERBOSE_NO:
+        if verbose < VERBOSE_DOUBLE:
             return
 
         click.echo(f"{NOTE_MARKER} All of the following files are excluded:")
