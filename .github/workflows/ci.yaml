@@ -34,4 +34,4 @@ jobs:
           poetry run ruff check
       - name: Test with pytest
         run: |
-          poetry run pytest
+          poetry run pytest -n auto
