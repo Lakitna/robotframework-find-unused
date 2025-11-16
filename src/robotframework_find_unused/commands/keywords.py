@@ -3,7 +3,6 @@ Implementation of the 'keywords' command
 """
 
 import fnmatch
-import sys
 from dataclasses import dataclass
 
 import click
