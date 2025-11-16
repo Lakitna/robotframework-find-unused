@@ -8,7 +8,13 @@ import pytest
 
 
 class AcceptanceTest:
-    def run_test(self, cli_options: list[str], expected_output_path: str, test_file_path: str):
+    def run_test(
+        self,
+        cli_options: list[str],
+        expected_output_path: str,
+        test_file_path: str,
+        expected_exit_code: int = 0,
+    ):
         test_folder = Path(test_file_path).parent
         expected_output_path_absolute: Path = test_folder.joinpath(expected_output_path)
 
@@ -18,23 +24,25 @@ class AcceptanceTest:
         command = [sys.executable, "-m", "robotframework_find_unused"]
         command.extend(cli_options)
 
-        try:
-            p = subprocess.run(  # noqa: S603
-                command,
-                capture_output=True,
-                cwd=test_folder,
-                check=True,
-            )
-        except subprocess.CalledProcessError as e:
+        p = subprocess.run(  # noqa: S603
+            command,
+            capture_output=True,
+            cwd=test_folder,
+            check=False,
+        )
+        if p.returncode != expected_exit_code:
             pytest.fail(
-                f"Subprocess failed with non-zero exit code {e.returncode}. "
-                "Subprocess stderr below:\n" + e.stderr.decode(),
+                (
+                    f"Subprocess exited with unexpected exit code {p.returncode}. "
+                    f"Expected exit code: {expected_exit_code} "
+                    f"Actual exit code: {p.returncode} "
+                    f"Subprocess stderr below:\n{p.stderr.decode()}\n"
+                    f"Subprocess stdout below:\n{p.stdout.decode()}\n"
+                ),
             )
 
-        actual = p.stdout.decode()
-        expected = expected_output
-
-        self._assert_logs(actual, expected)
+        actual_output = p.stdout.decode()
+        self._assert_logs(actual_output, expected_output)
 
     def _assert_logs(self, actual: str, expected: str) -> None:
         actual_lines = actual.strip().splitlines()

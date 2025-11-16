@@ -1,26 +1,26 @@
-Gathering files with LibDoc...
-[ DONE ] Found and processed 2 files
-    1 files of type RESOURCE
-    1 files of type SUITE
-Gathering keyword definitions from files...
-[ DONE ] Found 9 keyword definitions
-    8 keyword definitions of type CUSTOM_RESOURCE
-    1 keyword definitions of type CUSTOM_SUITE
-Gathering downloaded library keyword names...
+Discovering files in `./robot` using Robocop config...
+[ DONE ] Discovered 2 files
+Parsing files with LibDoc...
+[ DONE ] Parsed 2 files
+    1 files of type CUSTOM_RESOURCE
+    1 files of type CUSTOM_SUITE
+Gathering custom keyword definitions...
+[ DONE ] Found 9 custom keyword definitions
+    8 keywords of type CUSTOM_RESOURCE
+    1 keywords of type CUSTOM_SUITE
+Gathering downloaded library keyword definitions...
 [ DONE ] Found 1 downloaded libraries
     BuiltIn: 107 keywords
-Counting keyword usage with RoboCop...
-[ DONE ] Found 11 unique keywords
-    8 keyword definitions of type CUSTOM_RESOURCE
-    1 keyword definitions of type CUSTOM_SUITE
-    1 keyword definitions of type LIBRARY
-    1 keyword definitions of type UNKNOWN
+Counting keyword usage...
 [ DONE ] Processed 23 keyword calls
-    12 keyword calls of keyword type CUSTOM_RESOURCE
-    9 keyword calls of keyword type LIBRARY
-    1 keyword calls of keyword type CUSTOM_SUITE
-    1 keyword calls of keyword type UNKNOWN
-Excluding downloaded library keywords
+    12 calls to keywords of type CUSTOM_RESOURCE
+    9 calls to keywords of type LIBRARY
+    1 calls to keywords of type CUSTOM_SUITE
+    1 calls to keywords of type UNKNOWN
+[ DONE ] Found 11 unique keywords (keyword definitions and calls)
+[ WARNING ] Found 1 called keywords without a definition
+    Undefined keyword
+[ NOTE ] Excluding downloaded library keywords
 
 Found 1 unused keywords:
   keywords.Beautiful Keyword
