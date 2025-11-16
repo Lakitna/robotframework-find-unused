@@ -32,7 +32,6 @@ def cli_count_keyword_uses(
         keywords,
         downloaded_library_keywords,
     )
-
     _log_keyword_call_stats(counted_keywords, verbose)
 
     unknown_keywords = [kw for kw in counted_keywords if kw.type == "UNKNOWN"]
@@ -45,19 +44,11 @@ def _log_keyword_call_stats(keywords: list[KeywordData], verbose: int) -> None:
     """
     Output details on calls to the given keywords to the user
     """
-    total_uses = 0
-    for kw in keywords:
-        total_uses += kw.use_count
-
-    if total_uses == 0:
-        click.echo()
-        click.echo(f"{ERROR_MARKER} Found 0 keyword calls")
-        click.echo(f"{NOTE_MARKER} All files in Robocop config `exclude` are ignored")
-        click.echo(f"{NOTE_MARKER} All files listed in `.gitignore` files are ignored")
-        click.echo(f"{NOTE_MARKER} Run with `--verbose` for more details")
-        sys.exit(-1)
-    else:
-        click.echo(f"{DONE_MARKER} Processed {total_uses} keyword calls")
+    total_uses = sum([kw.use_count for kw in keywords])
+    click.echo(
+        (WARN_MARKER if total_uses == 0 else DONE_MARKER)
+        + f" Processed {total_uses} keyword calls",
+    )
 
     if verbose == VERBOSE_NO:
         return
