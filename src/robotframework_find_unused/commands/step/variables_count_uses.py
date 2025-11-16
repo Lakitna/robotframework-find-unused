@@ -2,7 +2,13 @@ from pathlib import Path
 
 import click
 
-from robotframework_find_unused.common.const import DONE_MARKER, ERROR_MARKER, INDENT, VariableData
+from robotframework_find_unused.common.const import (
+    DONE_MARKER,
+    ERROR_MARKER,
+    INDENT,
+    VERBOSE_NO,
+    VariableData,
+)
 from robotframework_find_unused.common.gather_variables import count_variable_uses
 
 
@@ -29,7 +35,7 @@ def _log_variable_stats(variables: list[VariableData], verbose: int) -> None:
     """
     Output details encountered downloaded libraries to the user
     """
-    if verbose <= 0:
+    if verbose == VERBOSE_NO:
         return
 
     click.echo(

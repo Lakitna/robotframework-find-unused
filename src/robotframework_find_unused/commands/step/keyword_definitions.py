@@ -2,7 +2,13 @@ import click
 from robot.libdocpkg.model import LibraryDoc
 
 from robotframework_find_unused.common.cli import pretty_kw_name
-from robotframework_find_unused.common.const import DONE_MARKER, ERROR_MARKER, INDENT
+from robotframework_find_unused.common.const import (
+    DONE_MARKER,
+    ERROR_MARKER,
+    INDENT,
+    VERBOSE_NO,
+    VERBOSE_SINGLE,
+)
 from robotframework_find_unused.common.gather_keywords import (
     KeywordData,
     get_custom_keyword_definitions,
@@ -30,7 +36,7 @@ def _log_keyword_stats(keywords: list[KeywordData], verbose: int) -> None:
         + f" Found {len(keywords)} custom keyword definitions",
     )
 
-    if verbose <= 0:
+    if verbose == VERBOSE_NO:
         return
 
     kw_types: dict[str, list[str]] = {}
@@ -42,7 +48,7 @@ def _log_keyword_stats(keywords: list[KeywordData], verbose: int) -> None:
     for kw_type, kw_names in sorted(kw_types.items(), key=lambda x: len(x[1]), reverse=True):
         click.echo(f"{INDENT}{len(kw_names)} keywords of type {kw_type}")
 
-        if verbose == 1:
+        if verbose == VERBOSE_SINGLE:
             continue
         for name in kw_names:
             click.echo(f"{INDENT}{INDENT}{name}")

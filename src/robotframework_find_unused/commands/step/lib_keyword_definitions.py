@@ -2,7 +2,13 @@ from pathlib import Path
 
 import click
 
-from robotframework_find_unused.common.const import DONE_MARKER, ERROR_MARKER, INDENT, WARN_MARKER
+from robotframework_find_unused.common.const import (
+    DONE_MARKER,
+    ERROR_MARKER,
+    INDENT,
+    VERBOSE_NO,
+    WARN_MARKER,
+)
 from robotframework_find_unused.common.visit import visit_files
 from robotframework_find_unused.visitors.library_import import LibraryData, LibraryImportVisitor
 
@@ -34,7 +40,7 @@ def _log_downloaded_lib_stats(libraries: list[LibraryData], verbose: int) -> Non
         + f" Found {len(libraries)} downloaded libraries",
     )
 
-    if verbose <= 0:
+    if verbose == VERBOSE_NO:
         return
 
     for lib in libraries:

@@ -4,7 +4,14 @@ from pathlib import Path
 import click
 from robocop.config import ConfigManager, FileFiltersOptions
 
-from robotframework_find_unused.common.const import DONE_MARKER, ERROR_MARKER, INDENT, NOTE_MARKER
+from robotframework_find_unused.common.const import (
+    DONE_MARKER,
+    ERROR_MARKER,
+    INDENT,
+    NOTE_MARKER,
+    VERBOSE_NO,
+    VERBOSE_SINGLE,
+)
 
 
 def cli_discover_file_paths(input_path: str, *, verbose: int) -> list[Path]:
@@ -36,7 +43,7 @@ def _log_file_stats(file_paths: list[Path], input_path: str, verbose: int) -> No
         click.echo(f"{NOTE_MARKER} All files in Robocop config `exclude` are ignored")
         click.echo(f"{NOTE_MARKER} All files listed in `.gitignore` files are ignored")
 
-        if verbose <= 1:
+        if verbose == VERBOSE_NO:
             return
 
         click.echo(f"{NOTE_MARKER} All of the following files are excluded:")
@@ -45,12 +52,12 @@ def _log_file_stats(file_paths: list[Path], input_path: str, verbose: int) -> No
                 click.echo(f"{INDENT}{Path(root, file).as_posix()}")
         return
 
-    if verbose <= 0:
+    if verbose == VERBOSE_NO:
         return
 
     click.echo(f"{DONE_MARKER} Discovered {len(file_paths)} files")
 
-    if verbose <= 1:
+    if verbose == VERBOSE_SINGLE:
         return
 
     for path in file_paths:

@@ -8,6 +8,7 @@ from robotframework_find_unused.common.const import (
     ERROR_MARKER,
     INDENT,
     NOTE_MARKER,
+    VERBOSE_NO,
     WARN_MARKER,
 )
 from robotframework_find_unused.common.gather_keywords import KeywordData, count_keyword_uses
@@ -58,7 +59,7 @@ def _log_keyword_call_stats(keywords: list[KeywordData], verbose: int) -> None:
     else:
         click.echo(f"{DONE_MARKER} Processed {total_uses} keyword calls")
 
-    if verbose <= 0:
+    if verbose == VERBOSE_NO:
         return
 
     kw_type_use_count: dict[str, int] = {}
@@ -86,7 +87,7 @@ def _log_unknown_keyword_stats(keywords: list[KeywordData], verbose: int) -> Non
             f"{WARN_MARKER} Found {len(keywords)} called keywords without a definition",
         )
 
-    if verbose <= 0:
+    if verbose == VERBOSE_NO:
         return
 
     for kw in keywords:

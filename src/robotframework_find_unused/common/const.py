@@ -9,6 +9,9 @@ WARN_MARKER = "[ " + click.style("WARNING", fg="yellow") + " ]"
 ERROR_MARKER = "[ " + click.style("ERROR", fg="red") + " ]"
 NOTE_MARKER = "[ " + click.style("NOTE", fg="cyan") + " ]"
 INDENT = "    "
+VERBOSE_NO = 0
+VERBOSE_SINGLE = 1
+VERBOSE_DOUBLE = 2
 
 KeywordFilterOption: TypeAlias = Literal["include", "exclude", "only"]
 

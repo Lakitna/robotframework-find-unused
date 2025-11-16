@@ -3,10 +3,7 @@ from collections.abc import Callable
 
 import click
 
-from robotframework_find_unused.common.const import (
-    NOTE_MARKER,
-    KeywordFilterOption,
-)
+from robotframework_find_unused.common.const import NOTE_MARKER, VERBOSE_DOUBLE, KeywordFilterOption
 from robotframework_find_unused.common.gather_keywords import KeywordData
 
 
@@ -55,7 +52,7 @@ def cli_hard_exit(verbose: int) -> None:
     """
     Immediately hard exit app. Use when something went wrong.
     """
-    if verbose < 2:
+    if verbose < VERBOSE_DOUBLE:
         click.echo(f"{NOTE_MARKER} Run with `--verbose --verbose` or `-vv` for more details")
     sys.exit(1_000_000)
     return 1_000_000

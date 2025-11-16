@@ -3,7 +3,13 @@ from pathlib import Path
 import click
 from robot.libdocpkg.model import LibraryDoc
 
-from robotframework_find_unused.common.const import DONE_MARKER, INDENT, WARN_MARKER
+from robotframework_find_unused.common.const import (
+    DONE_MARKER,
+    INDENT,
+    VERBOSE_NO,
+    VERBOSE_SINGLE,
+    WARN_MARKER,
+)
 from robotframework_find_unused.common.gather_files import find_files_with_libdoc
 
 
@@ -36,7 +42,7 @@ def _log_file_stats(files: list[LibraryDoc], verbose: int) -> None:
     """
     click.echo(f"{DONE_MARKER} Parsed {len(files)} files")
 
-    if verbose <= 0:
+    if verbose == VERBOSE_NO:
         return
 
     file_types: dict[str, list[str]] = {}
@@ -51,7 +57,7 @@ def _log_file_stats(files: list[LibraryDoc], verbose: int) -> None:
     for file_type, file_paths in sorted(file_types.items(), key=lambda x: len(x[1]), reverse=True):
         click.echo(f"{INDENT}{len(file_paths)} files of type CUSTOM_{file_type}")
 
-        if verbose == 1:
+        if verbose == VERBOSE_SINGLE:
             continue
         for path in file_paths:
             click.echo(f"{INDENT}{INDENT}{click.style(path, fg='bright_black')}")
