@@ -6,10 +6,16 @@ CLI entry point
 
 import click
 
-from robotframework_find_unused.arguments import ArgumentsOptions, cli_arguments
-from robotframework_find_unused.keywords import KeywordOptions, cli_keywords
-from robotframework_find_unused.returns import ReturnOptions, cli_returns
-from robotframework_find_unused.variables import VariableOptions, cli_variables
+from robotframework_find_unused.commands import (
+    ArgumentsOptions,
+    KeywordOptions,
+    ReturnOptions,
+    VariableOptions,
+    cli_arguments,
+    cli_keywords,
+    cli_returns,
+    cli_variables,
+)
 
 
 @click.group(
@@ -66,7 +72,7 @@ def cli():
     "-v",
     "--verbose",
     default=False,
-    is_flag=True,
+    count=True,
     help="Show more log output",
 )
 @click.argument("file_path", default=".")
@@ -76,7 +82,7 @@ def keywords(  # noqa: PLR0913
     deprecated: str,
     private: str,
     library: str,
-    verbose: bool,
+    verbose: int,
     file_path: str,
 ):
     """
@@ -87,18 +93,18 @@ def keywords(  # noqa: PLR0913
 
     ----------
 
-    Limitation 1: Keywords with embedded arguments are not counted.
+    Limitation 1: Keywords with embedded arguments are not counted
 
-    Example: This keyword is never counted because it contains the embedded argument ${something}:
+    Example: This keyword is not counted because it contains the embedded argument ${something}:
 
     \b
         Do ${something} amazing
 
     ----------
 
-    Limitation 2: Library prefixes are ignored
+    Limitation 2: Library prefixes are ignored.
 
-    Example: The following keywords are counted as a single keyword:
+    Example: The following keywords are counted as the same keyword:
 
     \b
         SeleniumLibrary.Get Text
@@ -129,6 +135,7 @@ def keywords(  # noqa: PLR0913
         Amazing    ${True}    inner_keyword=Beautiful keyword
     """
     options = KeywordOptions(
+        source_path=file_path,
         deprecated_keywords=deprecated,  # pyright: ignore[reportArgumentType]
         private_keywords=private,  # pyright: ignore[reportArgumentType]
         library_keywords=library,  # pyright: ignore[reportArgumentType]
@@ -136,7 +143,7 @@ def keywords(  # noqa: PLR0913
         show_all_count=show_count,
         verbose=verbose,
     )
-    cli_keywords(file_path, options)
+    cli_keywords(options)
 
 
 @cli.command(name="variables")
@@ -161,14 +168,14 @@ def keywords(  # noqa: PLR0913
     "-v",
     "--verbose",
     default=False,
-    is_flag=True,
+    count=True,
     help="Show more log output",
 )
 @click.argument("file_path", default=".")
 def variables(
     show_count: bool,
     filter: str | None,  # noqa: A002
-    verbose: bool,
+    verbose: int,
     file_path: str,
 ):
     """
@@ -225,6 +232,7 @@ def variables(
         *** Variables ***
         ${helloWorld}    Hello World!
 
+    \b
         *** Keywords ***
         My Amazing Keyword
             ${place} =    Set Variable    World
@@ -234,10 +242,9 @@ def variables(
 
     Limitation 4: Variable names with embedded python are ignored.
 
-    Sometimes variable names can contain python calls. This is not supported by this script. This
-    should never be an issue with global variables.
-
-    Robotframework call this the Extended variable syntax.
+    Sometimes variable names can contain python calls. Robotframework call this the extended
+    variable syntax. Extended variable syntax is not supported. This should never be an issue with
+    global variables.
 
     Example: The variable ${response} is not counted because ${response.json()} is not supported.
 
@@ -248,11 +255,12 @@ def variables(
             RETURN    ${response.json()}
     """
     options = VariableOptions(
+        source_path=file_path,
         show_all_count=show_count,
         filter_glob=filter,
         verbose=verbose,
     )
-    cli_variables(file_path, options)
+    cli_variables(options)
 
 
 @cli.command(name="arguments")
@@ -301,7 +309,7 @@ def variables(
     "-v",
     "--verbose",
     default=False,
-    is_flag=True,
+    count=True,
     help="Show more log output",
 )
 @click.argument("file_path", default=".")
@@ -311,7 +319,7 @@ def arguments(  # noqa: PLR0913
     deprecated: str,
     private: str,
     unused: str,
-    verbose: bool,
+    verbose: int,
     file_path: str,
 ):
     """
@@ -322,9 +330,9 @@ def arguments(  # noqa: PLR0913
 
     ----------
 
-    Limitation 1: Arguments for keywords with embedded arguments are not counted.
+    Limitation 1: Arguments for keywords with embedded arguments are not counted
 
-    Example: The argument ${beautiful} is never counted because the keyword contains the embedded
+    Example: The argument ${beautiful} is not counted because the keyword contains the embedded
     argument ${something}:
 
     \b
@@ -339,7 +347,8 @@ def arguments(  # noqa: PLR0913
     Example: 'Beautiful keyword' is not recognized as a keyword. Because of this, the ${hello}
     argument of 'Beautiful keyword' is falsely counted as an argument for 'Do Something Amazing'.
 
-    \b     Do Something Amazing    Beautiful keyword    hello=${True}
+    \b
+        Do Something Amazing    Beautiful keyword    hello=${True}
 
     To ensure that your keyword is handled properly, your keyword name or argument name must include
     the literal word 'keyword' (case insensitive).
@@ -347,17 +356,20 @@ def arguments(  # noqa: PLR0913
     Example: The ${hello} argument of 'Beautiful keyword' is counted, because 'Run Keyword' includes
     the word 'keyword'
 
-    \b     Run Keyword    Beautiful keyword    hello=${True}
+    \b
+        Run Keyword    Beautiful keyword    hello=${True}
 
     Example: The ${hello} argument of 'Beautiful keyword' is counted, because the argument
     ${inner_keyword} includes the word 'keyword'.
 
-    \b     Amazing    inner_keyword=Beautiful keyword    hello=${True}
+    \b
+        Amazing    inner_keyword=Beautiful keyword    hello=${True}
 
     Note how the script assumes that all arguments after ${inner_keyword} are arguments for
     'Beautiful keyword'.
     """
     options = ArgumentsOptions(
+        source_path=file_path,
         deprecated_keywords=deprecated,  # pyright: ignore[reportArgumentType]
         private_keywords=private,  # pyright: ignore[reportArgumentType]
         library_keywords="exclude",
@@ -366,7 +378,7 @@ def arguments(  # noqa: PLR0913
         show_all_count=show_count,
         verbose=verbose,
     )
-    cli_arguments(file_path, options)
+    cli_arguments(options)
 
 
 @cli.command(name="returns")
@@ -412,7 +424,7 @@ def arguments(  # noqa: PLR0913
     "-v",
     "--verbose",
     default=False,
-    is_flag=True,
+    count=True,
     help="Show more log output",
 )
 @click.argument("file_path", default=".")
@@ -422,14 +434,14 @@ def returns(  # noqa: PLR0913
     deprecated: str,
     private: str,
     unused: str,
-    verbose: bool,
+    verbose: int,
     file_path: str,
 ):
     """
     Find unused keyword return values
 
     Traverse files in the given file path. In those files, count how often each keyword return
-    value is used. Keywords whose return value is never useds are logged.
+    value is used. Keywords whose return value is never used are logged.
 
     ----------
 
@@ -445,11 +457,12 @@ def returns(  # noqa: PLR0913
 
     ----------
 
-    Limitation 2: Library keywords are ignored
+    Limitation 2: Library keywords are ignored.
 
     Any keyword defined in a Python file is ignored.
     """
     options = ReturnOptions(
+        source_path=file_path,
         deprecated_keywords=deprecated,  # pyright: ignore[reportArgumentType]
         private_keywords=private,  # pyright: ignore[reportArgumentType]
         library_keywords="exclude",
@@ -458,4 +471,4 @@ def returns(  # noqa: PLR0913
         show_all_count=show_count,
         verbose=verbose,
     )
-    cli_returns(file_path, options)
+    cli_returns(options)

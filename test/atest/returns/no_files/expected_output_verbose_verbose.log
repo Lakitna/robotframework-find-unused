@@ -1,0 +1,6 @@
+Discovering files in `./robot` using Robocop config...
+[ ERROR ] Found 0 files in `./robot`
+[ NOTE ] All files in Robocop config `exclude` are ignored
+[ NOTE ] All files listed in `.gitignore` files are ignored
+[ NOTE ] All of the following files are excluded:
+    robot/.gitkeep

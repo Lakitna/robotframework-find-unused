@@ -1,13 +1,14 @@
-from robocop.config import ConfigManager
+from pathlib import Path
+
 from robot.libdocpkg.model import LibraryDoc
 
 from robotframework_find_unused.common.const import KeywordData, LibraryData
 from robotframework_find_unused.common.convert import libdoc_keyword_to_keyword_data
-from robotframework_find_unused.common.robocop_visit import visit_files_with_robocop
+from robotframework_find_unused.common.visit import visit_files
 from robotframework_find_unused.visitors.keyword_visitor import KeywordVisitor
 
 
-def get_keyword_definitions_from_files(files: list[LibraryDoc]):
+def get_custom_keyword_definitions(files: list[LibraryDoc]):
     """
     Gather keyword definitions in the given scope with LibDoc
 
@@ -31,13 +32,13 @@ def get_keyword_definitions_from_files(files: list[LibraryDoc]):
 
 
 def count_keyword_uses(
-    robocop_config: ConfigManager,
+    file_paths: list[Path],
     keywords: list[KeywordData],
     downloaded_library_keywords: list[LibraryData],
 ):
     """
-    Walk through all robot files with RoboCop to count keyword uses.
+    Walk through all robot files to count keyword uses.
     """
     visitor = KeywordVisitor(keywords, downloaded_library_keywords)
-    visit_files_with_robocop(robocop_config, visitor)
+    visit_files(file_paths, visitor)
     return list(visitor.keywords.values())

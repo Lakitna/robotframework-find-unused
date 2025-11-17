@@ -15,3 +15,11 @@ class TestCommandAcceptance(AcceptanceTest):
             "./expected_output_verbose.log",
             __file__,
         )
+
+    def test_keywords_command_with_no_keywords_and_no_library(self):
+        self.run_test(
+            ["keywords", "./robot", "--library", "exclude"],
+            "./expected_output_no_keywords.log",
+            __file__,
+            expected_exit_code=255,
+        )
