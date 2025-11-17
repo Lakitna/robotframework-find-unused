@@ -1,13 +1,10 @@
-import sys
 from pathlib import Path
 
 import click
 
 from robotframework_find_unused.common.const import (
     DONE_MARKER,
-    ERROR_MARKER,
     INDENT,
-    NOTE_MARKER,
     VERBOSE_NO,
     WARN_MARKER,
 )
