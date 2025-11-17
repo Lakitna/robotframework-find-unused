@@ -41,7 +41,7 @@ def cli_variables(options: VariableOptions):
         return cli_hard_exit(options.verbose)
 
     _cli_log_results(variables, options)
-    return 0
+    return _exit_code(variables)
 
 
 def _cli_log_results(variables: list[VariableData], options: VariableOptions) -> None:
@@ -70,3 +70,9 @@ def _cli_log_results(variables: list[VariableData], options: VariableOptions) ->
         click.echo(f"Found {len(unused_variables)} unused variables:")
         for name in unused_variables:
             click.echo(INDENT + name)
+
+
+def _exit_code(variables: list[VariableData]) -> int:
+    unused_variables = [var for var in variables if var.use_count == 0]
+    exit_code = len(unused_variables)
+    return min(exit_code, 200)

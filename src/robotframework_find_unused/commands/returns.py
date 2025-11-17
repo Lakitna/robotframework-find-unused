@@ -70,7 +70,7 @@ def cli_returns(options: ReturnOptions):
     )
 
     _cli_log_results(counted_keywords, options)
-    return 0
+    return _exit_code(counted_keywords)
 
 
 def _cli_log_results(keywords: list[KeywordData], options: ReturnOptions) -> None:
@@ -143,3 +143,7 @@ def _cli_log_results_show_count(keywords: list[KeywordData]) -> None:
 
     for kw in sorted_keywords:
         click.echo("\t".join([str(kw.return_use_count), pretty_kw_name(kw)]))
+def _exit_code(keywords: list[KeywordData]) -> int:
+    unused_returns = [kw for kw in keywords if kw.return_use_count == 0]
+    exit_code = len(unused_returns)
+    return min(exit_code, 200)

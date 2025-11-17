@@ -36,7 +36,7 @@ class KeywordOptions:
     source_path: str
 
 
-def cli_keywords(options: KeywordOptions):
+def cli_keywords(options: KeywordOptions) -> int:
     """
     Entry point for the CLI command
     """
@@ -106,7 +106,8 @@ def _cli_filter_results(keywords: list[KeywordData], options: KeywordOptions) ->
             ),
         )
 
-    return keywords
+    _cli_log_results(counted_keywords, options)
+    return _exit_code(counted_keywords)
 
 
 def _cli_log_results(keywords: list[KeywordData], options: KeywordOptions) -> None:
@@ -124,3 +125,9 @@ def _cli_log_results(keywords: list[KeywordData], options: KeywordOptions) -> No
         click.echo(f"Found {len(unused_keywords)} unused keywords:")
         for kw in unused_keywords:
             click.echo("  " + pretty_kw_name(kw))
+
+
+def _exit_code(keywords: list[KeywordData]) -> int:
+    unused_keywords = [kw for kw in keywords if kw.use_count == 0]
+    exit_code = len(unused_keywords)
+    return min(exit_code, 200)

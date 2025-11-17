@@ -1,5 +1,6 @@
 import sys
 from collections.abc import Callable
+from typing import Literal
 
 import click
 
@@ -47,8 +48,7 @@ def cli_filter_keywords_by_option(
     msg = f"Unexpected value '{option}' when filtering {descriptor} keywords"
     raise TypeError(msg)
 
-
-def cli_hard_exit(verbose: int) -> None:
+def cli_hard_exit(verbose: int) -> Literal[255]:
     """
     Immediately hard exit app. Use when something went wrong.
     """

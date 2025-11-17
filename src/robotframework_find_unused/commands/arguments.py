@@ -70,7 +70,7 @@ def cli_arguments(options: ArgumentsOptions):
     )
 
     _cli_log_results(counted_keywords, options)
-    return 0
+    return _exit_code(counted_keywords)
 
 
 def _cli_log_results(keywords: list[KeywordData], options: ArgumentsOptions) -> None:
@@ -177,3 +177,17 @@ def _cli_log_results_show_count(kw: KeywordData) -> None:
             click.echo(f"{INDENT}{use_count}\t\t{arg}")
 
     click.echo()
+
+
+def _exit_code(keywords: list[KeywordData]) -> int:
+    unused_args = 0
+    for kw in keywords:
+        if not kw.argument_use_count:
+            continue
+
+        for count in kw.argument_use_count.values():
+            if count == 0:
+                unused_args += 1
+
+    exit_code = unused_args
+    return min(exit_code, 200)
