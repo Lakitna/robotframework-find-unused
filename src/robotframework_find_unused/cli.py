@@ -18,6 +18,12 @@ from robotframework_find_unused.commands import (
     cli_returns,
     cli_variables,
 )
+from robotframework_find_unused.common.const import KeywordFilterOption
+
+click_choice_keyword_filter_option = click.Choice(
+    ["include", "exclude", "only"],
+    case_sensitive=False,
+)
 
 
 @click.group(
@@ -49,7 +55,7 @@ def cli():
 @click.option(
     "-d",
     "--deprecated",
-    type=click.Choice(["include", "exclude", "only"], case_sensitive=False),
+    type=click_choice_keyword_filter_option,
     default="include",
     show_default=True,
     help="How to output deprecated keywords",
@@ -57,7 +63,7 @@ def cli():
 @click.option(
     "-p",
     "--private",
-    type=click.Choice(["include", "exclude", "only"], case_sensitive=False),
+    type=click_choice_keyword_filter_option,
     default="include",
     show_default=True,
     help="How to output private keywords",
@@ -65,7 +71,7 @@ def cli():
 @click.option(
     "-l",
     "--library",
-    type=click.Choice(["include", "exclude", "only"], case_sensitive=False),
+    type=click_choice_keyword_filter_option,
     default="exclude",
     show_default=True,
     help="How to output keywords from downloaded libraries",
@@ -75,15 +81,15 @@ def cli():
     "--verbose",
     default=False,
     count=True,
-    help="Show more log output",
+    help="Show more log output. Can be used twice",
 )
 @click.argument("file_path", default=".")
 def keywords(  # noqa: PLR0913
     show_count: bool,
     filter: str | None,  # noqa: A002
-    deprecated: str,
-    private: str,
-    library: str,
+    deprecated: KeywordFilterOption,
+    private: KeywordFilterOption,
+    library: KeywordFilterOption,
     verbose: int,
     file_path: str,
 ):
@@ -138,9 +144,9 @@ def keywords(  # noqa: PLR0913
     """
     options = KeywordOptions(
         source_path=file_path,
-        deprecated_keywords=deprecated,  # pyright: ignore[reportArgumentType]
-        private_keywords=private,  # pyright: ignore[reportArgumentType]
-        library_keywords=library,  # pyright: ignore[reportArgumentType]
+        deprecated_keywords=deprecated,
+        private_keywords=private,
+        library_keywords=library,
         keyword_filter_glob=filter,
         show_all_count=show_count,
         verbose=verbose,
@@ -172,7 +178,7 @@ def keywords(  # noqa: PLR0913
     "--verbose",
     default=False,
     count=True,
-    help="Show more log output",
+    help="Show more log output. Can be used twice",
 )
 @click.argument("file_path", default=".")
 def variables(
@@ -280,15 +286,12 @@ def variables(
     "--filter",
     default=None,
     metavar="<GLOB>",
-    help=(
-        "Only output arguments for keywords who's name match the glob pattern. "
-        "Match without library prefix"
-    ),
+    help="Only output keywords who's name match the glob pattern. Match without library prefix",
 )
 @click.option(
     "-d",
     "--deprecated",
-    type=click.Choice(["include", "exclude", "only"], case_sensitive=False),
+    type=click_choice_keyword_filter_option,
     default="include",
     show_default=True,
     help="How to output deprecated keywords",
@@ -296,7 +299,7 @@ def variables(
 @click.option(
     "-p",
     "--private",
-    type=click.Choice(["include", "exclude", "only"], case_sensitive=False),
+    type=click_choice_keyword_filter_option,
     default="include",
     show_default=True,
     help="How to output private keywords",
@@ -304,7 +307,7 @@ def variables(
 @click.option(
     "-u",
     "--unused",
-    type=click.Choice(["include", "exclude", "only"], case_sensitive=False),
+    type=click_choice_keyword_filter_option,
     default="exclude",
     show_default=True,
     help="How to output unused keywords",
@@ -314,15 +317,15 @@ def variables(
     "--verbose",
     default=False,
     count=True,
-    help="Show more log output",
+    help="Show more log output. Can be used twice",
 )
 @click.argument("file_path", default=".")
 def arguments(  # noqa: PLR0913
     show_count: bool,
     filter: str | None,  # noqa: A002
-    deprecated: str,
-    private: str,
-    unused: str,
+    deprecated: KeywordFilterOption,
+    private: KeywordFilterOption,
+    unused: KeywordFilterOption,
     verbose: int,
     file_path: str,
 ):
@@ -374,10 +377,10 @@ def arguments(  # noqa: PLR0913
     """
     options = ArgumentsOptions(
         source_path=file_path,
-        deprecated_keywords=deprecated,  # pyright: ignore[reportArgumentType]
-        private_keywords=private,  # pyright: ignore[reportArgumentType]
+        deprecated_keywords=deprecated,
+        private_keywords=private,
         library_keywords="exclude",
-        unused_keywords=unused,  # pyright: ignore[reportArgumentType]
+        unused_keywords=unused,
         keyword_filter_glob=filter,
         show_all_count=show_count,
         verbose=verbose,
@@ -404,7 +407,7 @@ def arguments(  # noqa: PLR0913
 @click.option(
     "-d",
     "--deprecated",
-    type=click.Choice(["include", "exclude", "only"], case_sensitive=False),
+    type=click_choice_keyword_filter_option,
     default="include",
     show_default=True,
     help="How to output deprecated keywords",
@@ -412,7 +415,7 @@ def arguments(  # noqa: PLR0913
 @click.option(
     "-p",
     "--private",
-    type=click.Choice(["include", "exclude", "only"], case_sensitive=False),
+    type=click_choice_keyword_filter_option,
     default="include",
     show_default=True,
     help="How to output private keywords",
@@ -420,7 +423,7 @@ def arguments(  # noqa: PLR0913
 @click.option(
     "-u",
     "--unused",
-    type=click.Choice(["include", "exclude", "only"], case_sensitive=False),
+    type=click_choice_keyword_filter_option,
     default="exclude",
     show_default=True,
     help="How to output unused keywords",
@@ -430,15 +433,15 @@ def arguments(  # noqa: PLR0913
     "--verbose",
     default=False,
     count=True,
-    help="Show more log output",
+    help="Show more log output. Can be used twice",
 )
 @click.argument("file_path", default=".")
 def returns(  # noqa: PLR0913
     show_count: bool,
     filter: str | None,  # noqa: A002
-    deprecated: str,
-    private: str,
-    unused: str,
+    deprecated: KeywordFilterOption,
+    private: KeywordFilterOption,
+    unused: KeywordFilterOption,
     verbose: int,
     file_path: str,
 ):
@@ -468,10 +471,10 @@ def returns(  # noqa: PLR0913
     """
     options = ReturnOptions(
         source_path=file_path,
-        deprecated_keywords=deprecated,  # pyright: ignore[reportArgumentType]
-        private_keywords=private,  # pyright: ignore[reportArgumentType]
+        deprecated_keywords=deprecated,
+        private_keywords=private,
         library_keywords="exclude",
-        unused_keywords=unused,  # pyright: ignore[reportArgumentType]
+        unused_keywords=unused,
         keyword_filter_glob=filter,
         show_all_count=show_count,
         verbose=verbose,

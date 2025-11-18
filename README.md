@@ -36,8 +36,6 @@ This is a command-line tool.
 Walk through your `.robot`, `.resource`, and `.py` files. In those files, count how often each
 keyword is used (called). Keywords with 0 uses are logged.
 
-By default, will ignore keywords from downloaded libraries.
-
 ```shell
 robotunused keywords
 ```
@@ -58,7 +56,7 @@ robotunused keywords --help
 | `-d`, `--deprecated` | `include` / `exclude` / `only` | `include` | How to output deprecated keywords                                                    |
 | `-p`, `--private`    | `include` / `exclude` / `only` | `include` | How to output private keywords                                                       |
 | `-l`, `--library`    | `include` / `exclude` / `only` | `exclude` | How to output keywords from downloaded libraries                                     |
-| `-v`, `--verbose`    |                                |           | Show more log output                                                                 |
+| `-v`, `--verbose`    |                                |           | Show more log output. When provided twice: Show even more log output                 |
 
 ### Find unused keyword arguments
 
@@ -80,14 +78,14 @@ robotunused arguments --help
 
 #### Available options
 
-| flag                 | option                         | default   | description                                                                                        |
-| -------------------- | ------------------------------ | --------- | -------------------------------------------------------------------------------------------------- |
-| `-c`, `--show-count` |                                |           | Show usage count for all arguments instead of only unused arguments                                |
-| `-f`, `--filter`     | Globlike pattern               |           | Only output arguments for keywords who's name match the glob pattern. Match without library prefix |
-| `-d`, `--deprecated` | `include` / `exclude` / `only` | `include` | How to output deprecated keywords                                                                  |
-| `-p`, `--private`    | `include` / `exclude` / `only` | `include` | How to output private keywords                                                                     |
-| `-l`, `--library`    | `include` / `exclude` / `only` | `exclude` | How to output keywords from downloaded libraries                                                   |
-| `-v`, `--verbose`    |                                |           | Show more log output                                                                               |
+| flag                 | option                         | default   | description                                                                          |
+| -------------------- | ------------------------------ | --------- | ------------------------------------------------------------------------------------ |
+| `-c`, `--show-count` |                                |           | Show usage count for all arguments instead of only unused arguments                  |
+| `-f`, `--filter`     | Globlike pattern               |           | Only output keywords who's name match the glob pattern. Match without library prefix |
+| `-d`, `--deprecated` | `include` / `exclude` / `only` | `include` | How to output deprecated keywords                                                    |
+| `-p`, `--private`    | `include` / `exclude` / `only` | `include` | How to output private keywords                                                       |
+| `-u`, `--unused`     | `include` / `exclude` / `only` | `exclude` | How to output unused keywords                                                        |
+| `-v`, `--verbose`    |                                |           | Show more log output. When provided twice: Show even more log output                 |
 
 ### Find unused keyword return statements
 
@@ -95,7 +93,7 @@ Walk through your `.robot`, `.resource`, and `.py` files. In those files, count 
 keyword return value is used (assigned to a variable). Keywords whose return value is never useds
 are logged.
 
-By default, will ignore keywords from downloaded libraries.
+By default, will ignore arguments from unused keywords.
 
 ```shell
 robotunused returns
@@ -116,8 +114,8 @@ robotunused returns --help
 | `-f`, `--filter`     | Globlike pattern               |           | Only output keywords who's name match the glob pattern. Match without library prefix |
 | `-d`, `--deprecated` | `include` / `exclude` / `only` | `include` | How to output deprecated keywords                                                    |
 | `-p`, `--private`    | `include` / `exclude` / `only` | `include` | How to output private keywords                                                       |
-| `-l`, `--library`    | `include` / `exclude` / `only` | `exclude` | How to output keywords from downloaded libraries                                     |
-| `-v`, `--verbose`    |                                |           | Show more log output                                                                 |
+| `-u`, `--unused`     | `include` / `exclude` / `only` | `exclude` | How to output unused keywords                                                        |
+| `-v`, `--verbose`    |                                |           | Show more log output. When provided twice: Show even more log output                 |
 
 ### Find unused global variables
 
@@ -141,7 +139,7 @@ robotunused variables --help
 | -------------------- | ---------------- | ------- | --------------------------------------------------------------------------------------------------- |
 | `-c`, `--show-count` |                  |         | Show usage count for all variables instead of only unused variables                                 |
 | `-f`, `--filter`     | Globlike pattern |         | Only show variables who's name match the glob pattern. Matching without {brackets} and $@& prefixes |
-| `-v`, `--verbose`    |                  |         | Show more log output                                                                                |
+| `-v`, `--verbose`    |                  |         | Show more log output. When provided twice: Show even more log output                                |
 
 ## Contributing
 
