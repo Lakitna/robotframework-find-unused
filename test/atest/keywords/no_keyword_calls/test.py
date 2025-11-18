@@ -7,4 +7,5 @@ class TestCommandAcceptance(AcceptanceTest):
             ["keywords", "./robot", "--show-count"],
             "./expected_output.log",
             __file__,
+            expected_exit_code=1,
         )

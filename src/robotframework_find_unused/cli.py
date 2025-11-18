@@ -4,6 +4,8 @@ CLI entry point
 
 # ruff: noqa: FBT001,D301
 
+import sys
+
 import click
 
 from robotframework_find_unused.commands import (
@@ -143,7 +145,8 @@ def keywords(  # noqa: PLR0913
         show_all_count=show_count,
         verbose=verbose,
     )
-    cli_keywords(options)
+    exit_code = cli_keywords(options)
+    sys.exit(exit_code)
 
 
 @cli.command(name="variables")
@@ -260,7 +263,8 @@ def variables(
         filter_glob=filter,
         verbose=verbose,
     )
-    cli_variables(options)
+    exit_code = cli_variables(options)
+    sys.exit(exit_code)
 
 
 @cli.command(name="arguments")
@@ -378,7 +382,8 @@ def arguments(  # noqa: PLR0913
         show_all_count=show_count,
         verbose=verbose,
     )
-    cli_arguments(options)
+    exit_code = cli_arguments(options)
+    sys.exit(exit_code)
 
 
 @cli.command(name="returns")
@@ -471,4 +476,5 @@ def returns(  # noqa: PLR0913
         show_all_count=show_count,
         verbose=verbose,
     )
-    cli_returns(options)
+    exit_code = cli_returns(options)
+    sys.exit(exit_code)

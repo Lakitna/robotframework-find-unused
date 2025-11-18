@@ -7,6 +7,7 @@ class TestCommandAcceptance(AcceptanceTest):
             ["variables", "./robot"],
             "./expected_output.log",
             __file__,
+            expected_exit_code=5,
         )
 
     def test_variables_command_with_count(self):
@@ -14,6 +15,7 @@ class TestCommandAcceptance(AcceptanceTest):
             ["variables", "./robot", "--show-count"],
             "./expected_output_count.log",
             __file__,
+            expected_exit_code=5,
         )
 
     def test_variables_command_with_verbose(self):
@@ -21,4 +23,5 @@ class TestCommandAcceptance(AcceptanceTest):
             ["variables", "./robot", "--verbose"],
             "./expected_output_verbose.log",
             __file__,
+            expected_exit_code=5,
         )

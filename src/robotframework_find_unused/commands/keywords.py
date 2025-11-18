@@ -2,21 +2,17 @@
 Implementation of the 'keywords' command
 """
 
-import fnmatch
 from dataclasses import dataclass
 
 import click
 
 from robotframework_find_unused.commands.step.discover_files import cli_discover_file_paths
-from robotframework_find_unused.common.cli import (
-    cli_filter_keywords_by_option,
-    cli_hard_exit,
-    pretty_kw_name,
-)
-from robotframework_find_unused.common.const import NOTE_MARKER, KeywordData, KeywordFilterOption
+from robotframework_find_unused.common.cli import cli_hard_exit, pretty_kw_name
+from robotframework_find_unused.common.const import KeywordData, KeywordFilterOption
 
 from .step.keyword_count_uses import cli_count_keyword_uses
 from .step.keyword_definitions import cli_step_get_custom_keyword_definitions
+from .step.keyword_filter import cli_filter_keywords
 from .step.lib_keyword_definitions import cli_step_get_downloaded_lib_keywords
 from .step.parse_files import cli_step_parse_files
 
@@ -36,7 +32,7 @@ class KeywordOptions:
     source_path: str
 
 
-def cli_keywords(options: KeywordOptions):
+def cli_keywords(options: KeywordOptions) -> int:
     """
     Entry point for the CLI command
     """
@@ -68,45 +64,15 @@ def cli_keywords(options: KeywordOptions):
         verbose=options.verbose,
     )
 
-    counted_keywords = _cli_filter_results(counted_keywords, options)
+    counted_keywords = cli_filter_keywords(
+        counted_keywords,
+        filter_deprecated=options.deprecated_keywords,
+        filter_private=options.private_keywords,
+        filter_library=options.library_keywords,
+        filter_glob=options.keyword_filter_glob,
+    )
     _cli_log_results(counted_keywords, options)
-    return 0
-
-
-def _cli_filter_results(keywords: list[KeywordData], options: KeywordOptions) -> list[KeywordData]:
-    keywords = cli_filter_keywords_by_option(
-        keywords,
-        options.deprecated_keywords,
-        lambda kw: kw.deprecated or False,
-        "deprecated",
-    )
-
-    keywords = cli_filter_keywords_by_option(
-        keywords,
-        options.private_keywords,
-        lambda kw: kw.private,
-        "private",
-    )
-
-    keywords = cli_filter_keywords_by_option(
-        keywords,
-        options.library_keywords,
-        lambda kw: kw.type == "LIBRARY",
-        "downloaded library",
-    )
-
-    if options.keyword_filter_glob:
-        click.echo(f"{NOTE_MARKER} Only showing keywords matching '{options.keyword_filter_glob}'")
-
-        pattern = options.keyword_filter_glob.lower()
-        keywords = list(
-            filter(
-                lambda kw: fnmatch.fnmatchcase(kw.name.lower(), pattern),
-                keywords,
-            ),
-        )
-
-    return keywords
+    return _exit_code(counted_keywords)
 
 
 def _cli_log_results(keywords: list[KeywordData], options: KeywordOptions) -> None:
@@ -124,3 +90,9 @@ def _cli_log_results(keywords: list[KeywordData], options: KeywordOptions) -> No
         click.echo(f"Found {len(unused_keywords)} unused keywords:")
         for kw in unused_keywords:
             click.echo("  " + pretty_kw_name(kw))
+
+
+def _exit_code(keywords: list[KeywordData]) -> int:
+    unused_keywords = [kw for kw in keywords if kw.use_count == 0]
+    exit_code = len(unused_keywords)
+    return min(exit_code, 200)

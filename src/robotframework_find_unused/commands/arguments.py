@@ -2,21 +2,17 @@
 Implementation of the 'arguments' command
 """
 
-import fnmatch
 from dataclasses import dataclass
 
 import click
 
 from robotframework_find_unused.commands.step.discover_files import cli_discover_file_paths
-from robotframework_find_unused.common.cli import (
-    cli_filter_keywords_by_option,
-    cli_hard_exit,
-    pretty_kw_name,
-)
+from robotframework_find_unused.common.cli import cli_hard_exit, pretty_kw_name
 from robotframework_find_unused.common.const import INDENT, KeywordData, KeywordFilterOption
 
 from .step.keyword_count_uses import cli_count_keyword_uses
 from .step.keyword_definitions import cli_step_get_custom_keyword_definitions
+from .step.keyword_filter import cli_filter_keywords
 from .step.lib_keyword_definitions import cli_step_get_downloaded_lib_keywords
 from .step.parse_files import cli_step_parse_files
 
@@ -69,50 +65,19 @@ def cli_arguments(options: ArgumentsOptions):
         verbose=options.verbose,
     )
 
+    counted_keywords = cli_filter_keywords(
+        counted_keywords,
+        filter_deprecated=options.deprecated_keywords,
+        filter_private=options.private_keywords,
+        filter_library=options.library_keywords,
+        filter_unused=options.unused_keywords,
+        filter_glob=options.keyword_filter_glob,
+    )
     _cli_log_results(counted_keywords, options)
-    return 0
+    return _exit_code(counted_keywords)
 
 
 def _cli_log_results(keywords: list[KeywordData], options: ArgumentsOptions) -> None:
-    keywords = cli_filter_keywords_by_option(
-        keywords,
-        options.deprecated_keywords,
-        lambda kw: kw.deprecated or False,
-        "deprecated",
-    )
-
-    keywords = cli_filter_keywords_by_option(
-        keywords,
-        options.private_keywords,
-        lambda kw: kw.private,
-        "private",
-    )
-
-    keywords = cli_filter_keywords_by_option(
-        keywords,
-        options.library_keywords,
-        lambda kw: kw.type == "LIBRARY",
-        "downloaded library",
-    )
-
-    keywords = cli_filter_keywords_by_option(
-        keywords,
-        options.unused_keywords,
-        lambda kw: kw.use_count == 0,
-        "unused",
-    )
-
-    if options.keyword_filter_glob:
-        click.echo(f"Only showing keywords matching '{options.keyword_filter_glob}'")
-
-        pattern = options.keyword_filter_glob.lower()
-        keywords = list(
-            filter(
-                lambda kw: fnmatch.fnmatchcase(kw.name.lower(), pattern),
-                keywords,
-            ),
-        )
-
     click.echo()
 
     for kw in keywords:
@@ -177,3 +142,17 @@ def _cli_log_results_show_count(kw: KeywordData) -> None:
             click.echo(f"{INDENT}{use_count}\t\t{arg}")
 
     click.echo()
+
+
+def _exit_code(keywords: list[KeywordData]) -> int:
+    unused_args = 0
+    for kw in keywords:
+        if not kw.argument_use_count:
+            continue
+
+        for count in kw.argument_use_count.values():
+            if count == 0:
+                unused_args += 1
+
+    exit_code = unused_args
+    return min(exit_code, 200)
