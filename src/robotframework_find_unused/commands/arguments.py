@@ -71,7 +71,6 @@ def cli_arguments(options: ArgumentsOptions):
         filter_private=options.private_keywords,
         filter_library=options.library_keywords,
         filter_unused=options.unused_keywords,
-        filter_returns="include",
         filter_glob=options.keyword_filter_glob,
     )
     _cli_log_results(counted_keywords, options)

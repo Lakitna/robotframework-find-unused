@@ -9,11 +9,11 @@ from robotframework_find_unused.common.const import NOTE_MARKER, KeywordData, Ke
 def cli_filter_keywords(  # noqa: PLR0913
     keywords: list[KeywordData],
     *,
-    filter_deprecated: KeywordFilterOption,
-    filter_private: KeywordFilterOption,
-    filter_library: KeywordFilterOption,
-    filter_unused: KeywordFilterOption,
-    filter_returns: KeywordFilterOption,
+    filter_deprecated: KeywordFilterOption | None = None,
+    filter_private: KeywordFilterOption | None = None,
+    filter_library: KeywordFilterOption | None = None,
+    filter_unused: KeywordFilterOption | None = None,
+    filter_returns: KeywordFilterOption | None = None,
     filter_glob: str | None,
 ) -> list[KeywordData]:
     """
@@ -23,40 +23,45 @@ def cli_filter_keywords(  # noqa: PLR0913
 
     Returns a filtered list.
     """
-    keywords = _cli_filter_keywords_by_option(
-        keywords,
-        filter_deprecated,
-        lambda kw: kw.deprecated or False,
-        "deprecated",
-    )
+    if filter_deprecated:
+        keywords = _cli_filter_keywords_by_option(
+            keywords,
+            filter_deprecated,
+            lambda kw: kw.deprecated or False,
+            "deprecated",
+        )
 
-    keywords = _cli_filter_keywords_by_option(
-        keywords,
-        filter_private,
-        lambda kw: kw.private,
-        "private",
-    )
+    if filter_private:
+        keywords = _cli_filter_keywords_by_option(
+            keywords,
+            filter_private,
+            lambda kw: kw.private,
+            "private",
+        )
 
-    keywords = _cli_filter_keywords_by_option(
-        keywords,
-        filter_library,
-        lambda kw: kw.type == "LIBRARY",
-        "downloaded library",
-    )
+    if filter_library:
+        keywords = _cli_filter_keywords_by_option(
+            keywords,
+            filter_library,
+            lambda kw: kw.type == "LIBRARY",
+            "downloaded library",
+        )
 
-    keywords = _cli_filter_keywords_by_option(
-        keywords,
-        filter_unused,
-        lambda kw: kw.use_count == 0,
-        "unused",
-    )
+    if filter_unused:
+        keywords = _cli_filter_keywords_by_option(
+            keywords,
+            filter_unused,
+            lambda kw: kw.use_count == 0,
+            "unused",
+        )
 
-    keywords = _cli_filter_keywords_by_option(
-        keywords,
-        filter_returns,
-        lambda kw: kw.returns is True,
-        "returning",
-    )
+    if filter_returns:
+        keywords = _cli_filter_keywords_by_option(
+            keywords,
+            filter_returns,
+            lambda kw: kw.returns is True,
+            "returning",
+        )
 
     if filter_glob:
         click.echo(f"Only showing keywords matching '{filter_glob}'")

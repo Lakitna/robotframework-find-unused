@@ -69,8 +69,6 @@ def cli_keywords(options: KeywordOptions) -> int:
         filter_deprecated=options.deprecated_keywords,
         filter_private=options.private_keywords,
         filter_library=options.library_keywords,
-        filter_unused="include",
-        filter_returns="include",
         filter_glob=options.keyword_filter_glob,
     )
     _cli_log_results(counted_keywords, options)
