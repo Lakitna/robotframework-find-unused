@@ -49,6 +49,7 @@ def cli_returns(options: ReturnOptions):
     keywords = cli_step_get_custom_keyword_definitions(
         files,
         verbose=options.verbose,
+        enrich_py_keywords=True,
     )
     if len(keywords) == 0:
         return cli_hard_exit(options.verbose)

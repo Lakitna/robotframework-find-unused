@@ -34,7 +34,11 @@ class KeywordData:
     private: bool
     use_count: int
     returns: None | bool
+    """If True: Returns something. If False: Does not return anything. If None: Unknown"""
+
     return_use_count: int
+    """If the keyword returns, how often is the return used during keyword call?"""
+
     arguments: ArgumentSpec | None
     library: str
 
