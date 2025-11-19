@@ -1,4 +1,3 @@
-import ast
 from pathlib import Path
 from typing import cast
 
@@ -6,12 +5,9 @@ from robot.libdocpkg.model import KeywordDoc, LibraryDoc
 
 from robotframework_find_unused.common.const import KeywordData, LibraryData
 from robotframework_find_unused.common.convert import libdoc_keyword_to_keyword_data
+from robotframework_find_unused.common.enrich_python_keywords import enrich_python_keyword_data
 from robotframework_find_unused.common.visit import visit_files
 from robotframework_find_unused.visitors.keyword_visitor import KeywordVisitor
-from robotframework_find_unused.visitors.python_keyword_visitor import (
-    EnrichedKeywordDoc,
-    PythonKeywordVisitor,
-)
 
 
 def get_custom_keyword_definitions(
@@ -36,11 +32,12 @@ def get_custom_keyword_definitions(
             raise ValueError("Unexpected file type " + file.type)
 
         if file_type == "CUSTOM_LIBRARY" and enrich_py_keywords:
-            for keyword in _enrich_python_keyword_data(file):
+            enriched_keywords = enrich_python_keyword_data(file)
+            for keyword in enriched_keywords:
                 keywords.append(
                     libdoc_keyword_to_keyword_data(
                         keyword.doc,
-                        keyword.type,
+                        "CUSTOM_LIBRARY",
                         keyword.returns,
                     ),
                 )
@@ -70,16 +67,3 @@ def count_keyword_uses(
     visitor = KeywordVisitor(keywords, downloaded_library_keywords)
     visit_files(file_paths, visitor)
     return list(visitor.keywords.values())
-
-
-def _enrich_python_keyword_data(libdoc: LibraryDoc) -> list[EnrichedKeywordDoc]:
-    """Gather data on Python keyword returns"""
-    source_path = Path(cast(str, libdoc.source))
-    with source_path.open() as f:
-        raw_python_source = f.read()
-    model = ast.parse(raw_python_source)
-
-    visitor = PythonKeywordVisitor(libdoc.keywords)
-    visitor.visit(model)
-
-    return visitor.keywords

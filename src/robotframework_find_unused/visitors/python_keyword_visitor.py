@@ -1,5 +1,4 @@
 import ast
-from typing import Literal
 
 from robot.libdocpkg.model import KeywordDoc
 
@@ -10,7 +9,6 @@ class EnrichedKeywordDoc:
     """Wrap Libdocs KeywordDoc to add more data points."""
 
     returns: bool | None = None
-    type: Literal["CUSTOM_LIBRARY"] = "CUSTOM_LIBRARY"
 
     def __init__(self, doc: KeywordDoc) -> None:
         self.doc = doc

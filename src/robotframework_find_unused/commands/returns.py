@@ -57,6 +57,7 @@ def cli_returns(options: ReturnOptions):
     downloaded_library_keywords = cli_step_get_downloaded_lib_keywords(
         file_paths,
         verbose=options.verbose,
+        enrich_py_keywords=options.library_keywords != "exclude",
     )
 
     counted_keywords = cli_count_keyword_uses(
