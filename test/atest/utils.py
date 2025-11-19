@@ -31,6 +31,10 @@ class AcceptanceTest:
             cwd=test_folder,
             check=False,
         )
+
+        actual_output = self._parse_output(p.stdout.decode())
+        self._assert_logs(actual_output, expected_output)
+
         if p.returncode != expected_exit_code:
             pytest.fail(
                 (
@@ -41,9 +45,6 @@ class AcceptanceTest:
                     f"Subprocess stdout below:\n{p.stdout.decode()}\n"
                 ),
             )
-
-        actual_output = self._parse_output(p.stdout.decode())
-        self._assert_logs(actual_output, expected_output)
 
     def _assert_logs(self, actual: str, expected: str) -> None:
         actual_lines = actual.splitlines()
