@@ -15,13 +15,21 @@ from robotframework_find_unused.common.gather_keywords import (
 )
 
 
-def cli_step_get_custom_keyword_definitions(files: list[LibraryDoc], *, verbose: int):
+def cli_step_get_custom_keyword_definitions(
+    files: list[LibraryDoc],
+    *,
+    verbose: int,
+    enrich_py_keywords: bool = False,
+):
     """
     Gather keyword definitions from already processed files and keep the user up-to-date on progress
     """
     click.echo("Gathering custom keyword definitions...")
 
-    keywords = get_custom_keyword_definitions(files)
+    keywords = get_custom_keyword_definitions(
+        files,
+        enrich_py_keywords=enrich_py_keywords,
+    )
 
     _log_keyword_stats(keywords, verbose)
     return keywords

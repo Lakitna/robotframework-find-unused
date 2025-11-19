@@ -77,6 +77,14 @@ def cli():
     help="How to output keywords from downloaded libraries",
 )
 @click.option(
+    "-u",
+    "--unused-library",
+    type=click.Choice(["include", "exclude"], case_sensitive=False),
+    default="exclude",
+    show_default=True,
+    help="How to output unused keywords from downloaded libraries",
+)
+@click.option(
     "-v",
     "--verbose",
     default=False,
@@ -90,6 +98,7 @@ def keywords(  # noqa: PLR0913
     deprecated: KeywordFilterOption,
     private: KeywordFilterOption,
     library: KeywordFilterOption,
+    unused_library: KeywordFilterOption,
     verbose: int,
     file_path: str,
 ):
@@ -147,6 +156,7 @@ def keywords(  # noqa: PLR0913
         deprecated_keywords=deprecated,
         private_keywords=private,
         library_keywords=library,
+        unused_library_keywords=unused_library,
         keyword_filter_glob=filter,
         show_all_count=show_count,
         verbose=verbose,
@@ -305,6 +315,14 @@ def variables(
     help="How to output private keywords",
 )
 @click.option(
+    "-l",
+    "--library",
+    type=click_choice_keyword_filter_option,
+    default="exclude",
+    show_default=True,
+    help="How to output keywords from downloaded libraries",
+)
+@click.option(
     "-u",
     "--unused",
     type=click_choice_keyword_filter_option,
@@ -325,6 +343,7 @@ def arguments(  # noqa: PLR0913
     filter: str | None,  # noqa: A002
     deprecated: KeywordFilterOption,
     private: KeywordFilterOption,
+    library: KeywordFilterOption,
     unused: KeywordFilterOption,
     verbose: int,
     file_path: str,
@@ -379,7 +398,7 @@ def arguments(  # noqa: PLR0913
         source_path=file_path,
         deprecated_keywords=deprecated,
         private_keywords=private,
-        library_keywords="exclude",
+        library_keywords=library,
         unused_keywords=unused,
         keyword_filter_glob=filter,
         show_all_count=show_count,
@@ -421,6 +440,14 @@ def arguments(  # noqa: PLR0913
     help="How to output private keywords",
 )
 @click.option(
+    "-l",
+    "--library",
+    type=click_choice_keyword_filter_option,
+    default="exclude",
+    show_default=True,
+    help="How to output keywords from downloaded libraries",
+)
+@click.option(
     "-u",
     "--unused",
     type=click_choice_keyword_filter_option,
@@ -441,6 +468,7 @@ def returns(  # noqa: PLR0913
     filter: str | None,  # noqa: A002
     deprecated: KeywordFilterOption,
     private: KeywordFilterOption,
+    library: KeywordFilterOption,
     unused: KeywordFilterOption,
     verbose: int,
     file_path: str,
@@ -462,18 +490,12 @@ def returns(  # noqa: PLR0913
         ${returned_value} =    Run Keyword    Beautiful keyword
 
     This situation can't be counted without knowing what exactly `Run Keyword` does.
-
-    ----------
-
-    Limitation 2: Library keywords are ignored.
-
-    Any keyword defined in a Python file is ignored.
     """
     options = ReturnOptions(
         source_path=file_path,
         deprecated_keywords=deprecated,
         private_keywords=private,
-        library_keywords="exclude",
+        library_keywords=library,
         unused_keywords=unused,
         keyword_filter_glob=filter,
         show_all_count=show_count,

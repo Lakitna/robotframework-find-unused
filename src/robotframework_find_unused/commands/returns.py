@@ -9,6 +9,7 @@ import click
 from robotframework_find_unused.commands.step.discover_files import cli_discover_file_paths
 from robotframework_find_unused.common.cli import cli_hard_exit, pretty_kw_name
 from robotframework_find_unused.common.const import KeywordData, KeywordFilterOption
+from robotframework_find_unused.common.sort import sort_keywords_by_name
 
 from .step.keyword_count_uses import cli_count_keyword_uses
 from .step.keyword_definitions import cli_step_get_custom_keyword_definitions
@@ -49,6 +50,7 @@ def cli_returns(options: ReturnOptions):
     keywords = cli_step_get_custom_keyword_definitions(
         files,
         verbose=options.verbose,
+        enrich_py_keywords=True,
     )
     if len(keywords) == 0:
         return cli_hard_exit(options.verbose)
@@ -56,6 +58,7 @@ def cli_returns(options: ReturnOptions):
     downloaded_library_keywords = cli_step_get_downloaded_lib_keywords(
         file_paths,
         verbose=options.verbose,
+        enrich_py_keywords=options.library_keywords != "exclude",
     )
 
     counted_keywords = cli_count_keyword_uses(
@@ -64,6 +67,13 @@ def cli_returns(options: ReturnOptions):
         downloaded_library_keywords=downloaded_library_keywords,
         verbose=options.verbose,
     )
+
+    if options.library_keywords != "exclude" and options.unused_keywords != "exclude":
+        for lib in downloaded_library_keywords:
+            for kw in lib.keywords:
+                if kw in counted_keywords:
+                    continue
+                counted_keywords.append(kw)
 
     counted_keywords = cli_filter_keywords(
         counted_keywords,
@@ -82,14 +92,15 @@ def _cli_log_results(keywords: list[KeywordData], options: ReturnOptions) -> Non
     click.echo()
 
     if options.show_all_count:
+        sorted_keywords = sort_keywords_by_name(keywords)
+        sorted_keywords = sorted(sorted_keywords, key=lambda kw: kw.return_use_count)
+
         click.echo("return_use_count\tkeyword_name")
-
-        sorted_keywords = sorted(keywords, key=lambda kw: kw.return_use_count)
-
         for kw in sorted_keywords:
             click.echo("\t".join([str(kw.return_use_count), pretty_kw_name(kw)]))
     else:
         unused_returns = [kw for kw in keywords if kw.return_use_count == 0]
+        unused_returns = sort_keywords_by_name(unused_returns)
 
         click.echo(f"Found {len(unused_returns)} unused keyword returns:")
         for kw in unused_returns:

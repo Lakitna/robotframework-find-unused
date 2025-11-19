@@ -1,14 +1,20 @@
 from pathlib import Path
+from typing import cast
 
-from robot.libdocpkg.model import LibraryDoc
+from robot.libdocpkg.model import KeywordDoc, LibraryDoc
 
 from robotframework_find_unused.common.const import KeywordData, LibraryData
 from robotframework_find_unused.common.convert import libdoc_keyword_to_keyword_data
+from robotframework_find_unused.common.enrich_python_keywords import enrich_python_keyword_data
 from robotframework_find_unused.common.visit import visit_files
 from robotframework_find_unused.visitors.keyword_visitor import KeywordVisitor
 
 
-def get_custom_keyword_definitions(files: list[LibraryDoc]):
+def get_custom_keyword_definitions(
+    files: list[LibraryDoc],
+    *,
+    enrich_py_keywords: bool = False,
+):
     """
     Gather keyword definitions in the given scope with LibDoc
 
@@ -25,8 +31,27 @@ def get_custom_keyword_definitions(files: list[LibraryDoc]):
         else:
             raise ValueError("Unexpected file type " + file.type)
 
-        for keyword in file.keywords:
-            keywords.append(libdoc_keyword_to_keyword_data(keyword, file_type))
+        if file_type == "CUSTOM_LIBRARY" and enrich_py_keywords:
+            enriched_keywords = enrich_python_keyword_data(file)
+            for keyword in enriched_keywords:
+                keywords.append(
+                    libdoc_keyword_to_keyword_data(
+                        keyword.doc,
+                        file_type,
+                        keyword.returns,
+                    ),
+                )
+        else:
+            # LibDoc provides all the data we need
+            for keyword in cast(list[KeywordDoc], file.keywords):
+                keywords.append(
+                    libdoc_keyword_to_keyword_data(
+                        keyword,
+                        file_type,
+                        # We don't care or will gather this later
+                        keyword_returns=None,
+                    ),
+                )
 
     return keywords
 
