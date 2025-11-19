@@ -1,0 +1,16 @@
+Discovering files in `./robot` using Robocop config...
+Parsing files with LibDoc...
+[ DONE ] Parsed 4 files
+Gathering custom keyword definitions...
+[ DONE ] Found 6 custom keyword definitions
+Gathering downloaded library keyword definitions...
+[ DONE ] Found 1 downloaded libraries
+Counting keyword usage...
+[ DONE ] Processed 3 keyword calls
+[ NOTE ] Excluding downloaded library keywords
+[ NOTE ] Only showing returning keywords
+
+return_use_count	keyword_name
+0	KeywordClass.Returning Keyword From Class
+0	keywords.Returning Keyword
+0	keywords.Robot Keyword With Return
