@@ -67,6 +67,13 @@ def cli_returns(options: ReturnOptions):
         verbose=options.verbose,
     )
 
+    if options.library_keywords != "exclude" and options.unused_keywords != "exclude":
+        for lib in downloaded_library_keywords:
+            for kw in lib.keywords:
+                if kw in counted_keywords:
+                    continue
+                counted_keywords.append(kw)
+
     counted_keywords = cli_filter_keywords(
         counted_keywords,
         filter_deprecated=options.deprecated_keywords,

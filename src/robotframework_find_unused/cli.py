@@ -305,6 +305,14 @@ def variables(
     help="How to output private keywords",
 )
 @click.option(
+    "-l",
+    "--library",
+    type=click_choice_keyword_filter_option,
+    default="exclude",
+    show_default=True,
+    help="How to output keywords from downloaded libraries",
+)
+@click.option(
     "-u",
     "--unused",
     type=click_choice_keyword_filter_option,
@@ -325,6 +333,7 @@ def arguments(  # noqa: PLR0913
     filter: str | None,  # noqa: A002
     deprecated: KeywordFilterOption,
     private: KeywordFilterOption,
+    library: KeywordFilterOption,
     unused: KeywordFilterOption,
     verbose: int,
     file_path: str,
@@ -379,7 +388,7 @@ def arguments(  # noqa: PLR0913
         source_path=file_path,
         deprecated_keywords=deprecated,
         private_keywords=private,
-        library_keywords="exclude",
+        library_keywords=library,
         unused_keywords=unused,
         keyword_filter_glob=filter,
         show_all_count=show_count,
