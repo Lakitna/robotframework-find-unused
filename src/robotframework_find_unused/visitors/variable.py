@@ -1,5 +1,3 @@
-# pyright: reportPrivateImportUsage=false
-
 import re
 from collections.abc import Iterable
 
