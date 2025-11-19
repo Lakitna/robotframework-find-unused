@@ -27,6 +27,7 @@ class KeywordOptions:
     deprecated_keywords: KeywordFilterOption
     private_keywords: KeywordFilterOption
     library_keywords: KeywordFilterOption
+    unused_library_keywords: KeywordFilterOption
     keyword_filter_glob: str | None
     verbose: int
     source_path: str
@@ -64,7 +65,7 @@ def cli_keywords(options: KeywordOptions) -> int:
         verbose=options.verbose,
     )
 
-    if options.library_keywords != "exclude":
+    if options.library_keywords != "exclude" and options.unused_library_keywords != "exclude":
         for lib in downloaded_library_keywords:
             for kw in lib.keywords:
                 if kw in counted_keywords:

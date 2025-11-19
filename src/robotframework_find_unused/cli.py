@@ -77,6 +77,14 @@ def cli():
     help="How to output keywords from downloaded libraries",
 )
 @click.option(
+    "-u",
+    "--unused-library",
+    type=click.Choice(["include", "exclude"], case_sensitive=False),
+    default="exclude",
+    show_default=True,
+    help="How to output unused keywords from downloaded libraries",
+)
+@click.option(
     "-v",
     "--verbose",
     default=False,
@@ -90,6 +98,7 @@ def keywords(  # noqa: PLR0913
     deprecated: KeywordFilterOption,
     private: KeywordFilterOption,
     library: KeywordFilterOption,
+    unused_library: KeywordFilterOption,
     verbose: int,
     file_path: str,
 ):
@@ -147,6 +156,7 @@ def keywords(  # noqa: PLR0913
         deprecated_keywords=deprecated,
         private_keywords=private,
         library_keywords=library,
+        unused_library_keywords=unused_library,
         keyword_filter_glob=filter,
         show_all_count=show_count,
         verbose=verbose,
