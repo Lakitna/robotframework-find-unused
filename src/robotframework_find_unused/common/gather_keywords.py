@@ -37,7 +37,7 @@ def get_custom_keyword_definitions(
                 keywords.append(
                     libdoc_keyword_to_keyword_data(
                         keyword.doc,
-                        "CUSTOM_LIBRARY",
+                        file_type,
                         keyword.returns,
                     ),
                 )
