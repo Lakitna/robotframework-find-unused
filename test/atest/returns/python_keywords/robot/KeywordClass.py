@@ -1,9 +1,9 @@
 class KeywordClass:
-    def does_not_return_from_class() -> None:
+    def does_not_return_from_class(self) -> None:
         """Do nothing"""
 
-    def returning_keyword_from_class():
+    def returning_keyword_from_class(self):
         """Return true"""
         if True:
             return True
-        return
+        return  # noqa: RET502

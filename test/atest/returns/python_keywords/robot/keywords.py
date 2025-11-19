@@ -6,4 +6,4 @@ def returning_keyword():
     """Return true"""
     if True:
         return True
-    return
+    return  # noqa: RET502
