@@ -2,7 +2,7 @@ import ast
 
 from robot.libdocpkg.model import KeywordDoc
 
-from robotframework_find_unused.common.impossible_exception import ImpossibleStateError
+from robotframework_find_unused.common.impossible_state_error import ImpossibleStateError
 
 
 class EnrichedKeywordDoc:
