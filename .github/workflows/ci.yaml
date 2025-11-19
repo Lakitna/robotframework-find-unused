@@ -32,7 +32,7 @@ jobs:
           pip install poetry
           poetry install
           echo "Change to Robotframework ${{ matrix.robot-version }}"
-          poetry add robotframework${{ matrix.robot-version }}
+          poetry add "robotframework${{ matrix.robot-version }}"
       - name: Lint with ruff
         run: |
           poetry run ruff check
