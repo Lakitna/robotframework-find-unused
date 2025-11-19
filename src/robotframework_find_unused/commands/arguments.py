@@ -9,6 +9,7 @@ import click
 from robotframework_find_unused.commands.step.discover_files import cli_discover_file_paths
 from robotframework_find_unused.common.cli import cli_hard_exit, pretty_kw_name
 from robotframework_find_unused.common.const import INDENT, KeywordData, KeywordFilterOption
+from robotframework_find_unused.common.sort import sort_keywords_by_name
 
 from .step.keyword_count_uses import cli_count_keyword_uses
 from .step.keyword_definitions import cli_step_get_custom_keyword_definitions
@@ -86,6 +87,8 @@ def cli_arguments(options: ArgumentsOptions):
 
 def _cli_log_results(keywords: list[KeywordData], options: ArgumentsOptions) -> None:
     click.echo()
+
+    keywords = sort_keywords_by_name(keywords)
 
     for kw in keywords:
         if kw.argument_use_count is None:
