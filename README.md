@@ -49,14 +49,15 @@ robotunused keywords --help
 
 #### Available options
 
-| flag                 | option                         | default   | description                                                                          |
-| -------------------- | ------------------------------ | --------- | ------------------------------------------------------------------------------------ |
-| `-c`, `--show-count` |                                |           | Output usage count for all keywords instead of only unused keywords                  |
-| `-f`, `--filter`     | Globlike pattern               |           | Only output keywords who's name match the glob pattern. Match without library prefix |
-| `-d`, `--deprecated` | `include` / `exclude` / `only` | `include` | How to output deprecated keywords                                                    |
-| `-p`, `--private`    | `include` / `exclude` / `only` | `include` | How to output private keywords                                                       |
-| `-l`, `--library`    | `include` / `exclude` / `only` | `exclude` | How to output keywords from downloaded libraries                                     |
-| `-v`, `--verbose`    |                                |           | Show more log output. When provided twice: Show even more log output                 |
+| flag                     | option                         | default   | description                                                                          |
+| ------------------------ | ------------------------------ | --------- | ------------------------------------------------------------------------------------ |
+| `-c`, `--show-count`     |                                |           | Output usage count for all keywords instead of only unused keywords                  |
+| `-f`, `--filter`         | Globlike pattern               |           | Only output keywords who's name match the glob pattern. Match without library prefix |
+| `-d`, `--deprecated`     | `include` / `exclude` / `only` | `include` | How to output deprecated keywords                                                    |
+| `-p`, `--private`        | `include` / `exclude` / `only` | `include` | How to output private keywords                                                       |
+| `-l`, `--library`        | `include` / `exclude` / `only` | `exclude` | How to output keywords from downloaded libraries                                     |
+| `-u`, `--unused-library` | `include` / `exclude`          | `exclude` | How to output unused keywords from downloaded libraries                              |
+| `-v`, `--verbose`        |                                |           | Show more log output. When provided twice: Show even more log output                 |
 
 ### Find unused keyword arguments
 
@@ -84,6 +85,7 @@ robotunused arguments --help
 | `-f`, `--filter`     | Globlike pattern               |           | Only output keywords who's name match the glob pattern. Match without library prefix |
 | `-d`, `--deprecated` | `include` / `exclude` / `only` | `include` | How to output deprecated keywords                                                    |
 | `-p`, `--private`    | `include` / `exclude` / `only` | `include` | How to output private keywords                                                       |
+| `-l`, `--library`    | `include` / `exclude` / `only` | `exclude` | How to output keywords from downloaded libraries                                     |
 | `-u`, `--unused`     | `include` / `exclude` / `only` | `exclude` | How to output unused keywords                                                        |
 | `-v`, `--verbose`    |                                |           | Show more log output. When provided twice: Show even more log output                 |
 
@@ -114,6 +116,7 @@ robotunused returns --help
 | `-f`, `--filter`     | Globlike pattern               |           | Only output keywords who's name match the glob pattern. Match without library prefix |
 | `-d`, `--deprecated` | `include` / `exclude` / `only` | `include` | How to output deprecated keywords                                                    |
 | `-p`, `--private`    | `include` / `exclude` / `only` | `include` | How to output private keywords                                                       |
+| `-l`, `--library`    | `include` / `exclude` / `only` | `exclude` | How to output keywords from downloaded libraries                                     |
 | `-u`, `--unused`     | `include` / `exclude` / `only` | `exclude` | How to output unused keywords                                                        |
 | `-v`, `--verbose`    |                                |           | Show more log output. When provided twice: Show even more log output                 |
 
