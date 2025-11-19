@@ -480,12 +480,6 @@ def returns(  # noqa: PLR0913
         ${returned_value} =    Run Keyword    Beautiful keyword
 
     This situation can't be counted without knowing what exactly `Run Keyword` does.
-
-    ----------
-
-    Limitation 2: Library keywords are ignored.
-
-    Any keyword defined in a Python file is ignored.
     """
     options = ReturnOptions(
         source_path=file_path,
