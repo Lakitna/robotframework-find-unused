@@ -453,14 +453,12 @@ class KeywordVisitor(ModelVisitor):
 
             if token.type == Token.KEYWORD:
                 called_keyword_name = token.get_token(Token.KEYWORD)
-                if not called_keyword_name:
+                if not called_keyword_name or called_keyword_name.value is None:
                     continue
 
                 # Node is special return keywords `Return From Keyword` and `Return From Keyword If`
 
-                keyword_name_normalized = normalize_robot_name(
-                    called_keyword_name.value,
-                )
+                keyword_name_normalized = normalize_robot_name(called_keyword_name.value)
                 if keyword_name_normalized not in (
                     "returnfromkeyword",
                     "returnfromkeywordif",
