@@ -274,12 +274,13 @@ def variables(
 
     ----------
 
-    Limitation 5: Variable usage inside imported Python variables files is not counted.
+    Limitation 5: Only counts variable uses in `.robot` and `.resource` files.
 
-    You can import global variables from a variables file. In Python variable files, you can use
-    variables to create the value of other variables. This usage is not counted.
+    Using variables in Python files is never counted. This is true for both libraries and Python
+    variable files.
 
-    Example: The use of variable `person` is not counted in the following Python variable file:
+    Example: The use of the variable `person` is not counted because it's used in a Python variable
+    file.
 
     \b
         person = "Pekka"
