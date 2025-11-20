@@ -14,7 +14,7 @@ classifiers = [
 requires-python = ">=3.10"
 dependencies = [
     "click (>=8.1.7,<9.0.0)",
-    "robotframework (<8)",
+    "robotframework (>=6.1.1)",
     "robotframework-robocop (>=6.0.0)",
 ]
 
