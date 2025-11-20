@@ -7,10 +7,11 @@ from dataclasses import dataclass
 
 import click
 
-from robotframework_find_unused.commands.step.discover_files import cli_discover_file_paths
-from robotframework_find_unused.commands.step.variables_count_uses import cli_count_variable_uses
 from robotframework_find_unused.common.cli import cli_hard_exit
 from robotframework_find_unused.common.const import INDENT, VariableData
+
+from .step.discover_files import cli_discover_file_paths
+from .step.variables_count_uses import cli_count_variable_uses
 
 
 @dataclass

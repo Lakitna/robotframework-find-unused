@@ -6,11 +6,11 @@ from dataclasses import dataclass
 
 import click
 
-from robotframework_find_unused.commands.step.discover_files import cli_discover_file_paths
 from robotframework_find_unused.common.cli import cli_hard_exit, pretty_kw_name
 from robotframework_find_unused.common.const import INDENT, KeywordData, KeywordFilterOption
 from robotframework_find_unused.common.sort import sort_keywords_by_name
 
+from .step.discover_files import cli_discover_file_paths
 from .step.keyword_count_uses import cli_count_keyword_uses
 from .step.keyword_definitions import cli_step_get_custom_keyword_definitions
 from .step.keyword_filter import cli_filter_keywords

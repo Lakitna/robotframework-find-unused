@@ -3,11 +3,12 @@ from typing import cast
 
 from robot.libdocpkg.model import KeywordDoc, LibraryDoc
 
-from robotframework_find_unused.common.const import KeywordData, LibraryData
-from robotframework_find_unused.common.convert import libdoc_keyword_to_keyword_data
-from robotframework_find_unused.common.enrich_python_keywords import enrich_python_keyword_data
-from robotframework_find_unused.common.visit import visit_files
 from robotframework_find_unused.visitors.keyword_visitor import KeywordVisitor
+
+from .const import KeywordData, LibraryData
+from .convert import libdoc_keyword_to_keyword_data
+from .enrich_python_keywords import enrich_python_keyword_data
+from .visit import visit_files
 
 
 def get_custom_keyword_definitions(

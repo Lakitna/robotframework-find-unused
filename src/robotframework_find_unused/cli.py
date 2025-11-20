@@ -8,7 +8,7 @@ import sys
 
 import click
 
-from robotframework_find_unused.commands import (
+from .commands import (
     ArgumentsOptions,
     KeywordOptions,
     ReturnOptions,
@@ -18,7 +18,7 @@ from robotframework_find_unused.commands import (
     cli_returns,
     cli_variables,
 )
-from robotframework_find_unused.common.const import KeywordFilterOption
+from .common.const import KeywordFilterOption
 
 click_choice_keyword_filter_option = click.Choice(
     ["include", "exclude", "only"],

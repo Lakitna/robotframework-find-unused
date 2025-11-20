@@ -1,4 +1,4 @@
-from robotframework_find_unused.common.const import KeywordData
+from .const import KeywordData
 
 
 def sort_keywords_by_name(unsorted: list[KeywordData]) -> list[KeywordData]:
