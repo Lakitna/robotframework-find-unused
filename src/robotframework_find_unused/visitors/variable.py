@@ -76,9 +76,13 @@ class VariableVisitor(ModelVisitor):
             msg = "Found variables file import outside a .robot or .resource file"
             raise ImpossibleStateError(msg)
 
-        abs_import_path = self.current_working_directory.joinpath(node.name)
+        import_path = node.name
+        if "/" in import_path or "\\" in import_path:
+            # Is a file path. Make it absolute
+            import_path = self.current_working_directory.joinpath(node.name)
+
         try:
-            self._import_variable_file(abs_import_path, node.args)
+            self._import_variable_file(import_path, node.args)
         except Exception as e:  # noqa: BLE001
             click.echo(f"{ERROR_MARKER} Failed to import variables from variables file.")
             click.echo(f"{ERROR_MARKER} Something went very wrong. Details below:")
