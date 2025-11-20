@@ -7,9 +7,9 @@ Gathering custom keyword definitions...
 [ ERROR ] Found 0 custom keyword definitions
 Gathering downloaded library keyword definitions...
 [ DONE ] Found 3 downloaded libraries
-    BuiltIn: 107 keywords
-    Collections: 43 keywords
-    String: 32 keywords
+    BuiltIn: [[MASK]] keywords
+    Collections: [[MASK]] keywords
+    String: [[MASK]] keywords
 Counting keyword usage...
 [ DONE ] Processed 2 keyword calls
     1 calls to keywords of type LIBRARY

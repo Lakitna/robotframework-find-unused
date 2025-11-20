@@ -2,16 +2,19 @@ Discovering files in `./robot` using Robocop config...
 Parsing files with LibDoc...
 [ DONE ] Parsed 2 files
 Gathering custom keyword definitions...
-[ DONE ] Found 3 custom keyword definitions
+[ DONE ] Found 6 custom keyword definitions
 Gathering downloaded library keyword definitions...
 [ DONE ] Found 1 downloaded libraries
 Counting keyword usage...
-[ DONE ] Processed 9 keyword calls
+[ DONE ] Processed 15 keyword calls
 [ WARNING ] Found 1 called keywords without a definition
 [ NOTE ] Excluding downloaded library keywords
 
 use_count	keyword_name
 0	keywords.Beautiful Keyword
-1	Test.Test Template Keyword
 1	Undefined keyword
-4	keywords.Amazing Keyword
+1	keywords.Suite Setup Keyword
+1	keywords.Suite Teardown Keyword
+2	keywords.Amazing Keyword
+2	keywords.Test Setup Keyword
+2	keywords.Test Teardown Keyword

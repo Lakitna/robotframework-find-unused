@@ -1,4 +1,5 @@
 import difflib
+import re
 import subprocess
 import sys
 from pathlib import Path
@@ -30,6 +31,10 @@ class AcceptanceTest:
             cwd=test_folder,
             check=False,
         )
+
+        actual_output = self._parse_output(p.stdout.decode())
+        self._assert_logs(actual_output, expected_output)
+
         if p.returncode != expected_exit_code:
             pytest.fail(
                 (
@@ -41,11 +46,8 @@ class AcceptanceTest:
                 ),
             )
 
-        actual_output = p.stdout.decode()
-        self._assert_logs(actual_output, expected_output)
-
     def _assert_logs(self, actual: str, expected: str) -> None:
-        actual_lines = actual.strip().splitlines()
+        actual_lines = actual.splitlines()
         expected_lines = expected.strip().splitlines()
         diff = difflib.ndiff(actual_lines, expected_lines)
 
@@ -63,3 +65,21 @@ class AcceptanceTest:
 
         if error:
             pytest.fail("\n".join(error_msg), pytrace=False)
+
+    def _parse_output(self, output: str) -> str:
+        output = output.strip()
+
+        # Remove the keyword use count from standard libraries
+        builtin_libraries = [
+            "BuiltIn",
+            "Collections",
+            "DateTime",
+            "OperatingSystem",
+            "Process",
+            "String",
+            "XML",
+        ]
+        for lib in builtin_libraries:
+            output = re.sub(f"(    {lib}: )\\d+", r"\1[[MASK]]", output)
+
+        return output

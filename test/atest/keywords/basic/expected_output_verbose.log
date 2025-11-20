@@ -5,19 +5,19 @@ Parsing files with LibDoc...
     1 files of type CUSTOM_RESOURCE
     1 files of type CUSTOM_SUITE
 Gathering custom keyword definitions...
-[ DONE ] Found 9 custom keyword definitions
-    8 keywords of type CUSTOM_RESOURCE
+[ DONE ] Found 3 custom keyword definitions
+    2 keywords of type CUSTOM_RESOURCE
     1 keywords of type CUSTOM_SUITE
 Gathering downloaded library keyword definitions...
 [ DONE ] Found 1 downloaded libraries
-    BuiltIn: 107 keywords
+    BuiltIn: [[MASK]] keywords
 Counting keyword usage...
-[ DONE ] Processed 23 keyword calls
-    12 calls to keywords of type CUSTOM_RESOURCE
-    9 calls to keywords of type LIBRARY
+[ DONE ] Processed 9 keyword calls
+    4 calls to keywords of type CUSTOM_RESOURCE
+    3 calls to keywords of type LIBRARY
     1 calls to keywords of type CUSTOM_SUITE
     1 calls to keywords of type UNKNOWN
-[ DONE ] Found 11 unique keywords (keyword definitions and calls)
+[ DONE ] Found 5 unique keywords (keyword definitions and calls)
 [ WARNING ] Found 1 called keywords without a definition
     Undefined keyword
 [ NOTE ] Excluding downloaded library keywords
