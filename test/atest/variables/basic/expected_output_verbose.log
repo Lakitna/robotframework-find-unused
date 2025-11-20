@@ -9,8 +9,8 @@ Variables section variables usage metrics:
     Average	0.5x per variable
 
 Found 5 unused variables:
-    ${string_unused}
-    ${int_unused}
-    ${float_unused}
-    @{list_unused}
     &{dict_unused}
+    ${float_unused}
+    ${int_unused}
+    @{list_unused}
+    ${string_unused}

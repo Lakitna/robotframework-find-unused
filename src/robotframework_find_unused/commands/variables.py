@@ -59,17 +59,19 @@ def _cli_log_results(variables: list[VariableData], options: VariableOptions) ->
         variables = filtered_variables
 
     if options.show_all_count:
-        sorted_variables = sorted(variables, key=lambda var: var.use_count)
+        sorted_variables = sorted(variables, key=lambda var: var.normalized_name)
+        sorted_variables = sorted(sorted_variables, key=lambda var: var.use_count)
 
         click.echo("use_count\tvariable")
         for var in sorted_variables:
             click.echo("\t".join([str(var.use_count), var.name]))
     else:
-        unused_variables = [var.name for var in variables if var.use_count == 0]
+        unused_variables = [var for var in variables if var.use_count == 0]
+        unused_variables = sorted(unused_variables, key=lambda var: var.normalized_name)
 
         click.echo(f"Found {len(unused_variables)} unused variables:")
-        for name in unused_variables:
-            click.echo(INDENT + name)
+        for var in unused_variables:
+            click.echo(INDENT + var.name)
 
 
 def _exit_code(variables: list[VariableData]) -> int:
