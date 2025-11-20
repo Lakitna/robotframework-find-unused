@@ -198,10 +198,10 @@ def variables(
     file_path: str,
 ):
     """
-    Find unused variables defined in a variables section
+    Find unused global variables
 
-    Traverse files in the given file path. In those files, count how often each variable is used.
-    Variables defined in a variables section with 0 uses are logged.
+    Traverse files in the given file path. In those files, count how often each global variable is
+    used. Variables defined in a variables section or variable file with 0 uses are logged.
 
     ----------
 
@@ -210,7 +210,6 @@ def variables(
     All of the following variables are ignored:
 
     \b
-    - Variables only defined in a variables file
     - Variables only provided via the command line
     - Environment variables
     - BuiltIn variables
@@ -272,6 +271,19 @@ def variables(
         My Amazing Keyword
             ${response} =    GET    ${someUrl}
             RETURN    ${response.json()}
+
+    ----------
+
+    Limitation 5: Variable usage inside imported Python variables files is not counted.
+
+    You can import global variables from a variables file. In Python variable files, you can use
+    variables to create the value of other variables. This usage is not counted.
+
+    Example: The use of variable `person` is not counted in the following Python variable file:
+
+    \b
+        person = "Pekka"
+        message = "Hello " + person
     """
     options = VariableOptions(
         source_path=file_path,
