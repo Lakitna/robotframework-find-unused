@@ -1,5 +1,5 @@
 class DynamicClassName:
-    def get_variables(self, user_arg: bool = False):
+    def get_variables(self, user_arg: bool = False):  # noqa: FBT001, FBT002
         variables = {
             "static_var_from_python_dynamic_class_file": True,
         }
