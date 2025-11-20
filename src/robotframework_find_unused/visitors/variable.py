@@ -76,7 +76,6 @@ class VariableVisitor(ModelVisitor):
             msg = "Found variables file import outside a .robot or .resource file"
             raise ImpossibleStateError(msg)
 
-        # TODO: Limitation: No python module imports
         abs_import_path = self.current_working_directory.joinpath(node.name)
         try:
             self._import_variable_file(abs_import_path, node.args)
@@ -112,8 +111,6 @@ class VariableVisitor(ModelVisitor):
             return
 
         for var_name in var_store.as_dict(decoration=True):
-            # TODO: Limitation: Not looking for variable uses in variable values. We can't do this,
-            # since at we're using resolved values. This is a limitation that should be documented.
             self._register_variable(var_name, [])
 
     def _register_variable(self, name: str, value: Iterable[str]) -> None:
