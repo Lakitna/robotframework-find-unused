@@ -127,6 +127,7 @@ class VariableVisitor(ModelVisitor):
                 name_without_brackets=self._var_name_without_brackets(name),
                 use_count=0,
                 defined_in_variables_section=True,
+                extended_syntaxable=name.startswith(("&", "@")),
             )
         else:
             self.variables[name_normalized].defined_in_variables_section = True
@@ -271,5 +272,6 @@ class VariableVisitor(ModelVisitor):
                 name_without_brackets=self._var_name_without_brackets(name),
                 use_count=0,
                 defined_in_variables_section=False,
+                extended_syntaxable=False,
             )
         self.variables[normalized_name].use_count += 1

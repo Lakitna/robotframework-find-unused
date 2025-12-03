@@ -52,6 +52,7 @@ class VariableData:
     name_without_brackets: str
     use_count: int
     defined_in_variables_section: bool
+    extended_syntaxable: bool
 
 
 @dataclass
