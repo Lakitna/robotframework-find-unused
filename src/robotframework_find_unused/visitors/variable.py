@@ -42,6 +42,7 @@ class VariableVisitor(ModelVisitor):
     _pattern_eval_variable = re.compile(r"\$(\w+)")
     # Details: https://robotframework.org/robotframework/latest/RobotFrameworkUserGuide.html#inline-python-evaluation
     _pattern_inline_eval = re.compile(r"\${{(.+?)}}")
+    _pattern_variable_extended_syntax = re.compile(r"[^a-zA-Z]")
 
     def __init__(self) -> None:
         self.variables = {}
@@ -249,11 +250,28 @@ class VariableVisitor(ModelVisitor):
             if var in ("{true}", "{false}", "{none}", "{empty}", "{space}"):
                 continue
 
+            if not var.strip("{}").isalnum():
+                # Potential extended variable syntax
+                var = self._normalize_extended_variable_syntax(var)
+
             filtered.append(
                 (var, formatted_var),
             )
 
         return filtered
+
+    def _normalize_extended_variable_syntax(self, var: str) -> str:
+        base_name = var.strip("{}")
+        base_name = re.split(self._pattern_variable_extended_syntax, base_name, maxsplit=1)[0]
+        base_name = "{" + base_name + "}"
+
+        if base_name in self.variables:
+            var_def = self.variables[base_name]
+            if var_def.extended_syntaxable:
+                # Is extended variable syntax
+                return base_name
+
+        return var
 
     def _normalize_var_name(self, name: str) -> str:
         return name.lstrip("$@&").replace(" ", "").replace("_", "").lower()
