@@ -3,7 +3,7 @@ from typing import Any, Literal, cast
 from robocop.linter.utils.misc import normalize_robot_name
 from robot.libdocpkg.model import KeywordDoc
 
-from robotframework_find_unused.common.const import KeywordData
+from .const import KeywordData
 
 
 def libdoc_keyword_to_keyword_data(

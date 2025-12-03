@@ -17,8 +17,10 @@ class AcceptanceTest:
         expected_exit_code: int = 0,
     ):
         test_folder = Path(test_file_path).parent
-        expected_output_path_absolute: Path = test_folder.joinpath(expected_output_path)
+        test_data_folder = test_folder.joinpath(cli_options[1])
+        sys.path.append(str(test_data_folder))
 
+        expected_output_path_absolute: Path = test_folder.joinpath(expected_output_path)
         with expected_output_path_absolute.open() as f:
             expected_output = f.read()
 

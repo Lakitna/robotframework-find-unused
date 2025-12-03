@@ -1,7 +1,8 @@
 from pathlib import Path
 
-from robotframework_find_unused.common.visit import visit_files
 from robotframework_find_unused.visitors.variable import VariableVisitor
+
+from .visit import visit_files
 
 
 def count_variable_uses(file_paths: list[Path]):

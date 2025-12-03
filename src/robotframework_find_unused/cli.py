@@ -8,7 +8,7 @@ import sys
 
 import click
 
-from robotframework_find_unused.commands import (
+from .commands import (
     ArgumentsOptions,
     KeywordOptions,
     ReturnOptions,
@@ -18,7 +18,7 @@ from robotframework_find_unused.commands import (
     cli_returns,
     cli_variables,
 )
-from robotframework_find_unused.common.const import KeywordFilterOption
+from .common.const import KeywordFilterOption
 
 click_choice_keyword_filter_option = click.Choice(
     ["include", "exclude", "only"],
@@ -198,10 +198,10 @@ def variables(
     file_path: str,
 ):
     """
-    Find unused variables defined in a variables section
+    Find unused global variables
 
-    Traverse files in the given file path. In those files, count how often each variable is used.
-    Variables defined in a variables section with 0 uses are logged.
+    Traverse files in the given file path. In those files, count how often each global variable is
+    used. Variables defined in a variables section or variable file with 0 uses are logged.
 
     ----------
 
@@ -210,7 +210,6 @@ def variables(
     All of the following variables are ignored:
 
     \b
-    - Variables only defined in a variables file
     - Variables only provided via the command line
     - Environment variables
     - BuiltIn variables
@@ -272,6 +271,20 @@ def variables(
         My Amazing Keyword
             ${response} =    GET    ${someUrl}
             RETURN    ${response.json()}
+
+    ----------
+
+    Limitation 5: Only counts variable uses in `.robot` and `.resource` files.
+
+    Using variables in Python files is never counted. This is true for both libraries and Python
+    variable files.
+
+    Example: The use of the variable `person` is not counted because it's used in a Python variable
+    file.
+
+    \b
+        person = "Pekka"
+        message = "Hello " + person
     """
     options = VariableOptions(
         source_path=file_path,

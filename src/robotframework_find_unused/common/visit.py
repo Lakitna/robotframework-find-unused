@@ -1,11 +1,11 @@
 from pathlib import Path
 
-import robot.parsing
+import robot.api.parsing
 
 
 def visit_files(
     file_paths: list[Path],
-    visitor: robot.parsing.model.ModelVisitor,
+    visitor: robot.api.parsing.ModelVisitor,
 ):
     """
     Use Robocop to traverse files with a visitor.
@@ -13,5 +13,5 @@ def visit_files(
     See Robocop/Robotframework docs on Visitor details.
     """
     for file_path in file_paths:
-        model = robot.parsing.get_model(file_path, data_only=True)
+        model = robot.api.parsing.get_model(file_path, data_only=True)
         visitor.visit(model)

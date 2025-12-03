@@ -3,8 +3,8 @@ Gathering variables usage...
 [ DONE ] Found 10 unique variables defined in a variables section
 
 Found 5 unused variables:
-    ${string_unused}
-    ${int_unused}
-    ${float_unused}
-    @{list_unused}
     &{dict_unused}
+    ${float_unused}
+    ${int_unused}
+    @{list_unused}
+    ${string_unused}

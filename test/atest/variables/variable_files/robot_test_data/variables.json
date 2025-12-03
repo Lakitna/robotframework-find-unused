@@ -1,0 +1,11 @@
+{
+    "var_from_json_file": true,
+    "list_var_from_json_file": [
+        1,
+        2,
+        3
+    ],
+    "dict_var_from_json_file": {
+        "foo": "bar"
+    }
+}

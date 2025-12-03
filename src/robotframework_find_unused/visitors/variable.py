@@ -1,17 +1,23 @@
 import re
 from collections.abc import Iterable
+from pathlib import Path
 
+import click
+import robot.errors
 from robot.api.parsing import (
     Arguments,
+    File,
     For,
     If,
     KeywordCall,
     ModelVisitor,
     Variable,
     VariableSection,
+    VariablesImport,
 )
 
-from robotframework_find_unused.common.const import VariableData
+from robotframework_find_unused.common.const import ERROR_MARKER, VariableData
+from robotframework_find_unused.common.impossible_state_error import ImpossibleStateError
 
 
 class VariableVisitor(ModelVisitor):
@@ -28,6 +34,8 @@ class VariableVisitor(ModelVisitor):
     """
 
     variables: dict[str, VariableData]
+    current_working_file: Path | None = None
+    current_working_directory: Path | None = None
 
     _pattern_variable = re.compile(r"[@$&](\{[^{].+?[^}]\})")
     # Details: https://robotframework.org/robotframework/latest/RobotFrameworkUserGuide.html#special-variable-syntax
@@ -39,6 +47,14 @@ class VariableVisitor(ModelVisitor):
         self.variables = {}
         super().__init__()
 
+    def visit_File(self, node: File):  # noqa: N802
+        """Keep track of the current working file"""
+        if node.source is not None:
+            self.current_working_file = node.source
+            self.current_working_directory = self.current_working_file.parent
+
+        return self.generic_visit(node)
+
     def visit_VariableSection(self, node: VariableSection):  # noqa: N802
         """
         Look for variable declarations in the variables section.
@@ -48,26 +64,75 @@ class VariableVisitor(ModelVisitor):
         for var_node in node.body:
             if not isinstance(var_node, Variable):
                 continue
-
-            name = self._normalize_var_name(var_node.name)
-            if name not in self.variables:
-                # Set defined variable to be unused
-                self.variables[name] = VariableData(
-                    name=var_node.name,
-                    normalized_name=name,
-                    name_without_brackets=self._var_name_without_brackets(
-                        var_node.name,
-                    ),
-                    use_count=0,
-                    defined_in_variables_section=True,
-                )
-            else:
-                self.variables[name].defined_in_variables_section = True
-                self.variables[name].name = var_node.name
-
-            self._count_used_vars_in_args(var_node.value)
+            self._register_variable(var_node.name, var_node.value)
 
         return self.generic_visit(node)
+
+    def visit_VariablesImport(self, node: VariablesImport):  # noqa: N802
+        """
+        Look for variable declarations in variable files.
+        """
+        if self.current_working_directory is None:
+            msg = "Found variables file import outside a .robot or .resource file"
+            raise ImpossibleStateError(msg)
+
+        import_path = node.name
+        if "/" in import_path or "\\" in import_path:
+            # Is a file path. Make it absolute
+            import_path = self.current_working_directory.joinpath(node.name)
+
+        try:
+            self._import_variable_file(import_path, node.args)
+        except Exception as e:  # noqa: BLE001
+            click.echo(f"{ERROR_MARKER} Failed to import variables from variables file.")
+            click.echo(f"{ERROR_MARKER} Something went very wrong. Details below:")
+            click.echo(f"{ERROR_MARKER} {e}")
+            click.echo()
+
+        return self.generic_visit(node)
+
+    def _import_variable_file(self, import_path: Path | str, import_args: tuple[str, ...]) -> None:
+        """
+        Import a file as a variable file.
+
+        WARNING: This function uses code that is NOT in the public Robot API.
+        Always wrap this function in a try-except to reduce the impact of internal Robot code
+        changing.
+        """
+        from robot.variables.filesetter import VariableFileSetter
+        from robot.variables.store import VariableStore
+
+        var_store = VariableStore(None)
+        file_setter = VariableFileSetter(var_store)
+
+        try:
+            file_setter.set(
+                str(import_path),
+                args=import_args,
+            )
+        except robot.errors.DataError as e:
+            click.echo(f"{ERROR_MARKER} {e.message.splitlines()[0]}")
+            return
+
+        for var_name in var_store.as_dict(decoration=True):
+            self._register_variable(var_name, [])
+
+    def _register_variable(self, name: str, value: Iterable[str]) -> None:
+        name_normalized = self._normalize_var_name(name)
+        if name_normalized not in self.variables:
+            # Set defined variable to be unused
+            self.variables[name_normalized] = VariableData(
+                name=name,
+                normalized_name=name_normalized,
+                name_without_brackets=self._var_name_without_brackets(name),
+                use_count=0,
+                defined_in_variables_section=True,
+            )
+        else:
+            self.variables[name_normalized].defined_in_variables_section = True
+            self.variables[name_normalized].name = name
+
+        self._count_used_vars_in_args(value)
 
     def visit_Arguments(self, node: Arguments):  # noqa: N802
         """
