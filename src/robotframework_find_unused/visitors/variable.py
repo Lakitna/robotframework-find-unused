@@ -247,6 +247,7 @@ class VariableVisitor(ModelVisitor):
             if "${" in stripped_var or "@{" in stripped_var or "&{" in stripped_var:
                 # There is a variable inside the variable name.
                 # Not worth supporting this at this time
+                # See issue #14
                 continue
 
             if not stripped_var.isalnum():
