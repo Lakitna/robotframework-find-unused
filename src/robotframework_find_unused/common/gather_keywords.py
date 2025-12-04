@@ -8,7 +8,7 @@ from robotframework_find_unused.visitors.keyword_visitor import KeywordVisitor
 from .const import KeywordData, LibraryData
 from .convert import libdoc_keyword_to_keyword_data
 from .enrich_python_keywords import enrich_python_keyword_data
-from .visit import visit_files
+from .visit import visit_robot_files
 
 
 def get_custom_keyword_definitions(
@@ -66,5 +66,5 @@ def count_keyword_uses(
     Walk through all robot files to count keyword uses.
     """
     visitor = KeywordVisitor(keywords, downloaded_library_keywords)
-    visit_files(file_paths, visitor)
+    visit_robot_files(file_paths, visitor)
     return list(visitor.keywords.values())
