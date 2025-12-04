@@ -89,5 +89,5 @@ def _log_variable_stats(variables: list[VariableData], verbose: int) -> None:
         average = 0
     click.echo(
         f"{INDENT}{INDENT}Average\t{average} "
-        + click.style("uses per gathered variable", fg="bright_black")
+        + click.style("uses per gathered variable", fg="bright_black"),
     )

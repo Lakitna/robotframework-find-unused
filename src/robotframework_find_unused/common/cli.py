@@ -3,8 +3,7 @@ from typing import Literal
 
 import click
 
-from .const import NOTE_MARKER, VERBOSE_DOUBLE
-from .gather_keywords import KeywordData
+from .const import NOTE_MARKER, VERBOSE_DOUBLE, KeywordData
 
 
 def pretty_kw_name(keyword: KeywordData) -> str:
