@@ -9,9 +9,9 @@ use_count	variable
 0	${int_unused}
 0	@{list_unused}
 0	${string_unused}
-1	${dot.separated.used}
 1	${float_used}
 1	${int_used}
-1	${string_used}
+2	${dot.separated.used}
 4	&{dict_used}
 4	@{list_used}
+4	${string_used}

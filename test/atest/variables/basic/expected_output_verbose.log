@@ -5,8 +5,8 @@ Gathering variables usage...
     12	total variables
     6	unused variables (50.0%)
 Variables section variables usage metrics:
-    Total	12x
-    Average	1.0x per variable
+    Total	16x
+    Average	1.3x per variable
 
 Found 6 unused variables:
     &{dict_unused}

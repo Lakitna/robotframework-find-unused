@@ -28,7 +28,10 @@ Use some Variables
     Log    &{dict_used}
 
 Use some Variables with extended syntax
+    Log    ${i.do.not.exist}
+
     Log    ${dot.separated.used}
+    Log    ${dot.separated.used.lower()}
     Log    ${string_used.extended}
     Log    ${string_used[0]}
     Log    ${string_used["extended"]}
