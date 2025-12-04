@@ -43,15 +43,18 @@ class KeywordData:
     library: str
 
 
+type VariableDefinedInType = Literal["variables_section", "variable_file", "runtime"]
+
+
 @dataclass
 class VariableData:
     """Data structure for Variables"""
 
     name: str
     normalized_name: str
-    name_without_brackets: str
     use_count: int
-    defined_in_variables_section: bool
+    defined_in_type: VariableDefinedInType
+    defined_in: str
 
 
 @dataclass
