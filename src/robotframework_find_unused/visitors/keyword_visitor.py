@@ -2,7 +2,6 @@ from collections.abc import Iterable
 from dataclasses import dataclass
 from typing import Any, Literal
 
-from robocop.linter.utils.misc import normalize_robot_name
 from robot.api.parsing import (
     Keyword,
     KeywordCall,
@@ -23,6 +22,7 @@ from robot.parsing.model.blocks import Block
 from robot.running.arguments.argumentmapper import DefaultValue
 
 from robotframework_find_unused.common.const import KeywordData
+from robotframework_find_unused.common.normalize import normalize_keyword_name
 from robotframework_find_unused.visitors.library_import import LibraryData
 
 
@@ -38,12 +38,7 @@ class KeywordCallData:
 
 class KeywordVisitor(ModelVisitor):
     """
-    A Robocop visitor.
-
-    Will never log a lint issue, unlike a normal Robocop visitor. We use it here
-    as a convenient way of working with Robotframework files.
-
-    Uses file exclusion from the Robocop config.
+    A Robot Framework visitor.
 
     Gathers keywords
     Counts keyword usage
@@ -154,7 +149,7 @@ class KeywordVisitor(ModelVisitor):
 
     def _get_keyword_data(self, name: str) -> KeywordData:
         name = self._remove_lib_from_name(name)
-        normalized_name = normalize_robot_name(name)
+        normalized_name = normalize_keyword_name(name)
 
         if normalized_name not in self.keywords:
             # Found a previously unused:
@@ -247,7 +242,7 @@ class KeywordVisitor(ModelVisitor):
             # Remove library prefix
             arg_val = arg_val.split(".", 1)[1]
 
-        normalized_name = normalize_robot_name(arg_val)
+        normalized_name = normalize_keyword_name(arg_val)
         if normalized_name not in self.normalized_keyword_names:
             # Not a known keyword name
             return False
@@ -458,7 +453,7 @@ class KeywordVisitor(ModelVisitor):
 
                 # Node is special return keywords `Return From Keyword` and `Return From Keyword If`
 
-                keyword_name_normalized = normalize_robot_name(called_keyword_name.value)
+                keyword_name_normalized = normalize_keyword_name(called_keyword_name.value)
                 if keyword_name_normalized not in (
                     "returnfromkeyword",
                     "returnfromkeywordif",

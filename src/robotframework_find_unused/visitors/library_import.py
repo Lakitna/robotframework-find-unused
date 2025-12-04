@@ -2,7 +2,6 @@ from typing import cast
 
 import click
 import robot.errors
-from robocop.linter.utils.misc import normalize_robot_name
 from robot.api.parsing import LibraryImport, ModelVisitor
 from robot.libdoc import LibraryDocumentation
 from robot.libdocpkg.model import KeywordDoc, LibraryDoc
@@ -10,16 +9,12 @@ from robot.libdocpkg.model import KeywordDoc, LibraryDoc
 from robotframework_find_unused.common.const import ERROR_MARKER, LibraryData
 from robotframework_find_unused.common.convert import libdoc_keyword_to_keyword_data
 from robotframework_find_unused.common.enrich_python_keywords import enrich_python_keyword_data
+from robotframework_find_unused.common.normalize import normalize_library_name
 
 
 class LibraryImportVisitor(ModelVisitor):
     """
     Gather downloaded library imports
-
-    A Robocop visitor. Will never log a lint issue, unlike a normal Robocop visitor. We use it here
-    as a convenient way of working with Robotframework files.
-
-    Uses file exclusion from the Robocop config.
     """
 
     downloaded_libraries: dict[str, LibraryData]
@@ -43,7 +38,7 @@ class LibraryImportVisitor(ModelVisitor):
         self._register_downloaded_library(lib_name)
 
     def _register_downloaded_library(self, lib_name: str) -> None:
-        normalized_lib_name = normalize_robot_name(lib_name)
+        normalized_lib_name = normalize_library_name(lib_name)
 
         if normalized_lib_name in self.downloaded_libraries:
             # Already found it

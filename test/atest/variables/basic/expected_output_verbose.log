@@ -1,12 +1,17 @@
 Discovering files in `./robot` using Robocop config...
 [ DONE ] Discovered 1 files
-Gathering variables usage...
-[ DONE ] Found 12 unique variables defined in a variables section
-    12	total variables
-    6	unused variables (50.0%)
-Variables section variables usage metrics:
-    Total	16x
-    Average	1.3x per variable
+Gathering variables definitions...
+[ DONE ] Found 12 unique non-local variables definitions
+    12 variables definitions of type 'variables_section'
+Counting variable usage...
+[ DONE ] Found 16 variable uses of gathered variables
+    Variable definitions
+        Total	12
+        Used	6	(50.0%)
+        Unused	6	(50.0%)
+    Variable usage
+        Total	16 uses
+        Average	1.3 uses per gathered variable
 
 Found 6 unused variables:
     &{dict_unused}

@@ -9,56 +9,85 @@ from robotframework_find_unused.common.const import (
     VERBOSE_NO,
     VariableData,
 )
-from robotframework_find_unused.common.gather_variables import count_variable_uses
+from robotframework_find_unused.common.visit import visit_robot_files
+from robotframework_find_unused.visitors.variable_count import VariableCountVisitor
 
 
 def cli_count_variable_uses(
     file_paths: list[Path],
+    variable_defs: dict[str, VariableData],
     *,
     verbose: int,
 ):
     """
-    Gather variable definitions and count variable uses and show progress
+    Walk through all robot files to count keyword uses and show progress
     """
-    click.echo("Gathering variables usage...")
-    variables = count_variable_uses(file_paths)
-    click.echo(
-        (ERROR_MARKER if len(variables) == 0 else DONE_MARKER)
-        + f" Found {len(variables)} unique variables defined in a variables section",
-    )
+    click.echo("Counting variable usage...")
+    variables = _count_variable_uses(file_paths, variable_defs)
 
     _log_variable_stats(variables, verbose)
     return variables
+
+
+def _count_variable_uses(
+    file_paths: list[Path],
+    variables: dict[str, VariableData],
+) -> list[VariableData]:
+    """
+    Walk through all robot files to count keyword uses.
+    """
+    visitor = VariableCountVisitor(variables)
+    visit_robot_files(file_paths, visitor)
+
+    return list(visitor.variables.values())
 
 
 def _log_variable_stats(variables: list[VariableData], verbose: int) -> None:
     """
     Output details encountered downloaded libraries to the user
     """
+    total_uses = 0
+    for var in variables:
+        total_uses += var.use_count
+    click.echo(
+        (ERROR_MARKER if total_uses == 0 else DONE_MARKER)
+        + f" Found {total_uses} variable uses of gathered variables",
+    )
+
     if verbose == VERBOSE_NO:
         return
 
-    click.echo(
-        f"{INDENT}{len(variables)}\ttotal variables",
-    )
+    click.echo(f"{INDENT}Variable definitions")
+    click.echo(f"{INDENT}{INDENT}Total\t{len(variables)}")
 
     unused_variables = [var.name for var in variables if var.use_count == 0]
     try:
-        percentage = round(len(unused_variables) / len(variables) * 100, 1)
+        percentage_unused = round(len(unused_variables) / len(variables) * 100, 1)
     except ZeroDivisionError:
-        percentage = 0
+        percentage_unused = 0
+
+    percentage_used = round((100 - percentage_unused), 1)
     click.echo(
-        f"{INDENT}{len(unused_variables)}\tunused variables ({percentage}%)",
+        f"{INDENT}{INDENT}Used\t{len(variables) - len(unused_variables)}\t"
+        + click.style(f"({percentage_used}%)", fg="bright_black"),
     )
+    click.echo(
+        f"{INDENT}{INDENT}Unused\t{len(unused_variables)}\t"
+        + click.style(f"({percentage_unused}%)", fg="bright_black"),
+    )
+
+    click.echo(f"{INDENT}Variable usage")
 
     total_uses = 0
     for var in variables:
         total_uses += var.use_count
-    click.echo("Variables section variables usage metrics:")
-    click.echo(f"{INDENT}Total\t{total_uses}x")
+    click.echo(f"{INDENT}{INDENT}Total\t{total_uses} " + click.style("uses", fg="bright_black"))
 
     try:
         average = round(total_uses / len(variables), 1)
     except ZeroDivisionError:
         average = 0
-    click.echo(f"{INDENT}Average\t{average}x per variable")
+    click.echo(
+        f"{INDENT}{INDENT}Average\t{average} "
+        + click.style("uses per gathered variable", fg="bright_black"),
+    )

@@ -7,9 +7,11 @@ from robotframework_find_unused.common.const import (
     INDENT,
     VERBOSE_NO,
     WARN_MARKER,
+    KeywordData,
+    LibraryData,
 )
-from robotframework_find_unused.common.gather_keywords import KeywordData, count_keyword_uses
-from robotframework_find_unused.visitors.library_import import LibraryData
+from robotframework_find_unused.common.visit import visit_robot_files
+from robotframework_find_unused.visitors.keyword_visitor import KeywordVisitor
 
 
 def cli_count_keyword_uses(
@@ -20,11 +22,11 @@ def cli_count_keyword_uses(
     verbose: int,
 ):
     """
-    Count keyword uses with RoboCop and keep the user up-to-date on progress
+    Walk through all robot files to count keyword uses and keep the user up-to-date on progress
     """
     click.echo("Counting keyword usage...")
 
-    counted_keywords = count_keyword_uses(
+    counted_keywords = _count_keyword_uses(
         file_paths,
         keywords,
         downloaded_library_keywords,
@@ -35,6 +37,19 @@ def cli_count_keyword_uses(
     _log_unknown_keyword_stats(unknown_keywords, verbose)
 
     return counted_keywords
+
+
+def _count_keyword_uses(
+    file_paths: list[Path],
+    keywords: list[KeywordData],
+    downloaded_library_keywords: list[LibraryData],
+) -> list[KeywordData]:
+    """
+    Walk through all robot files to count keyword uses.
+    """
+    visitor = KeywordVisitor(keywords, downloaded_library_keywords)
+    visit_robot_files(file_paths, visitor)
+    return list(visitor.keywords.values())
 
 
 def _log_keyword_call_stats(keywords: list[KeywordData], verbose: int) -> None:

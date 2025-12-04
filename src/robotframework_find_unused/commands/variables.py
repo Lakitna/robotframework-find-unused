@@ -12,6 +12,7 @@ from robotframework_find_unused.common.const import INDENT, VariableData
 
 from .step.discover_files import cli_discover_file_paths
 from .step.variables_count_uses import cli_count_variable_uses
+from .step.variables_definitions import cli_get_variable_definitions
 
 
 @dataclass
@@ -34,12 +35,15 @@ def cli_variables(options: VariableOptions):
     if len(file_paths) == 0:
         return cli_hard_exit(options.verbose)
 
-    variables = cli_count_variable_uses(
-        file_paths,
-        verbose=options.verbose,
-    )
+    variables = cli_get_variable_definitions(file_paths, verbose=options.verbose)
     if len(variables) == 0:
         return cli_hard_exit(options.verbose)
+
+    variables = cli_count_variable_uses(
+        file_paths,
+        variables,
+        verbose=options.verbose,
+    )
 
     _cli_log_results(variables, options)
     return _exit_code(variables)
@@ -54,7 +58,7 @@ def _cli_log_results(variables: list[VariableData], options: VariableOptions) ->
         pattern = options.filter_glob.lower()
         filtered_variables = []
         for var in variables:
-            if fnmatch.fnmatchcase(var.name_without_brackets.lower(), pattern):
+            if fnmatch.fnmatchcase(var.normalized_name, pattern):
                 filtered_variables.append(var)
 
         variables = filtered_variables

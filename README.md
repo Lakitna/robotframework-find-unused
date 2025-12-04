@@ -123,7 +123,7 @@ robotunused returns --help
 ### Find unused global variables
 
 Walk through your `.robot` and `.resource` files. In those files, count how often each
-variable is used. Variables defined in a variables section with 0 uses are logged.
+variable is used. Variables defined in a variables section or variable file with 0 uses are logged.
 
 ```shell
 robotunused variables
@@ -138,11 +138,11 @@ robotunused variables --help
 
 #### Available options
 
-| flag                 | option           | default | description                                                                                         |
-| -------------------- | ---------------- | ------- | --------------------------------------------------------------------------------------------------- |
-| `-c`, `--show-count` |                  |         | Show usage count for all variables instead of only unused variables                                 |
-| `-f`, `--filter`     | Globlike pattern |         | Only show variables who's name match the glob pattern. Matching without {brackets} and $@& prefixes |
-| `-v`, `--verbose`    |                  |         | Show more log output. When provided twice: Show even more log output                                |
+| flag                 | option           | default | description                                                                                          |
+| -------------------- | ---------------- | ------- | ---------------------------------------------------------------------------------------------------- |
+| `-c`, `--show-count` |                  |         | Show usage count for all variables instead of only unused variables                                  |
+| `-f`, `--filter`     | Globlike pattern |         | Only show variables who's name match the glob pattern. Matching without {brackets} and $@&% prefixes |
+| `-v`, `--verbose`    |                  |         | Show more log output. When provided twice: Show even more log output                                 |
 
 ## Contributing
 

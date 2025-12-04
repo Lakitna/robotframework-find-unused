@@ -1,9 +1,9 @@
 from typing import Any, Literal, cast
 
-from robocop.linter.utils.misc import normalize_robot_name
 from robot.libdocpkg.model import KeywordDoc
 
 from .const import KeywordData
+from .normalize import normalize_keyword_name
 
 
 def libdoc_keyword_to_keyword_data(
@@ -19,7 +19,7 @@ def libdoc_keyword_to_keyword_data(
         argument_use_count[arg] = 0
 
     return KeywordData(
-        normalized_name=normalize_robot_name(libdoc.name),
+        normalized_name=normalize_keyword_name(libdoc.name),
         name=libdoc.name,
         library=cast(Any, libdoc.parent).name,
         deprecated=(libdoc.deprecated is True),
