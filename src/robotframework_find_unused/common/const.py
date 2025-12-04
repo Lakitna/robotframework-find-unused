@@ -43,7 +43,7 @@ class KeywordData:
     library: str
 
 
-type VariableDefinedInType = Literal["variables_section", "variable_file", "runtime"]
+VariableDefinedInType: TypeAlias = Literal["variables_section", "variable_file", "runtime"]
 
 
 @dataclass

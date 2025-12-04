@@ -205,7 +205,7 @@ def variables(
 
     ----------
 
-    Limitation 1: Only variables defined in a variables section.
+    Limitation 1: Only variables defined in a variables section or variable file.
 
     All of the following variables are ignored:
 
