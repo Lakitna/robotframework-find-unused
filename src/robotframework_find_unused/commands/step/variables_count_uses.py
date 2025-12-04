@@ -20,7 +20,7 @@ def cli_count_variable_uses(
     verbose: int,
 ):
     """
-    Walk through all robot files with RoboCop to count keyword uses and show progress
+    Walk through all robot files to count keyword uses and show progress
     """
     click.echo("Counting variable usage...")
     variables = _count_variable_uses(file_paths, variable_defs)
@@ -34,7 +34,7 @@ def _count_variable_uses(
     variables: dict[str, VariableData],
 ) -> list[VariableData]:
     """
-    Walk through all robot files with RoboCop to count keyword uses.
+    Walk through all robot files to count keyword uses.
     """
     visitor = VariableCountVisitor(variables)
     visit_robot_files(file_paths, visitor)

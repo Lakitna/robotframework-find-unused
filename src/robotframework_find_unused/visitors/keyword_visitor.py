@@ -38,12 +38,7 @@ class KeywordCallData:
 
 class KeywordVisitor(ModelVisitor):
     """
-    A Robocop visitor.
-
-    Will never log a lint issue, unlike a normal Robocop visitor. We use it here
-    as a convenient way of working with Robotframework files.
-
-    Uses file exclusion from the Robocop config.
+    A Robot Framework visitor.
 
     Gathers keywords
     Counts keyword usage

@@ -15,11 +15,6 @@ from robotframework_find_unused.common.normalize import normalize_library_name
 class LibraryImportVisitor(ModelVisitor):
     """
     Gather downloaded library imports
-
-    A Robocop visitor. Will never log a lint issue, unlike a normal Robocop visitor. We use it here
-    as a convenient way of working with Robotframework files.
-
-    Uses file exclusion from the Robocop config.
     """
 
     downloaded_libraries: dict[str, LibraryData]
