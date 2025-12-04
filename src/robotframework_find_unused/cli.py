@@ -180,7 +180,7 @@ def keywords(  # noqa: PLR0913
     metavar="<GLOB>",
     help=(
         "Only show variables who's name match the glob pattern. "
-        "Matching without {brackets} and $@& prefixes"
+        "Matching without {brackets} and $@&% prefixes"
     ),
 )
 @click.option(

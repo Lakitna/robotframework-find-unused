@@ -138,11 +138,11 @@ robotunused variables --help
 
 #### Available options
 
-| flag                 | option           | default | description                                                                                         |
-| -------------------- | ---------------- | ------- | --------------------------------------------------------------------------------------------------- |
-| `-c`, `--show-count` |                  |         | Show usage count for all variables instead of only unused variables                                 |
-| `-f`, `--filter`     | Globlike pattern |         | Only show variables who's name match the glob pattern. Matching without {brackets} and $@& prefixes |
-| `-v`, `--verbose`    |                  |         | Show more log output. When provided twice: Show even more log output                                |
+| flag                 | option           | default | description                                                                                          |
+| -------------------- | ---------------- | ------- | ---------------------------------------------------------------------------------------------------- |
+| `-c`, `--show-count` |                  |         | Show usage count for all variables instead of only unused variables                                  |
+| `-f`, `--filter`     | Globlike pattern |         | Only show variables who's name match the glob pattern. Matching without {brackets} and $@&% prefixes |
+| `-v`, `--verbose`    |                  |         | Show more log output. When provided twice: Show even more log output                                 |
 
 ## Contributing
 
