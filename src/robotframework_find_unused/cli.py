@@ -258,23 +258,7 @@ def variables(
 
     ----------
 
-    Limitation 4: Variable names with embedded python are ignored.
-
-    Sometimes variable names can contain python calls. Robotframework call this the extended
-    variable syntax. Extended variable syntax is not supported. This should never be an issue with
-    global variables.
-
-    Example: The variable ${response} is not counted because ${response.json()} is not supported.
-
-    \b
-        *** Keywords ***
-        My Amazing Keyword
-            ${response} =    GET    ${someUrl}
-            RETURN    ${response.json()}
-
-    ----------
-
-    Limitation 5: Only counts variable uses in `.robot` and `.resource` files.
+    Limitation 4: Only counts variable uses in `.robot` and `.resource` files.
 
     Using variables in Python files is never counted. This is true for both libraries and Python
     variable files.

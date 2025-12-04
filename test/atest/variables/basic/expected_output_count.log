@@ -1,15 +1,17 @@
 Discovering files in `./robot` using Robocop config...
 Gathering variables usage...
-[ DONE ] Found 10 unique variables defined in a variables section
+[ DONE ] Found 12 unique variables defined in a variables section
 
 use_count	variable
 0	&{dict_unused}
+0	${dot}
 0	${float_unused}
 0	${int_unused}
 0	@{list_unused}
 0	${string_unused}
-1	&{dict_used}
 1	${float_used}
 1	${int_used}
-1	@{list_used}
-1	${string_used}
+2	${dot.separated.used}
+4	&{dict_used}
+4	@{list_used}
+4	${string_used}

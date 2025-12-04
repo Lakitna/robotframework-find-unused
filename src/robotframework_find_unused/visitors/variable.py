@@ -231,14 +231,10 @@ class VariableVisitor(ModelVisitor):
         filtered = []
         for formatted_var in variables:
             var = self._normalize_var_name(formatted_var)
-
-            if "${" in var or "@{" in var or "&{" in var:
-                # There is a variable inside the variable name.
-                # Not worth supporting this at this time
-                continue
+            stripped_var = var.strip("{}")
 
             try:
-                float(var.strip("{}"))
+                float(stripped_var)
                 # Is a number, not a variable name.
                 # Details: https://robotframework.org/robotframework/latest/RobotFrameworkUserGuide.html#number-variables
                 continue
@@ -248,11 +244,43 @@ class VariableVisitor(ModelVisitor):
             if var in ("{true}", "{false}", "{none}", "{empty}", "{space}"):
                 continue
 
-            filtered.append(
-                (var, formatted_var),
-            )
+            if "${" in stripped_var or "@{" in stripped_var or "&{" in stripped_var:
+                # There is a variable inside the variable name.
+                # Not worth supporting this at this time
+                # See issue #14
+                continue
+
+            if not stripped_var.isalnum():
+                # Potential extended variable syntax
+                var = self._normalize_extended_variable_syntax(var)
+
+            filtered.append((var, formatted_var))
 
         return filtered
+
+    def _normalize_extended_variable_syntax(self, var: str) -> str:
+        if var in self.variables:
+            return var
+
+        var_name = var.strip("{}")
+        while len(var_name) > 0:
+            # Remove all trailing alphanumeric
+            while len(var_name) > 0 and var_name[-1].isalnum():
+                var_name = var_name[0:-1]
+            if len(var_name) == 0:
+                break
+
+            # Remove single trailing special char
+            var_name = var_name[0:-1]
+            if len(var_name) == 0:
+                break
+
+            candidate = "{" + var_name + "}"
+            if candidate in self.variables:
+                return candidate
+
+        # Could not find var. Don't modify.
+        return var
 
     def _normalize_var_name(self, name: str) -> str:
         return name.lstrip("$@&").replace(" ", "").replace("_", "").lower()

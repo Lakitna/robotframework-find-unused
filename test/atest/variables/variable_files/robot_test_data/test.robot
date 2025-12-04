@@ -11,3 +11,9 @@ Variables       ./variables_module_all.py
 
 *** Variables ***
 ${var_from_robot_file}      ${True}
+
+
+*** Test Cases ***
+Use variable with extended syntax
+    Log    ${list_var_from_json_file[0]}
+    Log    ${dict_var_from_json_file.foo}
