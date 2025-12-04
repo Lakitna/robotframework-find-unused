@@ -42,7 +42,6 @@ class VariableVisitor(ModelVisitor):
     _pattern_eval_variable = re.compile(r"\$(\w+)")
     # Details: https://robotframework.org/robotframework/latest/RobotFrameworkUserGuide.html#inline-python-evaluation
     _pattern_inline_eval = re.compile(r"\${{(.+?)}}")
-    _pattern_variable_extended_syntax = re.compile(r"[^a-zA-Z]")
 
     def __init__(self) -> None:
         self.variables = {}
@@ -128,7 +127,6 @@ class VariableVisitor(ModelVisitor):
                 name_without_brackets=self._var_name_without_brackets(name),
                 use_count=0,
                 defined_in_variables_section=True,
-                extended_syntaxable=name.startswith(("&", "@")),
             )
         else:
             self.variables[name_normalized].defined_in_variables_section = True
@@ -233,14 +231,10 @@ class VariableVisitor(ModelVisitor):
         filtered = []
         for formatted_var in variables:
             var = self._normalize_var_name(formatted_var)
-
-            if "${" in var or "@{" in var or "&{" in var:
-                # There is a variable inside the variable name.
-                # Not worth supporting this at this time
-                continue
+            stripped_var = var.strip("{}")
 
             try:
-                float(var.strip("{}"))
+                float(stripped_var)
                 # Is a number, not a variable name.
                 # Details: https://robotframework.org/robotframework/latest/RobotFrameworkUserGuide.html#number-variables
                 continue
@@ -250,27 +244,41 @@ class VariableVisitor(ModelVisitor):
             if var in ("{true}", "{false}", "{none}", "{empty}", "{space}"):
                 continue
 
-            if not var.strip("{}").isalnum():
+            if "${" in stripped_var or "@{" in stripped_var or "&{" in stripped_var:
+                # There is a variable inside the variable name.
+                # Not worth supporting this at this time
+                continue
+
+            if not stripped_var.isalnum():
                 # Potential extended variable syntax
                 var = self._normalize_extended_variable_syntax(var)
 
-            filtered.append(
-                (var, formatted_var),
-            )
+            filtered.append((var, formatted_var))
 
         return filtered
 
     def _normalize_extended_variable_syntax(self, var: str) -> str:
-        base_name = var.strip("{}")
-        base_name = re.split(self._pattern_variable_extended_syntax, base_name, maxsplit=1)[0]
-        base_name = "{" + base_name + "}"
+        if var in self.variables:
+            return var
 
-        if base_name in self.variables:
-            var_def = self.variables[base_name]
-            if var_def.extended_syntaxable:
-                # Is extended variable syntax
-                return base_name
+        var_name = var.strip("{}")
+        while len(var_name) > 0:
+            # Remove all trailing alphanumeric
+            while len(var_name) > 0 and var_name[-1].isalnum():
+                var_name = var_name[0:-1]
+            if len(var_name) == 0:
+                break
 
+            # Remove single trailing special char
+            var_name = var_name[0:-1]
+            if len(var_name) == 0:
+                break
+
+            candidate = "{" + var_name + "}"
+            if candidate in self.variables:
+                return candidate
+
+        # Could not find var. Don't modify.
         return var
 
     def _normalize_var_name(self, name: str) -> str:
@@ -290,6 +298,5 @@ class VariableVisitor(ModelVisitor):
                 name_without_brackets=self._var_name_without_brackets(name),
                 use_count=0,
                 defined_in_variables_section=False,
-                extended_syntaxable=False,
             )
         self.variables[normalized_name].use_count += 1
