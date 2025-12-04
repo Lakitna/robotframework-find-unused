@@ -1,6 +1,8 @@
 from pathlib import Path
 
 import click
+import robot.errors
+from robot.libdoc import LibraryDocumentation
 from robot.libdocpkg.model import LibraryDoc
 
 from robotframework_find_unused.common.const import (
@@ -10,7 +12,6 @@ from robotframework_find_unused.common.const import (
     VERBOSE_SINGLE,
     WARN_MARKER,
 )
-from robotframework_find_unused.common.gather_files import find_files_with_libdoc
 
 
 def cli_step_parse_files(file_paths: list[Path], *, verbose: int):
@@ -19,11 +20,32 @@ def cli_step_parse_files(file_paths: list[Path], *, verbose: int):
     """
     click.echo("Parsing files with LibDoc...")
 
-    (parsed_files, errors) = find_files_with_libdoc(file_paths)
+    (parsed_files, errors) = _find_files_with_libdoc(file_paths)
 
     _log_file_errors(errors)
     _log_file_stats(parsed_files, verbose)
     return parsed_files
+
+
+def _find_files_with_libdoc(file_paths: list[Path]) -> tuple[list[LibraryDoc], list[str]]:
+    """
+    Gather files in the given scope with LibDoc
+
+    Libdoc supports .robot, .resource, .py, and downloaded libs
+    """
+    files: list[LibraryDoc] = []
+    errors: list[str] = []
+    for file in file_paths:
+        try:
+            libdoc = LibraryDocumentation(file)
+            files.append(libdoc)
+        except robot.errors.DataError as e:
+            errors.append(e.message.split("\n", maxsplit=1)[0])
+            continue
+        if not isinstance(libdoc, LibraryDoc):
+            continue
+
+    return (files, errors)
 
 
 def _log_file_errors(errors: list[str]) -> None:
