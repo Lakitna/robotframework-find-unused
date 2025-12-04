@@ -9,7 +9,8 @@ from robotframework_find_unused.common.const import (
     VERBOSE_NO,
     VariableData,
 )
-from robotframework_find_unused.common.gather_variables import count_variable_uses
+from robotframework_find_unused.common.visit import visit_robot_files
+from robotframework_find_unused.visitors.variable_count import VariableCountVisitor
 
 
 def cli_count_variable_uses(
@@ -19,13 +20,26 @@ def cli_count_variable_uses(
     verbose: int,
 ):
     """
-    Gather variable definitions and count variable uses and show progress
+    Walk through all robot files with RoboCop to count keyword uses and show progress
     """
     click.echo("Counting variable usage...")
-    variables = count_variable_uses(file_paths, variable_defs)
+    variables = _count_variable_uses(file_paths, variable_defs)
 
     _log_variable_stats(variables, verbose)
     return variables
+
+
+def _count_variable_uses(
+    file_paths: list[Path],
+    variables: dict[str, VariableData],
+) -> list[VariableData]:
+    """
+    Walk through all robot files with RoboCop to count keyword uses.
+    """
+    visitor = VariableCountVisitor(variables)
+    visit_robot_files(file_paths, visitor)
+
+    return list(visitor.variables.values())
 
 
 def _log_variable_stats(variables: list[VariableData], verbose: int) -> None:

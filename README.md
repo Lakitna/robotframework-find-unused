@@ -123,7 +123,7 @@ robotunused returns --help
 ### Find unused global variables
 
 Walk through your `.robot` and `.resource` files. In those files, count how often each
-variable is used. Variables defined in a variables section with 0 uses are logged.
+variable is used. Variables defined in a variables section or variable file with 0 uses are logged.
 
 ```shell
 robotunused variables

@@ -10,7 +10,8 @@ from robotframework_find_unused.common.const import (
     VERBOSE_SINGLE,
     VariableData,
 )
-from robotframework_find_unused.common.gather_variables import get_variable_definitions
+from robotframework_find_unused.common.visit import visit_robot_files
+from robotframework_find_unused.visitors.variable_definition import VariableDefinitionVisitor
 
 
 def cli_get_variable_definitions(
@@ -19,13 +20,23 @@ def cli_get_variable_definitions(
     verbose: int,
 ):
     """
-    Gather variable definitions and count variable uses and show progress
+    Walk through all robot files to discover non-local variable definitions and show progress
     """
     click.echo("Gathering variables definitions...")
-    variables = get_variable_definitions(file_paths)
+    variables = _get_variable_definitions(file_paths)
 
     _log_variable_stats(list(variables.values()), verbose)
     return variables
+
+
+def _get_variable_definitions(file_paths: list[Path]) -> dict[str, VariableData]:
+    """
+    Walk through all robot files to discover non-local variable definitions.
+    """
+    visitor = VariableDefinitionVisitor()
+    visit_robot_files(file_paths, visitor)
+
+    return visitor.variables
 
 
 def _log_variable_stats(variables: list[VariableData], verbose: int) -> None:
@@ -51,7 +62,7 @@ def _log_variable_stats(variables: list[VariableData], verbose: int) -> None:
         key=lambda items: len(items[1]),
         reverse=True,
     ):
-        click.echo(f"{INDENT}{len(var_names)} variables defined in {defined_in_type}")
+        click.echo(f"{INDENT}{len(var_names)} variables definitions of type '{defined_in_type}'")
 
         if verbose == VERBOSE_SINGLE:
             continue
