@@ -10,10 +10,12 @@ import click
 
 from .commands import (
     ArgumentsOptions,
+    FileOptions,
     KeywordOptions,
     ReturnOptions,
     VariableOptions,
     cli_arguments,
+    cli_files,
     cli_keywords,
     cli_returns,
     cli_variables,
@@ -499,4 +501,53 @@ def returns(  # noqa: PLR0913
         verbose=verbose,
     )
     exit_code = cli_returns(options)
+    sys.exit(exit_code)
+
+
+@cli.command(name="files")
+@click.option(
+    "-c",
+    "--show-count",
+    default=False,
+    is_flag=True,
+    help="Output usage count for all files instead of only unused files",
+)
+@click.option(
+    "-f",
+    "--filter",
+    default=None,
+    metavar="<GLOB>",
+    help="Only output files who's path match the glob pattern",
+)
+@click.option(
+    "-v",
+    "--verbose",
+    default=False,
+    count=True,
+    help="Show more log output. Can be used twice",
+)
+@click.argument("file_path", default=".")
+def files(
+    show_count: bool,
+    filter: str | None,  # noqa: A002
+    verbose: int,
+    file_path: str,
+):
+    """
+    Find unused files
+
+    Traverse files in the given file path. For all .robot files, figure out which files it uses. Log
+    files that are never used.
+
+    ----------
+
+    Limitation 1: ???
+    """
+    options = FileOptions(
+        source_path=file_path,
+        path_filter_glob=filter,
+        show_all_count=show_count,
+        verbose=verbose,
+    )
+    exit_code = cli_files(options)
     sys.exit(exit_code)
