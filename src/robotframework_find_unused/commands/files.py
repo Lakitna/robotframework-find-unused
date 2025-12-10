@@ -32,4 +32,10 @@ def cli_files(options: FileOptions):
     """
     Entry point for the CLI command
     """
+    file_paths = cli_discover_file_paths(options.source_path, verbose=options.verbose)
+    if len(file_paths) == 0:
+        return cli_hard_exit(options.verbose)
+
+    files = cli_step_parse_file_use(file_paths, verbose=options.verbose)
+
     return 0

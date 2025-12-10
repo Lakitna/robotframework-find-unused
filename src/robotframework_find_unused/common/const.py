@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from pathlib import Path
 from typing import Literal, TypeAlias
 
 import click
@@ -65,3 +66,20 @@ class LibraryData:
     name_normalized: str
     keywords: list[KeywordData]
     keyword_names_normalized: set[str]
+
+
+FileUseType: TypeAlias = Literal[
+    "SUITE",
+    "RESOURCE",
+    "LIBRARY",
+    "VARIABLE",
+]
+
+
+@dataclass
+class FileUseData:
+    """Data structure for file imports"""
+
+    path_absolute: Path
+    type: set[FileUseType]
+    used_by: list["FileUseData"]

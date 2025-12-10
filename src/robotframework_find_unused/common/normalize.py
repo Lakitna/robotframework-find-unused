@@ -1,3 +1,6 @@
+from pathlib import Path
+
+
 def normalize_variable_name(name: str) -> str:
     """
     Normalize Robot variables name. Output is suitable for matching and sorting purposes
@@ -17,3 +20,13 @@ def normalize_library_name(name: str) -> str:
     Normalize Robot library name. Output is suitable for matching and sorting purposes
     """
     return normalize_keyword_name(name)
+
+
+def normalize_file_path(path: str | Path) -> str:
+    """
+    Normalize file path. Output is suitable for matching and sorting purposes
+    """
+    if isinstance(path, str):
+        path = Path(path)
+
+    return path.resolve().as_posix()
