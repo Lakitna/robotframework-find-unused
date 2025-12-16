@@ -10,14 +10,9 @@ from robot.api.parsing import (
     VariablesImport,
 )
 
-from robotframework_find_unused.common.const import ERROR_MARKER, WARN_MARKER, FileUseData
+from robotframework_find_unused.common.const import ERROR_MARKER, FileUseData
 from robotframework_find_unused.common.impossible_state_error import ImpossibleStateError
 from robotframework_find_unused.common.normalize import normalize_file_path
-
-file_extention_mapping = {
-    "robot": "SUITE",
-    "resource": "RESOURCE",
-}
 
 
 class FileImportVisitor(ModelVisitor):
@@ -43,8 +38,8 @@ class FileImportVisitor(ModelVisitor):
         self.current_working_directory = current_working_file.parent
         current_file_path_normalized = normalize_file_path(current_working_file)
 
-        file_ext = current_file_path_normalized.rsplit(".", maxsplit=1)[1]
-        if file_ext.lower() not in ["robot", "resource"]:
+        file_ext = current_working_file.suffix.lstrip(".").lower()
+        if file_ext not in ["robot", "resource"]:
             return None
 
         file_type = "SUITE" if file_ext == "robot" else "RESOURCE"
@@ -54,6 +49,7 @@ class FileImportVisitor(ModelVisitor):
             self.current_working_file = self.files[current_file_path_normalized]
         else:
             self.current_working_file = FileUseData(
+                normalize_file_path(current_working_file),
                 path_absolute=current_working_file,
                 type={file_type},
                 used_by=[],
@@ -70,14 +66,17 @@ class FileImportVisitor(ModelVisitor):
 
         lib_name = node.name
         if not lib_name.endswith(".py"):
+            # TODO: Limitation: No downloaded library imports
             # A downloaded lib. We don't care
             return
-
-        # TODO: can still be a downloaded lib with import ending in `.py`. Example: Collections.py
+        if not lib_name.startswith(".") and "/" not in lib_name and "\\" not in lib_name:
+            # Assume this is a downloaded library imported with `.py` postfix. We don't care
+            return
 
         lib_path = self.current_working_directory.joinpath(lib_name)
 
-        # TODO: Support python module syntax
+        # TODO: Support name alias using `AS`
+        # TODO: Limitation: No python module syntax
 
         self._register_file_use(lib_path, file_type="LIBRARY")
 

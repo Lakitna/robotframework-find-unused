@@ -84,3 +84,6 @@ class FileUseData:
     path_absolute: Path
     type: set[FileUseType]
     used_by: list["FileUseData"]
+
+    def __hash__(self) -> int:
+        return hash(self.id)
