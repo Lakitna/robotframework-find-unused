@@ -80,6 +80,7 @@ FileUseType: TypeAlias = Literal[
 class FileUseData:
     """Data structure for file imports"""
 
+    id: str
     path_absolute: Path
     type: set[FileUseType]
     used_by: list["FileUseData"]

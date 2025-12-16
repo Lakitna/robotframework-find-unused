@@ -126,6 +126,7 @@ class FileImportVisitor(ModelVisitor):
             return
 
         self.files[normalized_path] = FileUseData(
+            id=normalize_file_path(file_path),
             path_absolute=file_path,
             type={file_type},
             used_by=[self.current_working_file],
