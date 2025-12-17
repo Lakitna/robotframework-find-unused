@@ -69,13 +69,13 @@ def _cli_log_results(files: list[FileUseData], options: FileOptions) -> None:
 
 def _to_file_tree(files: list[FileUseData]):
     # TODO: Make CLI args
-    max_depth = 5
-    max_height = 50
+    max_depth = -1
+    max_height = -1
 
     tree_root_files = [f for f in files if "SUITE" in f.type]
 
     print(f"Building {len(tree_root_files)} trees with max depth {max_depth}")
-    tree_builder = FileImportTreeBuilder(max_depth=max_depth)
+    tree_builder = FileImportTreeBuilder(max_depth=max_depth, max_height=max_height)
     grouped_trees = tree_builder.build_grouped_trees(tree_root_files, files)
 
     print(f"Print {len(grouped_trees)} tree groups...")
@@ -83,7 +83,7 @@ def _to_file_tree(files: list[FileUseData]):
         click.echo()
         for tree in trees[0:-1]:
             click.echo(normalize_file_path(tree.data.path_absolute))
-        tree_builder.print_file_use_tree(trees[-1], max_files=max_height)
+        tree_builder.print_file_use_tree(trees[-1])
 
     # return trees
 
