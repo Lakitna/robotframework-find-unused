@@ -23,6 +23,9 @@ class FileOptions:
 
     path_filter_glob: str | None
     show_all_count: bool
+    show_tree: bool
+    tree_max_depth: int
+    tree_max_height: int
     verbose: int
     source_path: str
 
@@ -37,8 +40,8 @@ def cli_files(options: FileOptions):
 
     files = cli_step_parse_file_use(file_paths, verbose=options.verbose)
 
-    file_tree = _to_file_tree(files)
-    # print(file_tree)
+    if options.show_tree:
+        _cli_print_grouped_file_trees(files, options.tree_max_depth, options.tree_max_height)
 
     # _cli_log_results(files, options)
     return 0
@@ -67,25 +70,26 @@ def _cli_log_results(files: list[FileUseData], options: FileOptions) -> None:
         click.echo(f"{INDENT}Use count: {len(file.used_by)}x")
 
 
-def _to_file_tree(files: list[FileUseData]):
-    # TODO: Make CLI args
-    max_depth = -1
-    max_height = -1
-
+def _cli_print_grouped_file_trees(
+    files: list[FileUseData],
+    max_depth: int,
+    max_height: int,
+) -> None:
     tree_root_files = [f for f in files if "SUITE" in f.type]
 
-    print(f"Building {len(tree_root_files)} trees with max depth {max_depth}")
+    click.echo(
+        f"Building {len(tree_root_files)} file import trees"
+        + (f" with max depth {max_depth}" if max_depth >= 0 else ""),
+    )
     tree_builder = FileImportTreeBuilder(max_depth=max_depth, max_height=max_height)
     grouped_trees = tree_builder.build_grouped_trees(tree_root_files, files)
 
-    print(f"Print {len(grouped_trees)} tree groups...")
+    click.echo(f"Print {len(grouped_trees)} tree groups...")
     for trees in grouped_trees:
         click.echo()
         for tree in trees[0:-1]:
             click.echo(normalize_file_path(tree.data.path_absolute))
         tree_builder.print_file_use_tree(trees[-1])
-
-    # return trees
 
 
 def _exit_code(files: list[FileUseData]) -> int:

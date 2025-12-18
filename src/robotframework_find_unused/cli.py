@@ -513,6 +513,25 @@ def returns(  # noqa: PLR0913
     help="Output usage count for all files instead of only unused files",
 )
 @click.option(
+    "-t",
+    "--show-tree",
+    default=False,
+    is_flag=True,
+    help="Output file import trees for every .robot file",
+)
+@click.option(
+    "--tree-max-depth",
+    default=-1,
+    type=click.IntRange(min=-1, clamp=True),
+    help="Only applies when using `--show-tree`. Maximum tree depth.",
+)
+@click.option(
+    "--tree-max-height",
+    default=-1,
+    type=click.IntRange(min=-1, clamp=True),
+    help="Only applies when using `--show-tree`. Maximum tree height.",
+)
+@click.option(
     "-f",
     "--filter",
     default=None,
@@ -527,8 +546,11 @@ def returns(  # noqa: PLR0913
     help="Show more log output. Can be used twice",
 )
 @click.argument("file_path", default=".")
-def files(
+def files(  # noqa: PLR0913
     show_count: bool,
+    show_tree: bool,
+    tree_max_depth: int,
+    tree_max_height: int,
     filter: str | None,  # noqa: A002
     verbose: int,
     file_path: str,
@@ -547,6 +569,9 @@ def files(
         source_path=file_path,
         path_filter_glob=filter,
         show_all_count=show_count,
+        show_tree=show_tree,
+        tree_max_depth=tree_max_depth,
+        tree_max_height=tree_max_height,
         verbose=verbose,
     )
     exit_code = cli_files(options)
