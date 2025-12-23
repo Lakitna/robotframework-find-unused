@@ -1,0 +1,13 @@
+Discovering files in `./robot` using Robocop config...
+Parsing file imports...
+[ DONE ] Parsed 4 files
+Building 1 file import trees
+Print 1 tree groups...
+
+C:/code/robotframework-find-unused/test/atest/files/basic/robot/test.robot
+|  ./alpha.resource
+|  |  ./beta.resource
+|  ./beta.resource [Already imported]
+
+Found 1 unused files:
+  ./gamma.resource
