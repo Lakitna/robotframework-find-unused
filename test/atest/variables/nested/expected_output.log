@@ -2,7 +2,7 @@ Discovering files in `./robot` using Robocop config...
 Gathering variables definitions...
 [ DONE ] Found 10 unique non-local variables definitions
 Counting variable usage...
-[ DONE ] Found 20 variable uses of gathered variables
+[ DONE ] Found 21 variable uses of gathered variables
 
 use_count	variable
 0	${abc}
@@ -11,7 +11,7 @@ use_count	variable
 1	${h}
 1	${hello1}
 1	${helloTrue}
-2	${place}
 3	${hw}
+3	${place}
 4	${greeting}
 7	${helloWorld}

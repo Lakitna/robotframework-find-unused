@@ -106,3 +106,21 @@ def _get_value_of_builtin_var(normalized_name: str) -> str:
 
     msg = f"Can't get value of unsupported builtin variable '${normalized_name}'"
     raise ValueError(msg)
+
+
+def resolve_variable_name(
+    var_name: str, variables: dict[str, VariableData]
+) -> tuple[str, list[str]]:
+    if not ("${" in var_name or "@{" in var_name or "&{" in var_name or "%{" in var_name):
+        return (var_name, [])
+
+    (resolved, resolved_vars) = resolve_variables(var_name, variables)
+    if var_name == resolved:
+        return (var_name, [])
+
+    resolved_var = normalize_variable_name(resolved, strip_decoration=False)
+    if resolved_var in variables:
+        return (normalize_variable_name(resolved), resolved_vars)
+
+    (recursed_resolved, recursed_resolved_vars) = resolve_variable_name(resolved, variables)
+    return (recursed_resolved, resolved_vars + recursed_resolved_vars)

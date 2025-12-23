@@ -15,7 +15,7 @@ from robotframework_find_unused.common.const import VariableData
 from robotframework_find_unused.common.normalize import normalize_variable_name
 from robotframework_find_unused.common.parse import (
     get_variables_in_string,
-    resolve_variables,
+    resolve_variable_name,
     supported_builtin_vars,
 )
 
@@ -156,7 +156,9 @@ class VariableCountVisitor(ModelVisitor):
             if var in supported_builtin_vars:
                 continue
 
-            var = self._count_vars_in_var_name(var)
+            (var, used_vars) = resolve_variable_name(var, self.variables)
+            for v in used_vars:
+                self._count_variable_use(v)
 
             if not var.isalnum():
                 # Potential extended variable syntax
@@ -197,25 +199,3 @@ class VariableCountVisitor(ModelVisitor):
             # Unknown variable definition. Ignore
             return
         self.variables[normalized_name].use_count += 1
-
-    def _count_vars_in_var_name(self, var_name: str) -> str:
-        if not ("${" in var_name or "@{" in var_name or "&{" in var_name or "%{" in var_name):
-            return var_name
-
-        (resolved, resolved_vars) = resolve_variables(var_name, self.variables)
-        if var_name == resolved:
-            return var_name
-
-        resolved_var = normalize_variable_name(resolved, strip_decoration=False)
-        if resolved_var in self.variables:
-            # Resolved var was found! Count nested vars
-            for v in resolved_vars:
-                self._count_variable_use(v)
-
-            return normalize_variable_name(resolved)
-
-        recursed_result = self._count_vars_in_var_name(resolved)
-        if recursed_result != resolved:
-            for v in resolved_vars:
-                self._count_variable_use(v)
-        return recursed_result
