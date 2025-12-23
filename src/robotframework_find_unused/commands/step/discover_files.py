@@ -61,5 +61,6 @@ def _log_file_stats(file_paths: list[Path], input_path: str, verbose: int) -> No
     if verbose == VERBOSE_SINGLE:
         return
 
-    for path in file_paths:
+    sorted_file_paths = sorted(file_paths, key=lambda f: f)
+    for path in sorted_file_paths:
         click.echo(INDENT + click.style(str(path), fg="bright_black"))
