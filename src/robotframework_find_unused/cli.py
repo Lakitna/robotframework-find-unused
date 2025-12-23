@@ -227,30 +227,16 @@ def variables(
 
     ----------
 
-    Limitation 2: Variable names containing variables are ignored.
+    Limitation 2: Variables with variables in their name are not always counted.
 
-    When defining a variable, the variable name can contain other variables. These variables are
-    ignored and can therefore not be flagged as unused.
-
-    Example: The variable ${helloWorld} (resolved from ${hello${place}}) is ignored.
-
-    \b
-        *** Variables ***
-        ${place}    World
-        ${hello${place}}    Hello World!
-
-    ----------
-
-    Limitation 3: Using variables with variables in their name is not always counted.
-
-    When using a variable, the variable name can contain other variables. The most common usecases
-    are supported but there are a lot of possible complexity which is not supported.
+    When using or defining a variable, the variable name can contain other variables. The most
+    common usecases are supported but there are a lot of possible complexity which is not supported.
 
     Variables in variable names are only counted when:
 
     \b
     - None of the involved variables are limited by limitation 1.
-    - All nested variables are single-line scalar variables without variables in its value.
+    - All nested variables are single-line scalar variables.
       - No lists (e.g. `@{example}`)
       - No dicts (e.g. `&{example}`)
       - No multi-line string definitions
@@ -271,7 +257,7 @@ def variables(
 
     ----------
 
-    Limitation 4: Only counts variable uses in `.robot` and `.resource` files.
+    Limitation 3: Only counts variable uses in `.robot` and `.resource` files.
 
     Using variables in Python files is never counted. This is true for both libraries and Python
     variable files.
