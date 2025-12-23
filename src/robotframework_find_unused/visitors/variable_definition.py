@@ -146,6 +146,7 @@ class VariableDefinitionVisitor(ModelVisitor):
         self.variables[name_normalized] = VariableData(
             name=name,
             normalized_name=name_normalized,
+            resolved_name=name,
             use_count=0,
             defined_in_type=defined_in_type,
             defined_in=defined_in.as_posix(),

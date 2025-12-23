@@ -28,3 +28,6 @@ My Amazing Keyword
     Log    ${helloUniverse}
     Log    ${hello${foo}}
     Log    ${hello${place}.lower()}
+
+    Log    ${easyAs${abc}}
+    Log    ${easyAsabcdefg}

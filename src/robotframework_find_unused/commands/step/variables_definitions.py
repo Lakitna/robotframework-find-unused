@@ -10,6 +10,12 @@ from robotframework_find_unused.common.const import (
     VERBOSE_SINGLE,
     VariableData,
 )
+from robotframework_find_unused.common.normalize import normalize_variable_name
+from robotframework_find_unused.common.parse import (
+    get_variables_in_string,
+    resolve_variables,
+    resolve_variable_name,
+)
 from robotframework_find_unused.common.visit import visit_robot_files
 from robotframework_find_unused.visitors.variable_definition import VariableDefinitionVisitor
 
@@ -36,7 +42,40 @@ def _get_variable_definitions(file_paths: list[Path]) -> dict[str, VariableData]
     visitor = VariableDefinitionVisitor()
     visit_robot_files(file_paths, visitor)
 
-    return visitor.variables
+    return _resolve_vars_in_var_name(visitor.variables)
+
+
+def _resolve_vars_in_var_name(variables: dict[str, VariableData]) -> dict[str, VariableData]:
+    resolved_variables: dict[str, VariableData] = {}
+    all_used_vars: list[str] = []
+    for var in variables.values():
+        var_name = var.normalized_name
+        (resolved_var_name, used_vars) = resolve_variable_name(var_name, variables)
+        resolved_var_name_normalized = normalize_variable_name(resolved_var_name)
+
+        if resolved_var_name_normalized == var_name:
+            # Nothing to resolve
+            resolved_variables[var_name] = var
+            continue
+
+        resolved_variables[resolved_var_name_normalized] = VariableData(
+            name=var.name,
+            normalized_name=resolved_var_name_normalized,
+            resolved_name="${" + resolved_var_name + "}",
+            use_count=var.use_count,
+            defined_in_type=var.defined_in_type,
+            defined_in=var.defined_in,
+            value=var.value,
+        )
+
+        all_used_vars = all_used_vars + used_vars
+
+    for used_var in all_used_vars:
+        if used_var not in resolved_variables:
+            continue
+        resolved_variables[used_var].use_count += 1
+
+    return resolved_variables
 
 
 def _log_variable_stats(variables: list[VariableData], verbose: int) -> None:

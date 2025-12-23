@@ -69,7 +69,10 @@ def _cli_log_results(variables: list[VariableData], options: VariableOptions) ->
 
         click.echo("use_count\tvariable")
         for var in sorted_variables:
-            click.echo("\t".join([str(var.use_count), var.name]))
+            name = var.name
+            if var.name != var.resolved_name:
+                name += click.style(f" -> {var.resolved_name}", fg="bright_black")
+            click.echo("\t".join([str(var.use_count), name]))
     else:
         unused_variables = [var for var in variables if var.use_count == 0]
         unused_variables = sorted(unused_variables, key=lambda var: var.normalized_name)

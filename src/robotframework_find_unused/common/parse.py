@@ -109,18 +109,24 @@ def _get_value_of_builtin_var(normalized_name: str) -> str:
 
 
 def resolve_variable_name(
-    var_name: str, variables: dict[str, VariableData]
+    var_name: str,
+    variables: dict[str, VariableData],
 ) -> tuple[str, list[str]]:
+    """
+    Resolve variable name.
+
+    Returns tuple of (resolved_var_name, used_vars)
+    """
     if not ("${" in var_name or "@{" in var_name or "&{" in var_name or "%{" in var_name):
         return (var_name, [])
 
-    (resolved, resolved_vars) = resolve_variables(var_name, variables)
+    (resolved, used_vars) = resolve_variables(var_name, variables)
     if var_name == resolved:
         return (var_name, [])
 
     resolved_var = normalize_variable_name(resolved, strip_decoration=False)
     if resolved_var in variables:
-        return (normalize_variable_name(resolved), resolved_vars)
+        return (normalize_variable_name(resolved), used_vars)
 
-    (recursed_resolved, recursed_resolved_vars) = resolve_variable_name(resolved, variables)
-    return (recursed_resolved, resolved_vars + recursed_resolved_vars)
+    (recursed_resolved, recursed_used_vars) = resolve_variable_name(resolved, variables)
+    return (recursed_resolved, used_vars + recursed_used_vars)
