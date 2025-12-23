@@ -13,6 +13,11 @@ from robot.api.parsing import (
 
 from robotframework_find_unused.common.const import VariableData
 from robotframework_find_unused.common.normalize import normalize_variable_name
+from robotframework_find_unused.common.parse import (
+    get_variables_in_string,
+    resolve_variable_name,
+    supported_builtin_vars,
+)
 
 
 class VariableCountVisitor(ModelVisitor):
@@ -22,7 +27,6 @@ class VariableCountVisitor(ModelVisitor):
 
     variables: dict[str, VariableData]
 
-    _pattern_variable = re.compile(r"[@$&](\{[^{].+?[^}]\})")
     # Details: https://robotframework.org/robotframework/latest/RobotFrameworkUserGuide.html#special-variable-syntax
     _pattern_eval_variable = re.compile(r"\$(\w+)")
     # Details: https://robotframework.org/robotframework/latest/RobotFrameworkUserGuide.html#inline-python-evaluation
@@ -105,7 +109,7 @@ class VariableCountVisitor(ModelVisitor):
 
         match = self._pattern_eval_variable.findall(eval_str)
         for var in match:
-            used_vars.append(normalize_variable_name("${" + var + "}"))
+            used_vars.append("${" + normalize_variable_name(var) + "}")
 
         return used_vars
 
@@ -124,7 +128,7 @@ class VariableCountVisitor(ModelVisitor):
         """
         used_vars = []
         for arg in args:
-            var_match = self._pattern_variable.findall(arg)
+            var_match = get_variables_in_string(arg)
             used_vars += var_match
 
             eval_match = self._pattern_inline_eval.findall(arg)
@@ -140,26 +144,23 @@ class VariableCountVisitor(ModelVisitor):
         filtered = []
         for formatted_var in variables:
             var = normalize_variable_name(formatted_var)
-            stripped_var = var.strip("{}")
 
             try:
-                float(stripped_var)
+                float(var)
                 # Is a number, not a variable name.
                 # Details: https://robotframework.org/robotframework/latest/RobotFrameworkUserGuide.html#number-variables
                 continue
             except ValueError:
                 pass
 
-            if var in ("{true}", "{false}", "{none}", "{empty}", "{space}"):
+            if var in supported_builtin_vars:
                 continue
 
-            if "${" in stripped_var or "@{" in stripped_var or "&{" in stripped_var:
-                # There is a variable inside the variable name.
-                # Not worth supporting this at this time
-                # See issue #14
-                continue
+            (var, used_vars) = resolve_variable_name(var, self.variables)
+            for v in used_vars:
+                self._count_variable_use(v)
 
-            if not stripped_var.isalnum():
+            if not var.isalnum():
                 # Potential extended variable syntax
                 var = self._normalize_extended_variable_syntax(var)
 
@@ -171,7 +172,7 @@ class VariableCountVisitor(ModelVisitor):
         if var in self.variables:
             return var
 
-        var_name = var.strip("{}")
+        var_name = var
         while len(var_name) > 0:
             # Remove all trailing alphanumeric
             while len(var_name) > 0 and var_name[-1].isalnum():
@@ -184,9 +185,8 @@ class VariableCountVisitor(ModelVisitor):
             if len(var_name) == 0:
                 break
 
-            candidate = "{" + var_name + "}"
-            if candidate in self.variables:
-                return candidate
+            if var_name in self.variables:
+                return var_name
 
         # Could not find var. Don't modify.
         return var

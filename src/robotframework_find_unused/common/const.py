@@ -1,3 +1,4 @@
+from collections.abc import Iterable
 from dataclasses import dataclass
 from typing import Literal, TypeAlias
 
@@ -52,9 +53,11 @@ class VariableData:
 
     name: str
     normalized_name: str
+    resolved_name: str
     use_count: int
     defined_in_type: VariableDefinedInType
     defined_in: str
+    value: Iterable[str]
 
 
 @dataclass
