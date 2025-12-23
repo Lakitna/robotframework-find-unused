@@ -205,7 +205,7 @@ def variables(
 
     ----------
 
-    Limitation 1: Only variables defined in a variables section or variable file.
+    Limitation 1: Only globally user-defined variables.
 
     All of the following variables are ignored:
 
@@ -221,6 +221,9 @@ def variables(
     - Variables only set with `VAR  ...  scope=TEST`
     - Variables only set with `Set Task Variable`
     - Variables only set with `VAR  ...  scope=TASK`
+    - Variables only set with `Set Variable`
+    - Variables only set with `VAR  ...`
+    - Variables only set with the return value of a keyword
 
     ----------
 
@@ -238,23 +241,33 @@ def variables(
 
     ----------
 
-    Limitation 3: Variable usage containing variables are not counted.
+    Limitation 3: Using variables with variables in their name is not always counted.
 
-    When using a variable, the variable name can contain other variables. These variables are not
-    counted.
+    When using a variable, the variable name can contain other variables. The most common usecases
+    are supported but there are a lot of possible complexity which is not supported.
 
-    Example: ${hello${place}} is ignored. Because of this, the variable ${helloWorld} will be
-    falsely flagged as unused.
+    Variables in variable names are only counted when:
+
+    \b
+    - None of the involved variables are limited by limitation 1.
+    - All nested variables are single-line scalar variables without variables in its value.
+      - No lists (e.g. `@{example}`)
+      - No dicts (e.g. `&{example}`)
+      - No multi-line string definitions
+    - No extended variable syntax.
+
+    Example: ${hello_${place.lower()}} uses extended variable syntax and is therefore ignored.
+    Because of this, the variable ${hello_world} will be falsely flagged as unused.
 
     \b
         *** Variables ***
-        ${helloWorld}    Hello World!
+        ${hello_world}    Hello World!
+        ${place}          WORLD
 
     \b
         *** Keywords ***
         My Amazing Keyword
-            ${place} =    Set Variable    World
-            Log    ${hello${place}}
+            Log    ${hello_${place.lower()}}
 
     ----------
 
