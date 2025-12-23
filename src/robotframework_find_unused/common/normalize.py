@@ -4,8 +4,8 @@ def normalize_variable_name(name: str, *, strip_decoration: bool = True) -> str:
     """
     norm = name.replace(" ", "").replace("_", "").lower()
 
-    if strip_decoration:
-        norm = norm.lstrip("$@&%").removeprefix("{").removesuffix("}")
+    if strip_decoration and norm[0] in ("$", "@", "&", "%"):
+        norm = norm[1:].removeprefix("{").removesuffix("}")
 
     return norm
 

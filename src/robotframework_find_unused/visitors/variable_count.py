@@ -162,17 +162,17 @@ class VariableCountVisitor(ModelVisitor):
 
             if not var.isalnum():
                 # Potential extended variable syntax
-                var = self._normalize_extended_variable_syntax(var, var)
+                var = self._normalize_extended_variable_syntax(var)
 
             filtered.append(var)
 
         return filtered
 
-    def _normalize_extended_variable_syntax(self, var: str, stripped_var: str) -> str:
+    def _normalize_extended_variable_syntax(self, var: str) -> str:
         if var in self.variables:
-            return stripped_var
+            return var
 
-        var_name = stripped_var
+        var_name = var
         while len(var_name) > 0:
             # Remove all trailing alphanumeric
             while len(var_name) > 0 and var_name[-1].isalnum():
@@ -189,7 +189,7 @@ class VariableCountVisitor(ModelVisitor):
                 return var_name
 
         # Could not find var. Don't modify.
-        return stripped_var
+        return var
 
     def _count_variable_use(self, normalized_name: str) -> None:
         """
