@@ -3,11 +3,13 @@ Implementation of the 'files' command
 """
 
 from dataclasses import dataclass
+from pathlib import Path
 
 import click
 
 from robotframework_find_unused.common.cli import cli_hard_exit
-from robotframework_find_unused.common.const import INDENT, WARN_MARKER, FileUseData
+from robotframework_find_unused.common.const import INDENT, WARN_MARKER, FileUseData, FileUseType
+from robotframework_find_unused.common.convert import to_relative_path
 from robotframework_find_unused.common.normalize import normalize_file_path
 
 from .step.discover_files import cli_discover_file_paths
@@ -42,32 +44,69 @@ def cli_files(options: FileOptions):
 
     if options.show_tree:
         _cli_print_grouped_file_trees(files, options.tree_max_depth, options.tree_max_height)
+    _cli_log_results(files, options)
 
-    # _cli_log_results(files, options)
     return 0
 
 
 def _cli_log_results(files: list[FileUseData], options: FileOptions) -> None:
-    for file in files:
-        if file.type != "SUITE" and not file.used_by:
-            click.echo("UNUSED " + str(file.path_absolute))
-        else:
-            click.echo(file.path_absolute)
+    click.echo()
 
-        if len(file.type) == 0:
-            click.echo(f"{INDENT}Used as: " + click.style("unknown", fg="bright_black"))
-        elif len(file.type) == 1:
-            file_type = next(iter(file.type))
-            if file_type == "RESOURCE" and not str(file.path_absolute).endswith(".resource"):
-                click.echo(f"{INDENT}{WARN_MARKER} .resource file unexpectedly used as {file_type}")
-            elif file_type == "SUITE" and not str(file.path_absolute).endswith(".robot"):
-                click.echo(f"{INDENT}{WARN_MARKER} .robot file unexpectedly used as {file_type}")
-            elif file_type == "LIBRARY" and not str(file.path_absolute).endswith(".py"):
-                click.echo(f"{INDENT}{WARN_MARKER} .py file unexpectedly used as {file_type}")
-        else:
-            click.echo(f"{INDENT}Used as: {' & '.join(file.type)}\t{WARN_MARKER}")
+    cwd = Path.cwd().joinpath(options.source_path)
+    if options.show_all_count:
+        # TODO: log filter
+        non_suite_files = [f for f in files if "SUITE" not in f.type]
+        sorted_files = sorted(non_suite_files, key=lambda f: f.id)
+        sorted_files = sorted(sorted_files, key=lambda f: len(f.used_by))
 
-        click.echo(f"{INDENT}Use count: {len(file.used_by)}x")
+        click.echo("import_count\tfile")
+        for file in sorted_files:
+            file_path = _pretty_file_path(
+                to_relative_path(cwd, file.path_absolute),
+                file.type,
+            )
+            click.echo(
+                "\t".join(
+                    [str(len(file.used_by)), file_path],
+                ),
+            )
+    else:
+        sorted_files = sorted(files, key=lambda f: f.id)
+        # TODO: log filter
+        unused_files = [f for f in sorted_files if "SUITE" not in f.type and len(f.used_by) == 0]
+
+        if len(unused_files) == 0:
+            click.echo("Found no unused files")
+            return
+
+        click.echo(f"Found {len(unused_files)} unused files:")
+        for file in unused_files:
+            file_path = _pretty_file_path(
+                to_relative_path(cwd, file.path_absolute),
+                file.type,
+            )
+            click.echo("  " + file_path)
+
+    # for file in files:
+    #     if file.type != "SUITE" and not file.used_by:
+    #         click.echo("UNUSED " + str(file.path_absolute))
+    #     else:
+    #         click.echo(file.path_absolute)
+
+    #     if len(file.type) == 0:
+    #         click.echo(f"{INDENT}Used as: " + click.style("unknown", fg="bright_black"))
+    #     elif len(file.type) == 1:
+    #         file_type = next(iter(file.type))
+    #         if file_type == "RESOURCE" and not str(file.path_absolute).endswith(".resource"):
+    #             click.echo(f"{INDENT}{WARN_MARKER} .resource file unexpectedly used as {file_type}")
+    #         elif file_type == "SUITE" and not str(file.path_absolute).endswith(".robot"):
+    #             click.echo(f"{INDENT}{WARN_MARKER} .robot file unexpectedly used as {file_type}")
+    #         elif file_type == "LIBRARY" and not str(file.path_absolute).endswith(".py"):
+    #             click.echo(f"{INDENT}{WARN_MARKER} .py file unexpectedly used as {file_type}")
+    #     else:
+    #         click.echo(f"{INDENT}Used as: {' & '.join(file.type)}\t{WARN_MARKER}")
+
+    #     click.echo(f"{INDENT}Use count: {len(file.used_by)}x")
 
 
 def _cli_print_grouped_file_trees(
@@ -97,3 +136,25 @@ def _exit_code(files: list[FileUseData]) -> int:
 
     exit_code = 0
     return min(exit_code, 200)
+
+
+# TODO: Move centrally
+def _pretty_file_path(path: str, file_types: set[FileUseType]) -> str:
+    if len(file_types) == 0:
+        return path
+    if len(file_types) > 1:
+        return click.style(f"{path} [Used as: {' & '.join(file_types)}]", fg="yellow")
+
+    file_type = next(iter(file_types))
+
+    if file_type == "RESOURCE":
+        return click.style(path, fg="bright_cyan")
+    if file_type == "SUITE":
+        return path
+    if file_type == "LIBRARY":
+        return click.style(path, fg="bright_magenta")
+    if file_type == "VARIABLE":
+        return click.style(path, fg="bright_green")
+
+    msg = f"Unexpected file type {file_type}"
+    raise ValueError(msg)
