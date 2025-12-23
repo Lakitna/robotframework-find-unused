@@ -1,6 +1,6 @@
 [project]
 name = "robotframework-find-unused"
-version = "0.3.0"
+version = "0.4.0"
 description = "Find unused parts of your Robot Framework project"
 readme = "./README.md"
 authors = [{ name = "Sander van Beek" }]
