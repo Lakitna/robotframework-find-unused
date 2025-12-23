@@ -7,7 +7,8 @@ from typing import Literal, Optional
 
 import click
 
-from robotframework_find_unused.common.const import FileUseData, FileUseType
+from robotframework_find_unused.common.cli import pretty_file_path
+from robotframework_find_unused.common.const import FileUseData
 from robotframework_find_unused.common.convert import to_relative_path
 from robotframework_find_unused.common.normalize import normalize_file_path
 
@@ -153,6 +154,9 @@ class FileImportTreeBuilder:
         return node
 
     def get_imports_of_files(self, files: list[FileUseData]) -> dict[str, list[FileUseData]]:
+        """
+        Swap nodes and branches from imported_files -> file to file -> imported_files.
+        """
         file_imports_map: dict[str, list[FileUseData]] = {}
         for file in files:
             file_imports_map[file.id] = []
@@ -164,6 +168,9 @@ class FileImportTreeBuilder:
         return file_imports_map
 
     def flatten_tree(self, tree: FileImportTreeNode) -> list[FileImportTreeNode]:
+        """
+        Flatten tree to list of nodes
+        """
         nodes = []
 
         def recurse(node: FileImportTreeNode) -> None:
@@ -178,6 +185,9 @@ class FileImportTreeBuilder:
         return nodes
 
     def print_file_use_tree(self, tree: FileImportTreeNode):
+        """
+        Output the full tree to the user
+        """
         nodes = self.flatten_tree(tree)
 
         print_height = min(self.max_height, len(nodes)) if self.max_height > 0 else len(nodes)
@@ -246,8 +256,7 @@ class FileImportTreeBuilder:
                 )
             else:
                 print_line_count += 1
-                file_type = next(iter(node.data.type))
-                click.echo(f"{indent}{self._pretty_file_path(relative_path, file_type)}")
+                click.echo(f"{indent}{pretty_file_path(relative_path, node.data.type)}")
 
         if len(nodes) == 1:
             click.echo(
@@ -265,16 +274,3 @@ class FileImportTreeBuilder:
                     fg="bright_black",
                 ),
             )
-
-    def _pretty_file_path(self, path: str, file_type: FileUseType) -> str:
-        if file_type == "RESOURCE":
-            return click.style(path, fg="bright_cyan")
-        if file_type == "SUITE":
-            return path
-        if file_type == "LIBRARY":
-            return click.style(path, fg="bright_magenta")
-        if file_type == "VARIABLE":
-            return click.style(path, fg="bright_green")
-
-        msg = f"Unexpected file type {file_type}"
-        raise ValueError(msg)

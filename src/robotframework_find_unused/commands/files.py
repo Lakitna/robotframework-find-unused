@@ -7,7 +7,7 @@ from pathlib import Path
 
 import click
 
-from robotframework_find_unused.common.cli import cli_hard_exit
+from robotframework_find_unused.common.cli import cli_hard_exit, pretty_file_path
 from robotframework_find_unused.common.const import INDENT, WARN_MARKER, FileUseData, FileUseType
 from robotframework_find_unused.common.convert import to_relative_path
 from robotframework_find_unused.common.normalize import normalize_file_path
@@ -23,7 +23,7 @@ class FileOptions:
     Command line options for the 'files' command
     """
 
-    path_filter_glob: str | None
+    path_filter_glob: str | None  # TODO:
     show_all_count: bool
     show_tree: bool
     tree_max_depth: int
@@ -61,7 +61,7 @@ def _cli_log_results(files: list[FileUseData], options: FileOptions) -> None:
 
         click.echo("import_count\tfile")
         for file in sorted_files:
-            file_path = _pretty_file_path(
+            file_path = pretty_file_path(
                 to_relative_path(cwd, file.path_absolute),
                 file.type,
             )
@@ -81,7 +81,7 @@ def _cli_log_results(files: list[FileUseData], options: FileOptions) -> None:
 
         click.echo(f"Found {len(unused_files)} unused files:")
         for file in unused_files:
-            file_path = _pretty_file_path(
+            file_path = pretty_file_path(
                 to_relative_path(cwd, file.path_absolute),
                 file.type,
             )
@@ -136,25 +136,3 @@ def _exit_code(files: list[FileUseData]) -> int:
 
     exit_code = 0
     return min(exit_code, 200)
-
-
-# TODO: Move centrally
-def _pretty_file_path(path: str, file_types: set[FileUseType]) -> str:
-    if len(file_types) == 0:
-        return path
-    if len(file_types) > 1:
-        return click.style(f"{path} [Used as: {' & '.join(file_types)}]", fg="yellow")
-
-    file_type = next(iter(file_types))
-
-    if file_type == "RESOURCE":
-        return click.style(path, fg="bright_cyan")
-    if file_type == "SUITE":
-        return path
-    if file_type == "LIBRARY":
-        return click.style(path, fg="bright_magenta")
-    if file_type == "VARIABLE":
-        return click.style(path, fg="bright_green")
-
-    msg = f"Unexpected file type {file_type}"
-    raise ValueError(msg)
