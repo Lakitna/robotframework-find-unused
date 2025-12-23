@@ -1,3 +1,4 @@
+from collections.abc import Iterable
 from pathlib import Path
 
 import click
@@ -53,7 +54,13 @@ class VariableDefinitionVisitor(ModelVisitor):
         for var_node in node.body:
             if not isinstance(var_node, Variable):
                 continue
-            self._register_variable(var_node.name, "variables_section", self.current_working_file)
+
+            self._register_variable(
+                var_node.name,
+                "variables_section",
+                self.current_working_file,
+                var_node.value,
+            )
 
         return self.generic_visit(node)
 
@@ -112,13 +119,14 @@ class VariableDefinitionVisitor(ModelVisitor):
             return
 
         for var_name in var_store.as_dict(decoration=True):
-            self._register_variable(var_name, "variable_file", import_path)
+            self._register_variable(var_name, "variable_file", import_path, [])
 
     def _register_variable(
         self,
         name: str,
         defined_in_type: VariableDefinedInType,
         defined_in: Path,
+        value: Iterable[str],
     ) -> None:
         name_normalized = normalize_variable_name(name)
         if name_normalized in self.variables:
@@ -141,4 +149,5 @@ class VariableDefinitionVisitor(ModelVisitor):
             use_count=0,
             defined_in_type=defined_in_type,
             defined_in=defined_in.as_posix(),
+            value=value,
         )

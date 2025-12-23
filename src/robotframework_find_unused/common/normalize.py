@@ -1,8 +1,13 @@
-def normalize_variable_name(name: str) -> str:
+def normalize_variable_name(name: str, *, strip_decoration: bool = True) -> str:
     """
     Normalize Robot variables name. Output is suitable for matching and sorting purposes
     """
-    return name.lstrip("$@&%").replace(" ", "").replace("_", "").lower()
+    norm = name.replace(" ", "").replace("_", "").lower()
+
+    if strip_decoration:
+        norm = norm.lstrip("$@&%").removeprefix("{").removesuffix("}")
+
+    return norm
 
 
 def normalize_keyword_name(name: str) -> str:
