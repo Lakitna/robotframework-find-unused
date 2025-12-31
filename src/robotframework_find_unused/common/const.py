@@ -89,4 +89,5 @@ class FileUseData:
     used_by: list["FileUseData"]
 
     def __hash__(self) -> int:
+        """Hash by id"""
         return hash(self.id)

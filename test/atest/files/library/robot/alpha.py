@@ -1,2 +1,1 @@
-*** Settings ***
-Resource    ./beta.resource
+# Nothing to see here

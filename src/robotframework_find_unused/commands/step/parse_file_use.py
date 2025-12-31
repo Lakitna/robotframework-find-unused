@@ -7,7 +7,6 @@ from robotframework_find_unused.common.const import (
     INDENT,
     VERBOSE_NO,
     VERBOSE_SINGLE,
-    WARN_MARKER,
     FileUseData,
 )
 from robotframework_find_unused.common.normalize import normalize_file_path

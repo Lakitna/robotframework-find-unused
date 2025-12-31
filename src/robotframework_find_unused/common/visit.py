@@ -6,6 +6,8 @@ import robot.api.parsing
 
 
 class SectionsList(list):
+    """Hashable list for Robot Framework `*** Section ***` names"""
+
     def __hash__(self) -> int:  # pyright: ignore[reportIncompatibleVariableOverride]  # noqa: D105
         return hash("|".join(iter(self)))
 
