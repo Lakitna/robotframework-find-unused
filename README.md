@@ -144,6 +144,33 @@ robotunused variables --help
 | `-f`, `--filter`     | Globlike pattern |         | Only show variables who's name match the glob pattern. Matching without {brackets} and $@&% prefixes |
 | `-v`, `--verbose`    |                  |         | Show more log output. When provided twice: Show even more log output                                 |
 
+### Find unused files
+
+For each of your `.robot` files, follow the full chain of imports. Files that are never (indirectly)
+imported by a `.robot` file are logged.
+
+```shell
+robotunused files
+```
+
+Please note that there are limitations. For an overview of current limitations, run the following
+command:
+
+```shell
+robotunused files --help
+```
+
+#### Available options
+
+| flag                 | option           | default | description                                                          |
+| -------------------- | ---------------- | ------- | -------------------------------------------------------------------- |
+| `-c`, `--show-count` |                  |         | Show usage count for all files instead of only unused variables      |
+| `-t`, `--show-tree`  |                  |         | Also show full import tree for every `.robot` file                   |
+| `--tree-max-depth`   | Positive integer | `None`  | Only when `--show-tree`: Limit import tree depth                     |
+| `--tree-max-height`  | Positive integer | `None`  | Only when `--show-tree`: Limit import tree height                    |
+| `-f`, `--filter`     | Globlike pattern |         | Only show files who's path matches the glob pattern                  |
+| `-v`, `--verbose`    |                  |         | Show more log output. When provided twice: Show even more log output |
+
 ## Contributing
 
 I'm open to contributions. Please contact me in the issues.
