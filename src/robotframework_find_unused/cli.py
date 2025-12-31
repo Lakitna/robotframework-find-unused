@@ -588,6 +588,18 @@ def files(  # noqa: PLR0913
     \b
         *** Settings ***
         Resource    my.package.TestLibrary
+
+    ----------
+
+    Limitation 3: Imports in python files are ignored
+
+    Only imports in `.robot` and `.resource` files are considered. Imports in other files are
+    ignored.
+
+    Example: The Python file `hello.py` is ignored since it's imported from a Python file.
+
+    \b
+        from hello import hello_world
     """
     options = FileOptions(
         source_path=file_path,
