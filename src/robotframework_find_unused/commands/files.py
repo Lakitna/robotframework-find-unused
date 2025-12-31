@@ -46,7 +46,7 @@ def cli_files(options: FileOptions):
         _cli_print_grouped_file_trees(files, options.tree_max_depth, options.tree_max_height)
     _cli_log_results(files, options)
 
-    return 0
+    return _exit_code(files)
 
 
 def _cli_log_results(files: list[FileUseData], options: FileOptions) -> None:
@@ -87,27 +87,6 @@ def _cli_log_results(files: list[FileUseData], options: FileOptions) -> None:
             )
             click.echo("  " + file_path)
 
-    # for file in files:
-    #     if file.type != "SUITE" and not file.used_by:
-    #         click.echo("UNUSED " + str(file.path_absolute))
-    #     else:
-    #         click.echo(file.path_absolute)
-
-    #     if len(file.type) == 0:
-    #         click.echo(f"{INDENT}Used as: " + click.style("unknown", fg="bright_black"))
-    #     elif len(file.type) == 1:
-    #         file_type = next(iter(file.type))
-    #         if file_type == "RESOURCE" and not str(file.path_absolute).endswith(".resource"):
-    #             click.echo(f"{INDENT}{WARN_MARKER} .resource file unexpectedly used as {file_type}")
-    #         elif file_type == "SUITE" and not str(file.path_absolute).endswith(".robot"):
-    #             click.echo(f"{INDENT}{WARN_MARKER} .robot file unexpectedly used as {file_type}")
-    #         elif file_type == "LIBRARY" and not str(file.path_absolute).endswith(".py"):
-    #             click.echo(f"{INDENT}{WARN_MARKER} .py file unexpectedly used as {file_type}")
-    #     else:
-    #         click.echo(f"{INDENT}Used as: {' & '.join(file.type)}\t{WARN_MARKER}")
-
-    #     click.echo(f"{INDENT}Use count: {len(file.used_by)}x")
-
 
 def _cli_print_grouped_file_trees(
     files: list[FileUseData],
@@ -132,7 +111,7 @@ def _cli_print_grouped_file_trees(
 
 
 def _exit_code(files: list[FileUseData]) -> int:
-    print("TODO")
+    unused_files = [f for f in files if "SUITE" not in f.type and len(f.used_by) == 0]
 
-    exit_code = 0
+    exit_code = len(unused_files)
     return min(exit_code, 200)
