@@ -66,17 +66,13 @@ class FileImportVisitor(ModelVisitor):
 
         lib_name = node.name
         if not lib_name.endswith(".py"):
-            # TODO: Limitation: No downloaded library imports
+            # Limitation 1.
             # A downloaded lib. We don't care
-            return
-        if not lib_name.startswith(".") and "/" not in lib_name and "\\" not in lib_name:
-            # Assume this is a downloaded library imported with `.py` postfix. We don't care
             return
 
         lib_path = self.current_working_directory.joinpath(lib_name)
 
-        # TODO: Support name alias using `AS`
-        # TODO: Limitation: No python module syntax
+        # Limitation 2: No python module syntax
 
         self._register_file_use(lib_path, file_type="LIBRARY")
 

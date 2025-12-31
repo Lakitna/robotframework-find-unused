@@ -562,7 +562,32 @@ def files(  # noqa: PLR0913
 
     ----------
 
-    Limitation 1: ???
+    Limitation 1: Downloaded libraries are ignored
+
+    Imports to downloaded libraries are ignored. Because of this, unused downloaded libraries are
+    not detected.
+
+    Example: The unused library 'SeleniumLibrary' is not detected.
+
+    \b
+        *** Settings ***
+        Library    Browser
+
+    ----------
+
+    Limitation 2: No Python module syntax
+
+    Libraries can be imported with both a path-like syntax (e.g. ./foo/bar.resource) and Python
+    module syntax (e.g. foo.bar). Python module syntax is not supported.
+
+    This does not impact Resource file imports.
+
+    Example: The custom library 'TestLibrary' is ignored since it's imported using the Python module
+    syntax.
+
+    \b
+        *** Settings ***
+        Resource    my.package.TestLibrary
     """
     options = FileOptions(
         source_path=file_path,
