@@ -97,12 +97,13 @@ def _cli_print_grouped_file_trees(
 
     click.echo(
         f"Building {len(tree_root_files)} file import trees"
-        + (f" with max depth {max_depth}" if max_depth >= 0 else ""),
+        + (f" with max depth {max_depth}" if max_depth >= 0 else "")
+        + "...",
     )
     tree_builder = FileImportTreeBuilder(max_depth=max_depth, max_height=max_height)
     grouped_trees = tree_builder.build_grouped_trees(tree_root_files, files)
 
-    click.echo(f"Print {len(grouped_trees)} tree groups...")
+    click.echo(f"Printing {len(grouped_trees)} tree groups...")
     for trees in grouped_trees:
         click.echo()
         for tree in trees[0:-1]:

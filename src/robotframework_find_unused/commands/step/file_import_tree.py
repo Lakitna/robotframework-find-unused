@@ -296,25 +296,28 @@ class FileImportTreeBuilder:
         raise ValueError(msg)
 
     def _print_tree_summary(self, nodes: list[FileImportTreeNode]) -> None:
+        stats: list[str] = self._get_tree_summary_stats(nodes)
+        click.echo(click.style(" | ".join(stats), fg="bright_black"))
+
+    def _get_tree_summary_stats(self, nodes: list[FileImportTreeNode]) -> list[str]:
+        stats: list[str] = []
+
         height = len(nodes)
+        stats.append(f"Tree height: {height}")
+
         max_depth = max(*[node.depth for node in nodes])
         if self.max_depth >= 0 and self.max_depth < max_depth:
-            max_depth = f"{max_depth - 1} (limited)"
+            stats.append(f"Stats unreliable due to `--tree-max-depth {self.max_depth}`")
+            return stats
+        stats.append(f"Tree depth: {max_depth}")
+
+        unique_file_count = len({node.data.id for node in nodes})
+        stats.append(f"Unique files: {unique_file_count}")
 
         circular_count = len([node for node in nodes if node.branches == "CIRCULAR"])
+        stats.append(f"Circular imports: {circular_count}")
+
         deduped_count = len([node for node in nodes if node.branches == "DEDUPED"])
-        unique_file_count = len({node.data.id for node in nodes})
-        click.echo(
-            click.style(
-                " | ".join(
-                    [
-                        f"Tree height: {height}",
-                        f"Tree depth: {max_depth}",
-                        f"Unique files: {unique_file_count}",
-                        f"Circular imports: {circular_count}x",
-                        f"Already imported: {deduped_count}x",
-                    ],
-                ),
-                fg="bright_black",
-            ),
-        )
+        stats.append(f"Already imported: {deduped_count}")
+
+        return stats
