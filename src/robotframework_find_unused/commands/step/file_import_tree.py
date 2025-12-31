@@ -14,6 +14,15 @@ from robotframework_find_unused.common.normalize import normalize_file_path
 
 
 @dataclass
+class FileImportTreePrintLine:
+    """Datastructure for printing file trees"""
+
+    indent: int
+    text: str
+    color: str | None
+
+
+@dataclass
 class FileImportTreeNode:
     """Datastructure for file import trees"""
 
@@ -190,87 +199,122 @@ class FileImportTreeBuilder:
         """
         nodes = self.flatten_tree(tree)
 
-        print_height = min(self.max_height, len(nodes)) if self.max_height > 0 else len(nodes)
-
-        file_count = 0
-        print_line_count = 0
-        skip_max_depth_marker = False
-        for node in nodes:
-            if print_line_count >= print_height:
-                break
-
-            file_count += 1
-
-            indent = click.style("|  " * node.depth, fg="bright_black")
-            relative_path = node.relative_path_to_parent()
-
-            if isinstance(node.branches, str):
-                if node.branches == "CIRCULAR":
-                    print_line_count += 1
-                    click.echo(
-                        indent
-                        + click.style(
-                            f"{relative_path} [Circular]",
-                            fg="yellow",
-                        ),
-                    )
-                if node.branches == "MAX_DEPTH" and not skip_max_depth_marker:
-                    print_line_count += 1
-                    click.echo(
-                        indent
-                        + click.style(
-                            "...",
-                            fg="bright_black",
-                        ),
-                    )
-                    skip_max_depth_marker = True
-                if node.branches == "DEDUPED":
-                    print_line_count += 1
-                    click.echo(
-                        indent
-                        + click.style(
-                            f"{relative_path} [Already imported]",
-                            fg="bright_black",
-                        ),
-                    )
-                continue
-
-            skip_max_depth_marker = False
-
-            types = node.data.type
-            if len(types) > 1:
-                print_line_count += 1
-                click.echo(
-                    click.style(
-                        f"{relative_path} [Multi-type: {' & '.join(types)}]",
-                        fg="bright_red",
-                    ),
-                )
-            elif len(types) == 0:
-                print_line_count += 1
-                click.echo(
-                    click.style(
-                        f"{relative_path} [Unknown type]",
-                        fg="bright_red",
-                    ),
-                )
-            else:
-                print_line_count += 1
-                click.echo(f"{indent}{pretty_file_path(relative_path, node.data.type)}")
-
         if len(nodes) == 1:
             click.echo(
+                click.style("No imports to show...", fg="bright_black"),
+            )
+            return
+
+        print_nodes = nodes.copy()
+        print_height = (
+            min(self.max_height, len(print_nodes)) if self.max_height > 0 else len(print_nodes)
+        )
+        print_lines: list[FileImportTreePrintLine] = []
+        while len(print_nodes) > 0:
+            if len(print_lines) >= print_height:
+                break
+
+            node = print_nodes.pop(0)
+
+            if isinstance(node.branches, str):
+                self._print_pruned_node(node, print_lines)
+                continue
+
+            relative_path = node.relative_path_to_parent()
+            types = node.data.type
+            if len(types) == 0:
+                print_lines.append(
+                    FileImportTreePrintLine(
+                        indent=node.depth,
+                        text=f"{relative_path} [Unknown type]",
+                        color="bright_red",
+                    ),
+                )
+                continue
+
+            print_lines.append(
+                FileImportTreePrintLine(
+                    indent=node.depth,
+                    text=pretty_file_path(relative_path, node.data.type),
+                    color=None,
+                ),
+            )
+
+        for line in print_lines:
+            indent = click.style("│  " * line.indent, fg="bright_black")
+            text = click.style(line.text, fg=line.color) if line.color else line.text
+            click.echo(indent + text)
+
+        if len(print_nodes) > 0:
+            click.echo(
                 click.style(
-                    "No imports to show...",
+                    f"Not showing {len(print_nodes)} additional files...",
                     fg="bright_black",
                 ),
             )
 
-        if len(nodes) > file_count:
-            skipped_count = len(nodes) - file_count
-            click.echo(
-                click.style(
-                    f"Not showing {skipped_count} additional files...",
-                    fg="bright_black",
+        self._print_tree_summary(nodes)
+
+    def _print_pruned_node(
+        self,
+        node: FileImportTreeNode,
+        print_lines: list[FileImportTreePrintLine],
+    ) -> None:
+        relative_path = node.relative_path_to_parent()
+        if node.branches == "CIRCULAR":
+            print_lines.append(
+                FileImportTreePrintLine(
+                    indent=node.depth,
+                    text=f"{relative_path} [Circular]",
+                    color="yellow",
                 ),
             )
+            return
+        if node.branches == "MAX_DEPTH":
+            if print_lines[-1].text == "...":
+                return
+
+            print_lines.append(
+                FileImportTreePrintLine(
+                    indent=node.depth,
+                    text="...",
+                    color="bright_black",
+                ),
+            )
+            return
+        if node.branches == "DEDUPED":
+            print_lines.append(
+                FileImportTreePrintLine(
+                    indent=node.depth,
+                    text=f"{relative_path} [Already imported]",
+                    color="bright_black",
+                ),
+            )
+            return
+
+        msg = f"Unexpected pruned branch reason '{node.branches}'"
+        raise ValueError(msg)
+
+    def _print_tree_summary(self, nodes: list[FileImportTreeNode]) -> None:
+        height = len(nodes)
+        max_depth = max(*[node.depth for node in nodes])
+        if self.max_depth >= 0 and self.max_depth < max_depth:
+            max_depth = f"{max_depth - 1} (limited)"
+
+        circular_count = len([node for node in nodes if node.branches == "CIRCULAR"])
+        deduped_count = len([node for node in nodes if node.branches == "DEDUPED"])
+        unique_file_count = len({node.data.id for node in nodes})
+        click.echo(
+            click.style(
+                " | ".join(
+                    [
+                        f"Tree height: {height}",
+                        f"Tree depth: {max_depth}",
+                        f"Unique files: {unique_file_count}",
+                        f"Circular imports: {circular_count}x",
+                        f"Already imported: {deduped_count}x",
+                    ],
+                ),
+                fg="bright_black",
+            ),
+        )
