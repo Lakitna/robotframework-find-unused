@@ -1,13 +1,14 @@
 Discovering files in `./robot` using Robocop config...
 Parsing file imports...
 [ DONE ] Parsed 4 files
-Building 1 file import trees
-Print 1 tree groups...
+Building 1 file import trees...
+Printing 1 tree groups...
 
 C:/code/robotframework-find-unused/test/atest/files/basic/robot/test.robot
-|  ./alpha.resource
-|  |  ./beta.resource
-|  ./beta.resource [Already imported]
+│  ./alpha.resource
+│  │  ./beta.resource
+│  ./beta.resource [Already imported]
+Tree height: 4 | Tree depth: 2 | Unique files: 3 | Circular imports: 0 | Already imported: 1
 
 Found 1 unused files:
   ./gamma.resource

@@ -1,4 +1,5 @@
 import difflib
+import os
 import re
 import subprocess
 import sys
@@ -21,20 +22,25 @@ class AcceptanceTest:
         sys.path.append(str(test_data_folder))
 
         expected_output_path_absolute: Path = test_folder.joinpath(expected_output_path)
-        with expected_output_path_absolute.open() as f:
+        with expected_output_path_absolute.open(encoding="utf8") as f:
             expected_output = f.read()
 
         command = [sys.executable, "-m", "robotframework_find_unused"]
         command.extend(cli_options)
 
+        env = os.environ.copy()
+        env["PYTHONIOENCODING"] = "utf8"
         p = subprocess.run(  # noqa: S603
             command,
-            capture_output=True,
             cwd=test_folder,
             check=False,
+            env=env,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.STDOUT,
+            encoding="utf8",
         )
 
-        actual_output = self._parse_output(p.stdout.decode())
+        actual_output = self._parse_output(p.stdout)
         self._assert_logs(actual_output, expected_output)
 
         if p.returncode != expected_exit_code:
@@ -43,8 +49,7 @@ class AcceptanceTest:
                     f"Subprocess exited with unexpected exit code {p.returncode}. "
                     f"Expected exit code: {expected_exit_code} "
                     f"Actual exit code: {p.returncode} "
-                    f"Subprocess stderr below:\n{p.stderr.decode()}\n"
-                    f"Subprocess stdout below:\n{p.stdout.decode()}\n"
+                    f"Subprocess stdout below:\n{p.stdout}\n"
                 ),
             )
 

@@ -1,0 +1,2 @@
+*** Settings ***
+Resource    gamma.resource
