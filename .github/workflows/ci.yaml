@@ -18,24 +18,34 @@ jobs:
     strategy:
       matrix:
         python-version: ["3.10", "3.12", "3.14"]
-        robot-version: ["==6.1.1", "<8"]
+        dependency-resolution: ["lowest-direct", "highest"]
       fail-fast: false
+    env:
+      UV_RESOLUTION: ${{ matrix.dependency-resolution }}
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
+
       - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           python-version: ${{ matrix.python-version }}
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v7
+        with:
+          python-version: ${{ matrix.python-version }}
+          enable-cache: true
+
       - name: Install dependencies
         run: |
-          pip install poetry
-          poetry install
-          echo "Change to Robotframework ${{ matrix.robot-version }}"
-          poetry add "robotframework${{ matrix.robot-version }}"
-      - name: Lint with ruff
+          uv sync --dev
+          uv tree --depth 1 --no-dev
+
+      - name: Lint
         run: |
-          poetry run ruff check
-      - name: Test with pytest
+          uv run ruff check
+
+      - name: Test
         run: |
-          poetry run pytest -n auto
+          uv run pytest -n auto

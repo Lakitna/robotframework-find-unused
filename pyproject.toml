@@ -2,9 +2,10 @@
 name = "robotframework-find-unused"
 version = "0.4.0"
 description = "Find unused parts of your Robot Framework project"
-readme = "./README.md"
+readme = "README.md"
 authors = [{ name = "Sander van Beek" }]
-license = "./LICENSE"
+license = "MIT"
+license-files = ["LICENSE"]
 classifiers = [
     "Framework :: Robot Framework",
     "Framework :: Robot Framework :: Tool",
@@ -18,11 +19,13 @@ dependencies = [
     "robotframework-robocop (>=6.0.0)",
 ]
 
-[tool.poetry.group.dev.dependencies]
-ruff = ">=0.9.1,<0.10.0"
-pytest = ">=8.3.4,<9.0.0"
-pytest-xdist = ">=3.8.0,<4.0.0"
-pyyaml = "^6.0.3"
+[dependency-groups]
+dev = [
+    "ruff (>=0.9.1,<0.10.0)",
+    "pytest (>=8.3.4,<9.0.0)",
+    "pytest-xdist (>=3.8.0,<4.0.0)",
+    "pyyaml (>=6.0.3,<7.0.0)",
+]
 
 [project.urls]
 Homepage = "https://github.com/Lakitna/robotframework-find-unused"
@@ -31,12 +34,9 @@ Repository = "https://github.com/Lakitna/robotframework-find-unused"
 [project.scripts]
 robotunused = "robotframework_find_unused.cli:cli"
 
-[tool.poetry]
-requires-poetry = ">=2.0.0"
-
 [build-system]
-requires = ["poetry-core>=2.0.0,<3.0.0"]
-build-backend = "poetry.core.masonry.api"
+requires = ["uv_build>=0.9.22,<0.10.0"]
+build-backend = "uv_build"
 
 [tool.pytest.ini_options]
 addopts = ["--import-mode=importlib"]
