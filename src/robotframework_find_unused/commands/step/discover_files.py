@@ -30,9 +30,10 @@ def cli_discover_file_paths(input_path: str, *, verbose: int) -> list[Path]:
         robocop_config.default_config.file_filters = FileFiltersOptions(default_include=extensions)
 
     file_paths = [path[0] for path in robocop_config.paths]
+    sorted_file_paths = sorted(file_paths, key=lambda f: f)
 
-    _log_file_stats(file_paths, input_path, verbose)
-    return file_paths
+    _log_file_stats(sorted_file_paths, input_path, verbose)
+    return sorted_file_paths
 
 
 def _log_file_stats(file_paths: list[Path], input_path: str, verbose: int) -> None:
@@ -61,6 +62,5 @@ def _log_file_stats(file_paths: list[Path], input_path: str, verbose: int) -> No
     if verbose == VERBOSE_SINGLE:
         return
 
-    sorted_file_paths = sorted(file_paths, key=lambda f: f)
-    for path in sorted_file_paths:
+    for path in file_paths:
         click.echo(INDENT + click.style(str(path), fg="bright_black"))
