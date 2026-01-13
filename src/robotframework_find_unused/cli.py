@@ -626,7 +626,7 @@ def files(  # noqa: PLR0913
 
     \b
         *** Settings ***
-        Resource    my.package.TestLibrary
+        Library    my.package.TestLibrary
 
     ----------
 
