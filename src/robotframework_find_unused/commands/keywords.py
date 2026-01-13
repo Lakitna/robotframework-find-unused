@@ -7,7 +7,7 @@ from dataclasses import dataclass
 import click
 
 from robotframework_find_unused.common.cli import cli_hard_exit, pretty_kw_name
-from robotframework_find_unused.common.const import KeywordData, FilterOption
+from robotframework_find_unused.common.const import FilterOption, KeywordData
 from robotframework_find_unused.common.sort import sort_keywords_by_name
 
 from .step.discover_files import cli_discover_file_paths
