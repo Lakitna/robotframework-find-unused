@@ -128,7 +128,9 @@ class VariableDefinitionVisitor(ModelVisitor):
         defined_in: Path,
         value: Iterable[str],
     ) -> None:
-        name_normalized = normalize_variable_name(name)
+        (var_name, var_type) = self._parse_var_name(name)
+
+        name_normalized = normalize_variable_name(var_name)
         if name_normalized in self.variables:
             var_def = self.variables[name_normalized]
 
@@ -144,11 +146,21 @@ class VariableDefinitionVisitor(ModelVisitor):
                 return
 
         self.variables[name_normalized] = VariableData(
-            name=name,
+            name=var_name,
+            type=var_type,
             normalized_name=name_normalized,
-            resolved_name=name,
+            resolved_name=var_name,
             use_count=0,
             defined_in_type=defined_in_type,
             defined_in=defined_in.as_posix(),
             value=value,
         )
+
+    def _parse_var_name(self, name: str) -> tuple[str, str | None]:
+        if ": " not in name:
+            return (name, None)
+
+        (var_name, var_type) = name.split(": ")
+        var_name = var_name + "}"
+        var_type = var_type.removesuffix("}")
+        return (var_name, var_type)

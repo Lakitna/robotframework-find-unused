@@ -56,6 +56,7 @@ def _resolve_vars_in_var_name(variables: dict[str, VariableData]) -> dict[str, V
 
         resolved_variables[resolved_var_name_normalized] = VariableData(
             name=var.name,
+            type=var.type,
             normalized_name=resolved_var_name_normalized,
             resolved_name="${" + resolved_var_name + "}",
             use_count=var.use_count,
