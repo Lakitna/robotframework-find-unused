@@ -3,17 +3,16 @@ from collections.abc import Callable
 
 import click
 
-from robotframework_find_unused.common.const import NOTE_MARKER, KeywordData, KeywordFilterOption
+from robotframework_find_unused.common.const import NOTE_MARKER, FilterOption, KeywordData
 
 
 def cli_filter_keywords(  # noqa: PLR0913
     keywords: list[KeywordData],
     *,
-    filter_deprecated: KeywordFilterOption | None = None,
-    filter_private: KeywordFilterOption | None = None,
-    filter_library: KeywordFilterOption | None = None,
-    filter_unused: KeywordFilterOption | None = None,
-    filter_returns: KeywordFilterOption | None = None,
+    filter_deprecated: FilterOption | None = None,
+    filter_private: FilterOption | None = None,
+    filter_library: FilterOption | None = None,
+    filter_returns: FilterOption | None = None,
     filter_glob: str | None,
 ) -> list[KeywordData]:
     """
@@ -47,14 +46,6 @@ def cli_filter_keywords(  # noqa: PLR0913
             "downloaded library",
         )
 
-    if filter_unused:
-        keywords = _cli_filter_keywords_by_option(
-            keywords,
-            filter_unused,
-            lambda kw: kw.use_count == 0,
-            "unused",
-        )
-
     if filter_returns:
         keywords = _cli_filter_keywords_by_option(
             keywords,
@@ -79,7 +70,7 @@ def cli_filter_keywords(  # noqa: PLR0913
 
 def _cli_filter_keywords_by_option(
     keywords: list[KeywordData],
-    option: KeywordFilterOption,
+    option: FilterOption,
     matcher_fn: Callable[[KeywordData], bool],
     descriptor: str,
 ) -> list[KeywordData]:

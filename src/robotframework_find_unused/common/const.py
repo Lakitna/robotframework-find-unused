@@ -15,7 +15,7 @@ VERBOSE_NO = 0
 VERBOSE_SINGLE = 1
 VERBOSE_DOUBLE = 2
 
-KeywordFilterOption: TypeAlias = Literal["include", "exclude", "only"]
+FilterOption: TypeAlias = Literal["include", "exclude", "only"]
 
 
 @dataclass

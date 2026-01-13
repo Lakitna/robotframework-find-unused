@@ -20,7 +20,7 @@ from .commands import (
     cli_returns,
     cli_variables,
 )
-from .common.const import KeywordFilterOption
+from .common.const import FilterOption
 
 click_choice_keyword_filter_option = click.Choice(
     ["include", "exclude", "only"],
@@ -97,10 +97,10 @@ def cli():
 def keywords(  # noqa: PLR0913
     show_count: bool,
     filter: str | None,  # noqa: A002
-    deprecated: KeywordFilterOption,
-    private: KeywordFilterOption,
-    library: KeywordFilterOption,
-    unused_library: KeywordFilterOption,
+    deprecated: FilterOption,
+    private: FilterOption,
+    library: FilterOption,
+    unused_library: FilterOption,
     verbose: int,
     file_path: str,
 ):
@@ -339,10 +339,10 @@ def variables(
 def arguments(  # noqa: PLR0913
     show_count: bool,
     filter: str | None,  # noqa: A002
-    deprecated: KeywordFilterOption,
-    private: KeywordFilterOption,
-    library: KeywordFilterOption,
-    unused: KeywordFilterOption,
+    deprecated: FilterOption,
+    private: FilterOption,
+    library: FilterOption,
+    unused: FilterOption,
     verbose: int,
     file_path: str,
 ):
@@ -464,10 +464,10 @@ def arguments(  # noqa: PLR0913
 def returns(  # noqa: PLR0913
     show_count: bool,
     filter: str | None,  # noqa: A002
-    deprecated: KeywordFilterOption,
-    private: KeywordFilterOption,
-    library: KeywordFilterOption,
-    unused: KeywordFilterOption,
+    deprecated: FilterOption,
+    private: FilterOption,
+    library: FilterOption,
+    unused: FilterOption,
     verbose: int,
     file_path: str,
 ):
