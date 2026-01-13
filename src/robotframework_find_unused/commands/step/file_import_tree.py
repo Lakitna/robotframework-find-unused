@@ -104,15 +104,15 @@ class FileImportTreeBuilder:
         *,
         depth: int = 0,
         visited_files_in_branch: list[str] | None = None,
-        runtime_scope: set[str] | None = None,
+        runtime_file_scope: set[str] | None = None,
     ) -> FileImportTreeNode:
         """
         Build file import tree for a single file.
         """
         if visited_files_in_branch is None:
             visited_files_in_branch = []
-        if runtime_scope is None:
-            runtime_scope = set()
+        if runtime_file_scope is None:
+            runtime_file_scope = set()
 
         node = FileImportTreeNode(
             data=cur_file,
@@ -121,24 +121,22 @@ class FileImportTreeBuilder:
             parent=None,
         )
 
-        if self.max_depth > 0 and depth > self.max_depth:
-            node.branches = "MAX_DEPTH"
-            return node
-
-        if cur_file.id in visited_files_in_branch:
-            node.branches = "CIRCULAR"
-            return node
-
-        if cur_file.id in runtime_scope:
-            node.branches = "DEDUPED"
+        prune_reason = self._get_node_prune_reason(
+            node,
+            depth,
+            visited_files_in_branch,
+            runtime_file_scope,
+        )
+        if prune_reason is not None:
+            node.branches = prune_reason
             return node
 
         visited_files_in_branch = visited_files_in_branch.copy()
-        visited_files_in_branch.append(cur_file.id)
+        visited_files_in_branch.append(node.data.id)
 
-        runtime_scope.add(cur_file.id)
+        runtime_file_scope.add(node.data.id)
 
-        cur_file_imports = file_imports.get(cur_file.id, [])
+        cur_file_imports = file_imports.get(node.data.id, [])
 
         cur_file_import_hash = hash("|".join([str(hash(i)) for i in cur_file_imports]))
         if depth == 0 and cur_file_import_hash in self._tree_cache:
@@ -153,7 +151,7 @@ class FileImportTreeBuilder:
                 file_imports,
                 depth=depth + 1,
                 visited_files_in_branch=visited_files_in_branch,
-                runtime_scope=runtime_scope,
+                runtime_file_scope=runtime_file_scope,
             )
             branch_node.parent = node
             node.branches.append(branch_node)
@@ -161,6 +159,27 @@ class FileImportTreeBuilder:
         if depth == 0:
             self._tree_cache[cur_file_import_hash] = node
         return node
+
+    def _get_node_prune_reason(
+        self,
+        node: FileImportTreeNode,
+        depth: int,
+        visited_files_in_branch: list[str],
+        runtime_file_scope: set[str],
+    ) -> Literal["CIRCULAR", "MAX_DEPTH", "DEDUPED"] | None:
+        """
+        Why should the node be pruned or None.
+        """
+        if self.max_depth > 0 and depth > self.max_depth:
+            return "MAX_DEPTH"
+
+        if node.data.id in visited_files_in_branch:
+            return "CIRCULAR"
+
+        if node.data.id in runtime_file_scope:
+            return "DEDUPED"
+
+        return None
 
     def get_imports_of_files(self, files: list[FileUseData]) -> dict[str, list[FileUseData]]:
         """
@@ -205,6 +224,21 @@ class FileImportTreeBuilder:
             )
             return
 
+        print_lines = self._get_tree_print_lines(nodes)
+        for line in print_lines:
+            indent = click.style("│  " * line.indent, fg="bright_black")
+            text = click.style(line.text, fg=line.color) if line.color else line.text
+            click.echo(indent + text)
+
+        self._print_tree_summary(nodes)
+
+    def _get_tree_print_lines(
+        self,
+        nodes: list[FileImportTreeNode],
+    ) -> list[FileImportTreePrintLine]:
+        """
+        Gather every line for tree printing.
+        """
         print_nodes = nodes.copy()
         print_height = (
             min(self.max_height, len(print_nodes)) if self.max_height > 0 else len(print_nodes)
@@ -217,7 +251,9 @@ class FileImportTreeBuilder:
             node = print_nodes.pop(0)
 
             if isinstance(node.branches, str):
-                self._print_pruned_node(node, print_lines)
+                line = self._get_tree_print_line_pruned_node(node, prev_line=print_lines[-1])
+                if line is not None:
+                    print_lines.append(line)
                 continue
 
             relative_path = node.relative_path_to_parent()
@@ -240,57 +276,47 @@ class FileImportTreeBuilder:
                 ),
             )
 
-        for line in print_lines:
-            indent = click.style("│  " * line.indent, fg="bright_black")
-            text = click.style(line.text, fg=line.color) if line.color else line.text
-            click.echo(indent + text)
-
         if len(print_nodes) > 0:
-            click.echo(
-                click.style(
-                    f"Not showing {len(print_nodes)} additional files...",
-                    fg="bright_black",
+            print_lines.append(
+                FileImportTreePrintLine(
+                    indent=0,
+                    text=f"Not showing {len(print_nodes)} additional files...",
+                    color="bright_black",
                 ),
             )
 
-        self._print_tree_summary(nodes)
+        return print_lines
 
-    def _print_pruned_node(
+    def _get_tree_print_line_pruned_node(
         self,
         node: FileImportTreeNode,
-        print_lines: list[FileImportTreePrintLine],
-    ) -> None:
+        prev_line: FileImportTreePrintLine,
+    ) -> FileImportTreePrintLine | None:
+        """
+        Create tree print line for pruned node
+        """
         relative_path = node.relative_path_to_parent()
         if node.branches == "CIRCULAR":
-            print_lines.append(
-                FileImportTreePrintLine(
-                    indent=node.depth,
-                    text=f"{relative_path} [Circular]",
-                    color="yellow",
-                ),
+            return FileImportTreePrintLine(
+                indent=node.depth,
+                text=f"{relative_path} [Circular]",
+                color="yellow",
             )
-            return
         if node.branches == "MAX_DEPTH":
-            if print_lines[-1].text == "...":
-                return
+            if prev_line.text == "...":
+                return None
 
-            print_lines.append(
-                FileImportTreePrintLine(
-                    indent=node.depth,
-                    text="...",
-                    color="bright_black",
-                ),
+            return FileImportTreePrintLine(
+                indent=node.depth,
+                text="...",
+                color="bright_black",
             )
-            return
         if node.branches == "DEDUPED":
-            print_lines.append(
-                FileImportTreePrintLine(
-                    indent=node.depth,
-                    text=f"{relative_path} [Already imported]",
-                    color="bright_black",
-                ),
+            return FileImportTreePrintLine(
+                indent=node.depth,
+                text=f"{relative_path} [Already imported]",
+                color="bright_black",
             )
-            return
 
         msg = f"Unexpected pruned branch reason '{node.branches}'"
         raise ValueError(msg)
