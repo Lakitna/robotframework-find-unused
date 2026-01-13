@@ -8,11 +8,17 @@ from pathlib import Path
 import click
 
 from robotframework_find_unused.common.cli import cli_hard_exit, pretty_file_path
-from robotframework_find_unused.common.const import INDENT, WARN_MARKER, FileUseData, FileUseType
+from robotframework_find_unused.common.const import (
+    INDENT,
+    WARN_MARKER,
+    FileUseData,
+    FilterOption,
+)
 from robotframework_find_unused.common.convert import to_relative_path
 from robotframework_find_unused.common.normalize import normalize_file_path
 
 from .step.discover_files import cli_discover_file_paths
+from .step.file_import_filter import cli_filter_file_imports
 from .step.file_import_tree import FileImportTreeBuilder
 from .step.parse_file_use import cli_step_parse_file_use
 
@@ -23,8 +29,12 @@ class FileOptions:
     Command line options for the 'files' command
     """
 
-    path_filter_glob: str | None  # TODO:
     show_all_count: bool
+    library_files: FilterOption
+    variable_files: FilterOption
+    resource_files: FilterOption
+    unused_files: FilterOption
+    path_filter_glob: str | None
     show_tree: bool
     tree_max_depth: int
     tree_max_height: int
@@ -52,11 +62,19 @@ def cli_files(options: FileOptions):
 def _cli_log_results(files: list[FileUseData], options: FileOptions) -> None:
     click.echo()
 
+    files = [f for f in files if "SUITE" not in f.type]
+    files = cli_filter_file_imports(
+        files,
+        filter_library=options.library_files,
+        filter_variable=options.variable_files,
+        filter_resource=options.resource_files,
+        filter_unused=options.unused_files,
+        filter_glob=options.path_filter_glob,
+    )
+
     cwd = Path.cwd().joinpath(options.source_path)
     if options.show_all_count:
-        # TODO: log filter
-        non_suite_files = [f for f in files if "SUITE" not in f.type]
-        sorted_files = sorted(non_suite_files, key=lambda f: f.id)
+        sorted_files = sorted(files, key=lambda f: f.id)
         sorted_files = sorted(sorted_files, key=lambda f: len(f.used_by))
 
         click.echo("import_count\tfile")
@@ -72,8 +90,7 @@ def _cli_log_results(files: list[FileUseData], options: FileOptions) -> None:
             )
     else:
         sorted_files = sorted(files, key=lambda f: f.id)
-        # TODO: log filter
-        unused_files = [f for f in sorted_files if "SUITE" not in f.type and len(f.used_by) == 0]
+        unused_files = [f for f in sorted_files if len(f.used_by) == 0]
 
         if len(unused_files) == 0:
             click.echo("Found no unused files")

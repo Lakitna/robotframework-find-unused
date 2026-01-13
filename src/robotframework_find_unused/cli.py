@@ -538,6 +538,38 @@ def returns(  # noqa: PLR0913
     help="Only output files who's path match the glob pattern",
 )
 @click.option(
+    "-r",
+    "--resource",
+    type=click_choice_keyword_filter_option,
+    default="include",
+    show_default=True,
+    help="How to output resource file imports",
+)
+@click.option(
+    "-l",
+    "--library",
+    type=click_choice_keyword_filter_option,
+    default="include",
+    show_default=True,
+    help="How to output (custom) library file imports",
+)
+@click.option(
+    "-V",
+    "--variable",
+    type=click_choice_keyword_filter_option,
+    default="include",
+    show_default=True,
+    help="How to output variable file imports",
+)
+@click.option(
+    "-u",
+    "--unused",
+    type=click_choice_keyword_filter_option,
+    default="include",
+    show_default=True,
+    help="How to output unused file imports",
+)
+@click.option(
     "-v",
     "--verbose",
     default=False,
@@ -551,6 +583,10 @@ def files(  # noqa: PLR0913
     tree_max_depth: int,
     tree_max_height: int,
     filter: str | None,  # noqa: A002
+    resource: FilterOption,
+    library: FilterOption,
+    variable: FilterOption,
+    unused: FilterOption,
     verbose: int,
     file_path: str,
 ):
@@ -602,13 +638,17 @@ def files(  # noqa: PLR0913
         from hello import hello_world
     """
     options = FileOptions(
-        source_path=file_path,
         path_filter_glob=filter,
         show_all_count=show_count,
+        library_files=library,
+        variable_files=variable,
+        resource_files=resource,
+        unused_files=unused,
         show_tree=show_tree,
         tree_max_depth=tree_max_depth,
         tree_max_height=tree_max_height,
         verbose=verbose,
+        source_path=file_path,
     )
     exit_code = cli_files(options)
     sys.exit(exit_code)
