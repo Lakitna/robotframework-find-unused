@@ -1,0 +1,8 @@
+Discovering files in `./robot` using Robocop config...
+Parsing file imports...
+[ DONE ] Parsed 4 files
+
+import_count	file
+0	./gamma.resource
+1	./alpha.resource
+2	./beta.resource

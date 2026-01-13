@@ -7,7 +7,7 @@ from dataclasses import dataclass
 import click
 
 from robotframework_find_unused.common.cli import cli_hard_exit, pretty_kw_name
-from robotframework_find_unused.common.const import INDENT, KeywordData, KeywordFilterOption
+from robotframework_find_unused.common.const import INDENT, FilterOption, KeywordData
 from robotframework_find_unused.common.sort import sort_keywords_by_name
 
 from .step.discover_files import cli_discover_file_paths
@@ -24,10 +24,10 @@ class ArgumentsOptions:
     Command line options for the 'arguments' command
     """
 
-    deprecated_keywords: KeywordFilterOption
-    private_keywords: KeywordFilterOption
-    library_keywords: KeywordFilterOption
-    unused_keywords: KeywordFilterOption
+    deprecated_keywords: FilterOption
+    private_keywords: FilterOption
+    library_keywords: FilterOption
+    unused_keywords: FilterOption
     keyword_filter_glob: str | None
     show_all_count: bool
     verbose: int

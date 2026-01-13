@@ -1,5 +1,6 @@
 from collections.abc import Iterable
 from dataclasses import dataclass
+from pathlib import Path
 from typing import Literal, TypeAlias
 
 import click
@@ -14,7 +15,7 @@ VERBOSE_NO = 0
 VERBOSE_SINGLE = 1
 VERBOSE_DOUBLE = 2
 
-KeywordFilterOption: TypeAlias = Literal["include", "exclude", "only"]
+FilterOption: TypeAlias = Literal["include", "exclude", "only"]
 
 
 @dataclass
@@ -68,3 +69,25 @@ class LibraryData:
     name_normalized: str
     keywords: list[KeywordData]
     keyword_names_normalized: set[str]
+
+
+FileUseType: TypeAlias = Literal[
+    "SUITE",
+    "RESOURCE",
+    "LIBRARY",
+    "VARIABLE",
+]
+
+
+@dataclass
+class FileUseData:
+    """Data structure for file imports"""
+
+    id: str
+    path_absolute: Path
+    type: set[FileUseType]
+    used_by: list["FileUseData"]
+
+    def __hash__(self) -> int:
+        """Hash by id"""
+        return hash(self.id)

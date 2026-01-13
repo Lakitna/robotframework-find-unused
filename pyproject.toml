@@ -32,7 +32,7 @@ Homepage = "https://github.com/Lakitna/robotframework-find-unused"
 Repository = "https://github.com/Lakitna/robotframework-find-unused"
 
 [project.scripts]
-robotunused = "robotframework_find_unused.cli:cli"
+robotunused = "robotframework_find_unused.cli:run_cli"
 
 [build-system]
 requires = ["uv_build>=0.9.22,<0.10.0"]

@@ -3,17 +3,17 @@ from collections.abc import Callable
 
 import click
 
-from robotframework_find_unused.common.const import NOTE_MARKER, KeywordData, KeywordFilterOption
+from robotframework_find_unused.common.const import NOTE_MARKER, FilterOption, KeywordData
 
 
 def cli_filter_keywords(  # noqa: PLR0913
     keywords: list[KeywordData],
     *,
-    filter_deprecated: KeywordFilterOption | None = None,
-    filter_private: KeywordFilterOption | None = None,
-    filter_library: KeywordFilterOption | None = None,
-    filter_unused: KeywordFilterOption | None = None,
-    filter_returns: KeywordFilterOption | None = None,
+    filter_deprecated: FilterOption | None = None,
+    filter_private: FilterOption | None = None,
+    filter_library: FilterOption | None = None,
+    filter_unused: FilterOption | None = None,
+    filter_returns: FilterOption | None = None,
     filter_glob: str | None,
 ) -> list[KeywordData]:
     """
@@ -64,7 +64,7 @@ def cli_filter_keywords(  # noqa: PLR0913
         )
 
     if filter_glob:
-        click.echo(f"Only showing keywords matching '{filter_glob}'")
+        click.echo(f"{NOTE_MARKER} Only showing keywords matching '{filter_glob}'")
 
         pattern = filter_glob.lower()
         keywords = list(
@@ -79,7 +79,7 @@ def cli_filter_keywords(  # noqa: PLR0913
 
 def _cli_filter_keywords_by_option(
     keywords: list[KeywordData],
-    option: KeywordFilterOption,
+    option: FilterOption,
     matcher_fn: Callable[[KeywordData], bool],
     descriptor: str,
 ) -> list[KeywordData]:

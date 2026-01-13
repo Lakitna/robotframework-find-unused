@@ -1,4 +1,5 @@
 import difflib
+import os
 import re
 import subprocess
 import sys
@@ -21,20 +22,25 @@ class AcceptanceTest:
         sys.path.append(str(test_data_folder))
 
         expected_output_path_absolute: Path = test_folder.joinpath(expected_output_path)
-        with expected_output_path_absolute.open() as f:
+        with expected_output_path_absolute.open(encoding="utf8") as f:
             expected_output = f.read()
 
         command = [sys.executable, "-m", "robotframework_find_unused"]
         command.extend(cli_options)
 
+        env = os.environ.copy()
+        env["PYTHONIOENCODING"] = "utf8"
         p = subprocess.run(  # noqa: S603
             command,
-            capture_output=True,
             cwd=test_folder,
             check=False,
+            env=env,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.STDOUT,
+            encoding="utf8",
         )
 
-        actual_output = self._parse_output(p.stdout.decode())
+        actual_output = self._parse_output(p.stdout)
         self._assert_logs(actual_output, expected_output)
 
         if p.returncode != expected_exit_code:
@@ -43,8 +49,7 @@ class AcceptanceTest:
                     f"Subprocess exited with unexpected exit code {p.returncode}. "
                     f"Expected exit code: {expected_exit_code} "
                     f"Actual exit code: {p.returncode} "
-                    f"Subprocess stderr below:\n{p.stderr.decode()}\n"
-                    f"Subprocess stdout below:\n{p.stdout.decode()}\n"
+                    f"Subprocess stdout below:\n{p.stdout}\n"
                 ),
             )
 
@@ -71,6 +76,10 @@ class AcceptanceTest:
     def _parse_output(self, output: str) -> str:
         output = output.strip()
 
+        # Remove file path to the repository root
+        repo_root = get_repo_root(Path(__file__))
+        output = output.replace(repo_root.as_posix(), "[[REPOSITORY_ROOT]]")
+
         # Remove the keyword use count from standard libraries
         builtin_libraries = [
             "BuiltIn",
@@ -85,3 +94,17 @@ class AcceptanceTest:
             output = re.sub(f"(    {lib}: )\\d+", r"\1[[MASK]]", output)
 
         return output
+
+
+def get_repo_root(file_path: Path) -> Path:
+    """Find repository root from the path's parents"""
+    for path in file_path.parents:
+        # Check whether "path/.git" exists and is a directory
+        if path.joinpath(".git").is_dir():
+            return path
+
+    msg = (
+        "Failed to find repository root. "
+        f"No parent of `{file_path.as_posix()}` contains a `.git` folder."
+    )
+    raise FileNotFoundError(msg)

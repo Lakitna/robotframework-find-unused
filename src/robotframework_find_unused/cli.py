@@ -10,17 +10,19 @@ import click
 
 from .commands import (
     ArgumentsOptions,
+    FileOptions,
     KeywordOptions,
     ReturnOptions,
     VariableOptions,
     cli_arguments,
+    cli_files,
     cli_keywords,
     cli_returns,
     cli_variables,
 )
-from .common.const import KeywordFilterOption
+from .common.const import FilterOption
 
-click_choice_keyword_filter_option = click.Choice(
+click_choice_filter_option = click.Choice(
     ["include", "exclude", "only"],
     case_sensitive=False,
 )
@@ -50,12 +52,13 @@ def cli():
     "--filter",
     default=None,
     metavar="<GLOB>",
+    type=click.UNPROCESSED,
     help="Only output keywords who's name match the glob pattern. Match without library prefix",
 )
 @click.option(
     "-d",
     "--deprecated",
-    type=click_choice_keyword_filter_option,
+    type=click_choice_filter_option,
     default="include",
     show_default=True,
     help="How to output deprecated keywords",
@@ -63,7 +66,7 @@ def cli():
 @click.option(
     "-p",
     "--private",
-    type=click_choice_keyword_filter_option,
+    type=click_choice_filter_option,
     default="include",
     show_default=True,
     help="How to output private keywords",
@@ -71,7 +74,7 @@ def cli():
 @click.option(
     "-l",
     "--library",
-    type=click_choice_keyword_filter_option,
+    type=click_choice_filter_option,
     default="exclude",
     show_default=True,
     help="How to output keywords from downloaded libraries",
@@ -95,10 +98,10 @@ def cli():
 def keywords(  # noqa: PLR0913
     show_count: bool,
     filter: str | None,  # noqa: A002
-    deprecated: KeywordFilterOption,
-    private: KeywordFilterOption,
-    library: KeywordFilterOption,
-    unused_library: KeywordFilterOption,
+    deprecated: FilterOption,
+    private: FilterOption,
+    library: FilterOption,
+    unused_library: FilterOption,
     verbose: int,
     file_path: str,
 ):
@@ -178,6 +181,7 @@ def keywords(  # noqa: PLR0913
     "--filter",
     default=None,
     metavar="<GLOB>",
+    type=click.UNPROCESSED,
     help=(
         "Only show variables who's name match the glob pattern. "
         "Matching without {brackets} and $@&% prefixes"
@@ -292,12 +296,13 @@ def variables(
     "--filter",
     default=None,
     metavar="<GLOB>",
+    type=click.UNPROCESSED,
     help="Only output keywords who's name match the glob pattern. Match without library prefix",
 )
 @click.option(
     "-d",
     "--deprecated",
-    type=click_choice_keyword_filter_option,
+    type=click_choice_filter_option,
     default="include",
     show_default=True,
     help="How to output deprecated keywords",
@@ -305,7 +310,7 @@ def variables(
 @click.option(
     "-p",
     "--private",
-    type=click_choice_keyword_filter_option,
+    type=click_choice_filter_option,
     default="include",
     show_default=True,
     help="How to output private keywords",
@@ -313,7 +318,7 @@ def variables(
 @click.option(
     "-l",
     "--library",
-    type=click_choice_keyword_filter_option,
+    type=click_choice_filter_option,
     default="exclude",
     show_default=True,
     help="How to output keywords from downloaded libraries",
@@ -321,7 +326,7 @@ def variables(
 @click.option(
     "-u",
     "--unused",
-    type=click_choice_keyword_filter_option,
+    type=click_choice_filter_option,
     default="exclude",
     show_default=True,
     help="How to output unused keywords",
@@ -337,10 +342,10 @@ def variables(
 def arguments(  # noqa: PLR0913
     show_count: bool,
     filter: str | None,  # noqa: A002
-    deprecated: KeywordFilterOption,
-    private: KeywordFilterOption,
-    library: KeywordFilterOption,
-    unused: KeywordFilterOption,
+    deprecated: FilterOption,
+    private: FilterOption,
+    library: FilterOption,
+    unused: FilterOption,
     verbose: int,
     file_path: str,
 ):
@@ -417,12 +422,13 @@ def arguments(  # noqa: PLR0913
     "--filter",
     default=None,
     metavar="<GLOB>",
+    type=click.UNPROCESSED,
     help="Only output keywords who's name match the glob pattern. Match without library prefix",
 )
 @click.option(
     "-d",
     "--deprecated",
-    type=click_choice_keyword_filter_option,
+    type=click_choice_filter_option,
     default="include",
     show_default=True,
     help="How to output deprecated keywords",
@@ -430,7 +436,7 @@ def arguments(  # noqa: PLR0913
 @click.option(
     "-p",
     "--private",
-    type=click_choice_keyword_filter_option,
+    type=click_choice_filter_option,
     default="include",
     show_default=True,
     help="How to output private keywords",
@@ -438,7 +444,7 @@ def arguments(  # noqa: PLR0913
 @click.option(
     "-l",
     "--library",
-    type=click_choice_keyword_filter_option,
+    type=click_choice_filter_option,
     default="exclude",
     show_default=True,
     help="How to output keywords from downloaded libraries",
@@ -446,7 +452,7 @@ def arguments(  # noqa: PLR0913
 @click.option(
     "-u",
     "--unused",
-    type=click_choice_keyword_filter_option,
+    type=click_choice_filter_option,
     default="exclude",
     show_default=True,
     help="How to output unused keywords",
@@ -462,10 +468,10 @@ def arguments(  # noqa: PLR0913
 def returns(  # noqa: PLR0913
     show_count: bool,
     filter: str | None,  # noqa: A002
-    deprecated: KeywordFilterOption,
-    private: KeywordFilterOption,
-    library: KeywordFilterOption,
-    unused: KeywordFilterOption,
+    deprecated: FilterOption,
+    private: FilterOption,
+    library: FilterOption,
+    unused: FilterOption,
     verbose: int,
     file_path: str,
 ):
@@ -499,3 +505,158 @@ def returns(  # noqa: PLR0913
     )
     exit_code = cli_returns(options)
     sys.exit(exit_code)
+
+
+@cli.command(name="files")
+@click.option(
+    "-c",
+    "--show-count",
+    default=False,
+    is_flag=True,
+    help="Output usage count for all files instead of only unused files",
+)
+@click.option(
+    "-t",
+    "--show-tree",
+    default=False,
+    is_flag=True,
+    help="Output file import trees for every .robot file",
+)
+@click.option(
+    "--tree-max-depth",
+    default=-1,
+    type=click.INT,
+    help="Only applies when using `--show-tree`. Maximum tree depth.",
+)
+@click.option(
+    "--tree-max-height",
+    default=-1,
+    type=click.INT,
+    help="Only applies when using `--show-tree`. Maximum tree height.",
+)
+@click.option(
+    "-f",
+    "--filter",
+    metavar="<GLOB>",
+    help="Only output files who's path match the glob pattern",
+)
+@click.option(
+    "-r",
+    "--resource",
+    type=click_choice_filter_option,
+    default="include",
+    show_default=True,
+    help="How to output resource file imports",
+)
+@click.option(
+    "-l",
+    "--library",
+    type=click_choice_filter_option,
+    default="include",
+    show_default=True,
+    help="How to output (custom) library file imports",
+)
+@click.option(
+    "-V",
+    "--variable",
+    type=click_choice_filter_option,
+    default="include",
+    show_default=True,
+    help="How to output variable file imports",
+)
+@click.option(
+    "-u",
+    "--unused",
+    type=click_choice_filter_option,
+    default="include",
+    show_default=True,
+    help="How to output unused file imports",
+)
+@click.option(
+    "-v",
+    "--verbose",
+    default=False,
+    count=True,
+    help="Show more log output. Can be used twice",
+)
+@click.argument("file_path", default=".")
+def files(  # noqa: PLR0913
+    show_count: bool,
+    show_tree: bool,
+    tree_max_depth: int,
+    tree_max_height: int,
+    filter: str | None,  # noqa: A002
+    resource: FilterOption,
+    library: FilterOption,
+    variable: FilterOption,
+    unused: FilterOption,
+    verbose: int,
+    file_path: str,
+):
+    """
+    Find unused files
+
+    For each of your `.robot` files, follow the full chain of imports. Files that are never
+    (indirectly) imported by a `.robot` file are logged.
+
+    ----------
+
+    Limitation 1: Downloaded libraries are ignored
+
+    Imports to downloaded libraries are ignored. Because of this, unused downloaded libraries are
+    not detected.
+
+    Example: The unused library 'SeleniumLibrary' is not detected.
+
+    \b
+        *** Settings ***
+        Library    Browser
+
+    ----------
+
+    Limitation 2: No Python module syntax
+
+    Libraries can be imported with both a path-like syntax (e.g. ./foo/bar.resource) and Python
+    module syntax (e.g. foo.bar). Python module syntax is not supported.
+
+    This does not impact Resource file imports.
+
+    Example: The custom library 'TestLibrary' is ignored since it's imported using the Python module
+    syntax.
+
+    \b
+        *** Settings ***
+        Library    my.package.TestLibrary
+
+    ----------
+
+    Limitation 3: Imports in python files are ignored
+
+    Only imports in `.robot` and `.resource` files are considered. Imports in other files are
+    ignored.
+
+    Example: The Python file `hello.py` is ignored since it's imported from a Python file.
+
+    \b
+        from hello import hello_world
+    """
+    options = FileOptions(
+        path_filter_glob=filter,
+        show_all_count=show_count,
+        library_files=library,
+        variable_files=variable,
+        resource_files=resource,
+        unused_files=unused,
+        show_tree=show_tree,
+        tree_max_depth=tree_max_depth,
+        tree_max_height=tree_max_height,
+        verbose=verbose,
+        source_path=file_path,
+    )
+    exit_code = cli_files(options)
+    sys.exit(exit_code)
+
+
+def run_cli():
+    """Run the CLI app."""
+    cli(windows_expand_args=False)

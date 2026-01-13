@@ -1,0 +1,19 @@
+Discovering files in `./robot` using Robocop config...
+Parsing file imports...
+[ DONE ] Parsed 6 files
+Building 3 file import trees with max depth 2...
+Printing 2 tree groups...
+
+[[REPOSITORY_ROOT]]/test/atest/files/tree/robot/test_one.robot
+[[REPOSITORY_ROOT]]/test/atest/files/tree/robot/test_two.robot
+│  ./alpha.resource
+│  │  ./beta.resource
+│  │  │  ...
+│  ./beta.resource [Already imported]
+Tree height: 6 | Limited by `--tree-max-depth 2`
+
+[[REPOSITORY_ROOT]]/test/atest/files/tree/robot/test_three.robot
+│  ./gamma.resource
+Tree height: 2 | Tree depth: 1 | Unique files: 2 | Circular imports: 0 | Already imported: 0
+
+Found no unused files

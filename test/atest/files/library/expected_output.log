@@ -1,0 +1,6 @@
+Discovering files in `./robot` using Robocop config...
+Parsing file imports...
+[ DONE ] Parsed 4 files
+
+Found 1 unused files:
+  ./gamma.py
