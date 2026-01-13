@@ -1,0 +1,21 @@
+Discovering files in `./robot` using Robocop config...
+Gathering variables definitions...
+[ DONE ] Found 14 unique non-local variables definitions
+Counting variable usage...
+[ DONE ] Found 17 variable uses of gathered variables
+
+use_count	variable
+0	&{dict_unused: dict[str, str]}
+0	${dot: Secret}
+0	${easyAs${abc}: str} -> ${easyasabcdefg}
+0	${float_unused: float}
+0	${int_unused: int}
+0	@{list_unused: list[str]}
+0	${string_unused: str}
+1	${abc}
+1	${float_used: float}
+1	${int_used: int}
+2	${dot.separated.used: str}
+4	&{dict_used: dict[str, str]}
+4	@{list_used: list[str]}
+4	${string_used: str}
