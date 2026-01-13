@@ -307,7 +307,7 @@ class FileImportTreeBuilder:
 
         max_depth = max(*[node.depth for node in nodes])
         if self.max_depth >= 0 and self.max_depth < max_depth:
-            stats.append(f"Stats unreliable due to `--tree-max-depth {self.max_depth}`")
+            stats.append(f"Limited by `--tree-max-depth {self.max_depth}`")
             return stats
         stats.append(f"Tree depth: {max_depth}")
 

@@ -64,7 +64,7 @@ def cli_filter_keywords(  # noqa: PLR0913
         )
 
     if filter_glob:
-        click.echo(f"Only showing keywords matching '{filter_glob}'")
+        click.echo(f"{NOTE_MARKER} Only showing keywords matching '{filter_glob}'")
 
         pattern = filter_glob.lower()
         keywords = list(

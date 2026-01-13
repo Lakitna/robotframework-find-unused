@@ -55,12 +55,12 @@ def cli_filter_file_imports(  # noqa: PLR0913
         )
 
     if filter_glob:
-        click.echo(f"Only showing files matching '{filter_glob}'")
+        click.echo(f"{NOTE_MARKER} Only showing files matching '{filter_glob}'")
 
         pattern = filter_glob.lower()
         files = list(
             filter(
-                lambda kw: fnmatch.fnmatchcase(kw.path_absolute.as_posix(), pattern),
+                lambda path: fnmatch.fnmatchcase(path.path_absolute.as_posix(), pattern),
                 files,
             ),
         )
