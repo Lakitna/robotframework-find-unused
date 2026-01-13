@@ -12,6 +12,7 @@ def cli_filter_keywords(  # noqa: PLR0913
     filter_deprecated: FilterOption | None = None,
     filter_private: FilterOption | None = None,
     filter_library: FilterOption | None = None,
+    filter_unused: FilterOption | None = None,
     filter_returns: FilterOption | None = None,
     filter_glob: str | None,
 ) -> list[KeywordData]:
@@ -44,6 +45,14 @@ def cli_filter_keywords(  # noqa: PLR0913
             filter_library,
             lambda kw: kw.type == "LIBRARY",
             "downloaded library",
+        )
+
+    if filter_unused:
+        keywords = _cli_filter_keywords_by_option(
+            keywords,
+            filter_unused,
+            lambda kw: kw.use_count == 0,
+            "unused",
         )
 
     if filter_returns:
