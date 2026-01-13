@@ -76,6 +76,10 @@ class AcceptanceTest:
     def _parse_output(self, output: str) -> str:
         output = output.strip()
 
+        # Remove file path to the repository root
+        repo_root = get_repo_root(Path(__file__))
+        output = output.replace(repo_root.as_posix(), "[[REPOSITORY_ROOT]]")
+
         # Remove the keyword use count from standard libraries
         builtin_libraries = [
             "BuiltIn",
@@ -90,3 +94,17 @@ class AcceptanceTest:
             output = re.sub(f"(    {lib}: )\\d+", r"\1[[MASK]]", output)
 
         return output
+
+
+def get_repo_root(file_path: Path) -> Path:
+    """Find repository root from the path's parents"""
+    for path in file_path.parents:
+        # Check whether "path/.git" exists and is a directory
+        if path.joinpath(".git").is_dir():
+            return path
+
+    msg = (
+        "Failed to find repository root. "
+        f"No parent of `{file_path.as_posix()}` contains a `.git` folder."
+    )
+    raise FileNotFoundError(msg)

@@ -4,8 +4,8 @@ Parsing file imports...
 Building 3 file import trees...
 Printing 2 tree groups...
 
-C:/code/robotframework-find-unused/test/atest/files/tree/robot/test_one.robot
-C:/code/robotframework-find-unused/test/atest/files/tree/robot/test_two.robot
+[[REPOSITORY_ROOT]]/test/atest/files/tree/robot/test_one.robot
+[[REPOSITORY_ROOT]]/test/atest/files/tree/robot/test_two.robot
 │  ./alpha.resource
 │  │  ./beta.resource
 │  │  │  ./alpha.resource [Circular]
@@ -13,7 +13,7 @@ C:/code/robotframework-find-unused/test/atest/files/tree/robot/test_two.robot
 │  ./beta.resource [Already imported]
 Tree height: 6 | Tree depth: 3 | Unique files: 4 | Circular imports: 1 | Already imported: 1
 
-C:/code/robotframework-find-unused/test/atest/files/tree/robot/test_three.robot
+[[REPOSITORY_ROOT]]/test/atest/files/tree/robot/test_three.robot
 │  ./gamma.resource
 Tree height: 2 | Tree depth: 1 | Unique files: 2 | Circular imports: 0 | Already imported: 0
 
