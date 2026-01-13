@@ -52,7 +52,7 @@ robotunused keywords --help
 | flag                     | option                         | default   | description                                                                          |
 | ------------------------ | ------------------------------ | --------- | ------------------------------------------------------------------------------------ |
 | `-c`, `--show-count`     |                                |           | Output usage count for all keywords instead of only unused keywords                  |
-| `-f`, `--filter`         | Globlike pattern               |           | Only output keywords who's name match the glob pattern. Match without library prefix |
+| `-f`, `--filter`         | Glob pattern                   |           | Only output keywords who's name match the glob pattern. Match without library prefix |
 | `-d`, `--deprecated`     | `include` / `exclude` / `only` | `include` | How to output deprecated keywords                                                    |
 | `-p`, `--private`        | `include` / `exclude` / `only` | `include` | How to output private keywords                                                       |
 | `-l`, `--library`        | `include` / `exclude` / `only` | `exclude` | How to output keywords from downloaded libraries                                     |
@@ -82,7 +82,7 @@ robotunused arguments --help
 | flag                 | option                         | default   | description                                                                          |
 | -------------------- | ------------------------------ | --------- | ------------------------------------------------------------------------------------ |
 | `-c`, `--show-count` |                                |           | Show usage count for all arguments instead of only unused arguments                  |
-| `-f`, `--filter`     | Globlike pattern               |           | Only output keywords who's name match the glob pattern. Match without library prefix |
+| `-f`, `--filter`     | Glob pattern                   |           | Only output keywords who's name match the glob pattern. Match without library prefix |
 | `-d`, `--deprecated` | `include` / `exclude` / `only` | `include` | How to output deprecated keywords                                                    |
 | `-p`, `--private`    | `include` / `exclude` / `only` | `include` | How to output private keywords                                                       |
 | `-l`, `--library`    | `include` / `exclude` / `only` | `exclude` | How to output keywords from downloaded libraries                                     |
@@ -113,7 +113,7 @@ robotunused returns --help
 | flag                 | option                         | default   | description                                                                          |
 | -------------------- | ------------------------------ | --------- | ------------------------------------------------------------------------------------ |
 | `-c`, `--show-count` |                                |           | Output usage count for all keywords instead of only keywords with unused returns     |
-| `-f`, `--filter`     | Globlike pattern               |           | Only output keywords who's name match the glob pattern. Match without library prefix |
+| `-f`, `--filter`     | Glob pattern                   |           | Only output keywords who's name match the glob pattern. Match without library prefix |
 | `-d`, `--deprecated` | `include` / `exclude` / `only` | `include` | How to output deprecated keywords                                                    |
 | `-p`, `--private`    | `include` / `exclude` / `only` | `include` | How to output private keywords                                                       |
 | `-l`, `--library`    | `include` / `exclude` / `only` | `exclude` | How to output keywords from downloaded libraries                                     |
@@ -138,11 +138,11 @@ robotunused variables --help
 
 #### Available options
 
-| flag                 | option           | default | description                                                                                          |
-| -------------------- | ---------------- | ------- | ---------------------------------------------------------------------------------------------------- |
-| `-c`, `--show-count` |                  |         | Show usage count for all variables instead of only unused variables                                  |
-| `-f`, `--filter`     | Globlike pattern |         | Only show variables who's name match the glob pattern. Matching without {brackets} and $@&% prefixes |
-| `-v`, `--verbose`    |                  |         | Show more log output. When provided twice: Show even more log output                                 |
+| flag                 | option       | default | description                                                                                          |
+| -------------------- | ------------ | ------- | ---------------------------------------------------------------------------------------------------- |
+| `-c`, `--show-count` |              |         | Show usage count for all variables instead of only unused variables                                  |
+| `-f`, `--filter`     | Glob pattern |         | Only show variables who's name match the glob pattern. Matching without {brackets} and $@&% prefixes |
+| `-v`, `--verbose`    |              |         | Show more log output. When provided twice: Show even more log output                                 |
 
 ### Find unused files
 
@@ -162,14 +162,14 @@ robotunused files --help
 
 #### Available options
 
-| flag                 | option           | default | description                                                          |
-| -------------------- | ---------------- | ------- | -------------------------------------------------------------------- |
-| `-c`, `--show-count` |                  |         | Show usage count for all files instead of only unused variables      |
-| `-t`, `--show-tree`  |                  |         | Also show full import tree for every `.robot` file                   |
-| `--tree-max-depth`   | Positive integer | `None`  | Only when `--show-tree`: Limit import tree depth                     |
-| `--tree-max-height`  | Positive integer | `None`  | Only when `--show-tree`: Limit import tree height                    |
-| `-f`, `--filter`     | Globlike pattern |         | Only show files who's path matches the glob pattern                  |
-| `-v`, `--verbose`    |                  |         | Show more log output. When provided twice: Show even more log output |
+| flag                 | option           | default | description                                                                                                                                     |
+| -------------------- | ---------------- | ------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
+| `-c`, `--show-count` |                  |         | Show usage count for all files instead of only unused variables                                                                                 |
+| `-t`, `--show-tree`  |                  |         | Also show full import tree for every `.robot` file                                                                                              |
+| `--tree-max-depth`   | Positive integer | `None`  | Only when `--show-tree`: Limit import tree depth                                                                                                |
+| `--tree-max-height`  | Positive integer | `None`  | Only when `--show-tree`: Limit import tree height                                                                                               |
+| `-f`, `--filter`     | Glob pattern     |         | Only show files who's path matches the glob pattern. When used with `--show-tree`: Only show trees for suite files that match the glob pattern. |
+| `-v`, `--verbose`    |                  |         | Show more log output. When provided twice: Show even more log output                                                                            |
 
 ## Contributing
 
