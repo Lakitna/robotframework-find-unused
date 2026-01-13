@@ -175,14 +175,7 @@ robotunused files --help
 
 I'm open to contributions. Please contact me in the issues.
 
-When contributing, you'll need [Poetry](https://python-poetry.org/) to manage dependencies.
-
-Please ensure that you install the develop dependencies as well as the regular dependencies by
-running the following command:
-
-```shell
-poetry install --with dev
-```
+When contributing, you'll need [uv](https://docs.astral.sh/uv/) to manage dependencies.
 
 ### Linting
 
@@ -191,7 +184,7 @@ You can't merge with lint issues. This is enforced by the pipeline.
 To run the linter, use the following command:
 
 ```shell
-poetry run ruff check
+uv run ruff check
 ```
 
 ### Testing
@@ -201,5 +194,5 @@ You can't merge with failing tests. This is enforced by the pipeline.
 To run all tests, use the following command:
 
 ```shell
-poetry run pytest
+uv run pytest -n auto
 ```
