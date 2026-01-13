@@ -2,6 +2,7 @@
 Implementation of the 'files' command
 """
 
+import fnmatch
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -9,8 +10,7 @@ import click
 
 from robotframework_find_unused.common.cli import cli_hard_exit, pretty_file_path
 from robotframework_find_unused.common.const import (
-    INDENT,
-    WARN_MARKER,
+    NOTE_MARKER,
     FileUseData,
     FilterOption,
 )
@@ -53,7 +53,12 @@ def cli_files(options: FileOptions):
     files = cli_step_parse_file_use(file_paths, verbose=options.verbose)
 
     if options.show_tree:
-        _cli_print_grouped_file_trees(files, options.tree_max_depth, options.tree_max_height)
+        _cli_print_grouped_file_trees(
+            files,
+            options.tree_max_depth,
+            options.tree_max_height,
+            options.path_filter_glob,
+        )
     _cli_log_results(files, options)
 
     return _exit_code(files)
@@ -109,8 +114,20 @@ def _cli_print_grouped_file_trees(
     files: list[FileUseData],
     max_depth: int,
     max_height: int,
+    root_path_filter_glob: str | None,
 ) -> None:
     tree_root_files = [f for f in files if "SUITE" in f.type]
+
+    if root_path_filter_glob:
+        click.echo(f"{NOTE_MARKER} Only trees for suites matching '{root_path_filter_glob}'")
+
+        pattern = root_path_filter_glob.lower()
+        tree_root_files = list(
+            filter(
+                lambda path: fnmatch.fnmatchcase(path.path_absolute.as_posix(), pattern),
+                tree_root_files,
+            ),
+        )
 
     click.echo(
         f"Building {len(tree_root_files)} file import trees"
