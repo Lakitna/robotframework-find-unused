@@ -52,6 +52,7 @@ def cli():
     "--filter",
     default=None,
     metavar="<GLOB>",
+    type=click.UNPROCESSED,
     help="Only output keywords who's name match the glob pattern. Match without library prefix",
 )
 @click.option(
@@ -180,6 +181,7 @@ def keywords(  # noqa: PLR0913
     "--filter",
     default=None,
     metavar="<GLOB>",
+    type=click.UNPROCESSED,
     help=(
         "Only show variables who's name match the glob pattern. "
         "Matching without {brackets} and $@&% prefixes"
@@ -294,6 +296,7 @@ def variables(
     "--filter",
     default=None,
     metavar="<GLOB>",
+    type=click.UNPROCESSED,
     help="Only output keywords who's name match the glob pattern. Match without library prefix",
 )
 @click.option(
@@ -419,6 +422,7 @@ def arguments(  # noqa: PLR0913
     "--filter",
     default=None,
     metavar="<GLOB>",
+    type=click.UNPROCESSED,
     help="Only output keywords who's name match the glob pattern. Match without library prefix",
 )
 @click.option(
@@ -521,19 +525,18 @@ def returns(  # noqa: PLR0913
 @click.option(
     "--tree-max-depth",
     default=-1,
-    type=click.IntRange(min=-1, clamp=True),
+    type=click.INT,
     help="Only applies when using `--show-tree`. Maximum tree depth.",
 )
 @click.option(
     "--tree-max-height",
     default=-1,
-    type=click.IntRange(min=-1, clamp=True),
+    type=click.INT,
     help="Only applies when using `--show-tree`. Maximum tree height.",
 )
 @click.option(
     "-f",
     "--filter",
-    default=None,
     metavar="<GLOB>",
     help="Only output files who's path match the glob pattern",
 )
@@ -652,3 +655,8 @@ def files(  # noqa: PLR0913
     )
     exit_code = cli_files(options)
     sys.exit(exit_code)
+
+
+def run_cli():
+    """Run the CLI app."""
+    cli(windows_expand_args=False)
