@@ -40,6 +40,18 @@ def parse_robot_file(file_path: Path, parse_sections: SectionsList | Literal["al
     if parse_sections == "all" or file_path.suffix.lower() not in [".robot", ".resource"]:
         return robot.api.parsing.get_model(file_path, data_only=True)
 
+    file_content = _get_partial_file_content(file_path, parse_sections)
+    model = robot.api.parsing.get_model(file_content, data_only=True)
+    model.source = file_path
+    return model
+
+
+def _get_partial_file_content(file_path: Path, parse_sections: SectionsList) -> str:
+    """
+    Get partial raw file content.
+
+    Output is a .robot or .resource file with only specific *** sections ***
+    """
     with file_path.open(encoding="utf8") as f:
         raw_file_content = f.readlines()
 
@@ -57,6 +69,4 @@ def parse_robot_file(file_path: Path, parse_sections: SectionsList | Literal["al
 
         file_content += line
 
-    model = robot.api.parsing.get_model(file_content, data_only=True)
-    model.source = file_path
-    return model
+    return file_content

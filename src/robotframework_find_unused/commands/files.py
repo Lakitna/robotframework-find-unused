@@ -53,12 +53,7 @@ def cli_files(options: FileOptions):
     files = cli_step_parse_file_use(file_paths, verbose=options.verbose)
 
     if options.show_tree:
-        _cli_print_grouped_file_trees(
-            files,
-            options.tree_max_depth,
-            options.tree_max_height,
-            options.path_filter_glob,
-        )
+        _cli_print_grouped_file_trees(files, options)
     _cli_log_results(files, options)
 
     return _exit_code(files)
@@ -110,18 +105,16 @@ def _cli_log_results(files: list[FileUseData], options: FileOptions) -> None:
             click.echo("  " + file_path)
 
 
-def _cli_print_grouped_file_trees(
-    files: list[FileUseData],
-    max_depth: int,
-    max_height: int,
-    root_path_filter_glob: str | None,
-) -> None:
+def _cli_print_grouped_file_trees(files: list[FileUseData], options: FileOptions) -> None:
     tree_root_files = [f for f in files if "SUITE" in f.type]
 
-    if root_path_filter_glob:
-        click.echo(f"{NOTE_MARKER} Only trees for suites matching '{root_path_filter_glob}'")
+    if options.path_filter_glob:
+        click.echo(
+            NOTE_MARKER
+            + f" Only showing trees for suite files matching '{options.path_filter_glob}'",
+        )
 
-        pattern = root_path_filter_glob.lower()
+        pattern = options.path_filter_glob.lower()
         tree_root_files = list(
             filter(
                 lambda path: fnmatch.fnmatchcase(path.path_absolute.as_posix(), pattern),
@@ -131,10 +124,13 @@ def _cli_print_grouped_file_trees(
 
     click.echo(
         f"Building {len(tree_root_files)} file import trees"
-        + (f" with max depth {max_depth}" if max_depth >= 0 else "")
+        + (f" with max depth {options.tree_max_depth}" if options.tree_max_depth >= 0 else "")
         + "...",
     )
-    tree_builder = FileImportTreeBuilder(max_depth=max_depth, max_height=max_height)
+    tree_builder = FileImportTreeBuilder(
+        max_depth=options.tree_max_depth,
+        max_height=options.tree_max_height,
+    )
     grouped_trees = tree_builder.build_grouped_trees(tree_root_files, files)
 
     click.echo(f"Printing {len(grouped_trees)} tree groups...")

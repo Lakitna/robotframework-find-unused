@@ -22,7 +22,7 @@ from .commands import (
 )
 from .common.const import FilterOption
 
-click_choice_keyword_filter_option = click.Choice(
+click_choice_filter_option = click.Choice(
     ["include", "exclude", "only"],
     case_sensitive=False,
 )
@@ -58,7 +58,7 @@ def cli():
 @click.option(
     "-d",
     "--deprecated",
-    type=click_choice_keyword_filter_option,
+    type=click_choice_filter_option,
     default="include",
     show_default=True,
     help="How to output deprecated keywords",
@@ -66,7 +66,7 @@ def cli():
 @click.option(
     "-p",
     "--private",
-    type=click_choice_keyword_filter_option,
+    type=click_choice_filter_option,
     default="include",
     show_default=True,
     help="How to output private keywords",
@@ -74,7 +74,7 @@ def cli():
 @click.option(
     "-l",
     "--library",
-    type=click_choice_keyword_filter_option,
+    type=click_choice_filter_option,
     default="exclude",
     show_default=True,
     help="How to output keywords from downloaded libraries",
@@ -302,7 +302,7 @@ def variables(
 @click.option(
     "-d",
     "--deprecated",
-    type=click_choice_keyword_filter_option,
+    type=click_choice_filter_option,
     default="include",
     show_default=True,
     help="How to output deprecated keywords",
@@ -310,7 +310,7 @@ def variables(
 @click.option(
     "-p",
     "--private",
-    type=click_choice_keyword_filter_option,
+    type=click_choice_filter_option,
     default="include",
     show_default=True,
     help="How to output private keywords",
@@ -318,7 +318,7 @@ def variables(
 @click.option(
     "-l",
     "--library",
-    type=click_choice_keyword_filter_option,
+    type=click_choice_filter_option,
     default="exclude",
     show_default=True,
     help="How to output keywords from downloaded libraries",
@@ -326,7 +326,7 @@ def variables(
 @click.option(
     "-u",
     "--unused",
-    type=click_choice_keyword_filter_option,
+    type=click_choice_filter_option,
     default="exclude",
     show_default=True,
     help="How to output unused keywords",
@@ -428,7 +428,7 @@ def arguments(  # noqa: PLR0913
 @click.option(
     "-d",
     "--deprecated",
-    type=click_choice_keyword_filter_option,
+    type=click_choice_filter_option,
     default="include",
     show_default=True,
     help="How to output deprecated keywords",
@@ -436,7 +436,7 @@ def arguments(  # noqa: PLR0913
 @click.option(
     "-p",
     "--private",
-    type=click_choice_keyword_filter_option,
+    type=click_choice_filter_option,
     default="include",
     show_default=True,
     help="How to output private keywords",
@@ -444,7 +444,7 @@ def arguments(  # noqa: PLR0913
 @click.option(
     "-l",
     "--library",
-    type=click_choice_keyword_filter_option,
+    type=click_choice_filter_option,
     default="exclude",
     show_default=True,
     help="How to output keywords from downloaded libraries",
@@ -452,7 +452,7 @@ def arguments(  # noqa: PLR0913
 @click.option(
     "-u",
     "--unused",
-    type=click_choice_keyword_filter_option,
+    type=click_choice_filter_option,
     default="exclude",
     show_default=True,
     help="How to output unused keywords",
@@ -543,7 +543,7 @@ def returns(  # noqa: PLR0913
 @click.option(
     "-r",
     "--resource",
-    type=click_choice_keyword_filter_option,
+    type=click_choice_filter_option,
     default="include",
     show_default=True,
     help="How to output resource file imports",
@@ -551,7 +551,7 @@ def returns(  # noqa: PLR0913
 @click.option(
     "-l",
     "--library",
-    type=click_choice_keyword_filter_option,
+    type=click_choice_filter_option,
     default="include",
     show_default=True,
     help="How to output (custom) library file imports",
@@ -559,7 +559,7 @@ def returns(  # noqa: PLR0913
 @click.option(
     "-V",
     "--variable",
-    type=click_choice_keyword_filter_option,
+    type=click_choice_filter_option,
     default="include",
     show_default=True,
     help="How to output variable file imports",
@@ -567,7 +567,7 @@ def returns(  # noqa: PLR0913
 @click.option(
     "-u",
     "--unused",
-    type=click_choice_keyword_filter_option,
+    type=click_choice_filter_option,
     default="include",
     show_default=True,
     help="How to output unused file imports",
@@ -596,8 +596,8 @@ def files(  # noqa: PLR0913
     """
     Find unused files
 
-    Traverse files in the given file path. For all .robot files, figure out which files it uses. Log
-    files that are never used.
+    For each of your `.robot` files, follow the full chain of imports. Files that are never
+    (indirectly) imported by a `.robot` file are logged.
 
     ----------
 

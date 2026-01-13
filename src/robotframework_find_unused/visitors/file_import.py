@@ -24,8 +24,7 @@ class FileImportVisitor(ModelVisitor):
     current_working_file: FileUseData | None = None
     current_working_directory: Path | None = None
 
-    def __init__(self, *, enrich_py_keywords: bool = False) -> None:
-        self.enrich_py_keywords = enrich_py_keywords
+    def __init__(self) -> None:
         self.files = {}
         super().__init__()
 

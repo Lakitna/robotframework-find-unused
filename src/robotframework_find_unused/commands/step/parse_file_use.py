@@ -16,7 +16,7 @@ from robotframework_find_unused.visitors.file_import import FileImportVisitor
 
 def cli_step_parse_file_use(file_paths: list[Path], *, verbose: int):
     """
-    Parse files with libdoc and keep the user up-to-date on progress
+    Parse files and keep the user up-to-date on progress
     """
     click.echo("Parsing file imports...")
 
@@ -40,12 +40,12 @@ def _count_file_uses(file_paths: list[Path]) -> list[FileUseData]:
 
     # Add undiscovered files from input file paths
     for path in file_paths:
-        path_normalized = path.as_posix()
+        path_normalized = normalize_file_path(path)
         if path_normalized in files:
             continue
 
         files[path_normalized] = FileUseData(
-            id=normalize_file_path(path),
+            id=path_normalized,
             path_absolute=path,
             type=set(),
             used_by=[],

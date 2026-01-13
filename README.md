@@ -162,14 +162,18 @@ robotunused files --help
 
 #### Available options
 
-| flag                 | option           | default | description                                                                                                                                     |
-| -------------------- | ---------------- | ------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
-| `-c`, `--show-count` |                  |         | Show usage count for all files instead of only unused variables                                                                                 |
-| `-t`, `--show-tree`  |                  |         | Also show full import tree for every `.robot` file                                                                                              |
-| `--tree-max-depth`   | Positive integer | `None`  | Only when `--show-tree`: Limit import tree depth                                                                                                |
-| `--tree-max-height`  | Positive integer | `None`  | Only when `--show-tree`: Limit import tree height                                                                                               |
-| `-f`, `--filter`     | Glob pattern     |         | Only show files who's path matches the glob pattern. When used with `--show-tree`: Only show trees for suite files that match the glob pattern. |
-| `-v`, `--verbose`    |                  |         | Show more log output. When provided twice: Show even more log output                                                                            |
+| flag                 | option                         | default   | description                                                                                                                                     |
+| -------------------- | ------------------------------ | --------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
+| `-c`, `--show-count` |                                |           | Show usage count for all files instead of only unused variables                                                                                 |
+| `-t`, `--show-tree`  |                                |           | Also show full import tree for every `.robot` file                                                                                              |
+| `--tree-max-depth`   | Positive integer               | `None`    | Only when `--show-tree`: Limit import tree depth                                                                                                |
+| `--tree-max-height`  | Positive integer               | `None`    | Only when `--show-tree`: Limit import tree height                                                                                               |
+| `-f`, `--filter`     | Glob pattern                   |           | Only show files who's path matches the glob pattern. When used with `--show-tree`: Only show trees for suite files that match the glob pattern. |
+| `-r`, `--resource`   | `include` / `exclude` / `only` | `include` | How to output resource file imports                                                                                                             |
+| `-l`, `--library`    | `include` / `exclude` / `only` | `include` | How to output (custom) library file imports                                                                                                     |
+| `-V`, `--variable`   | `include` / `exclude` / `only` | `include` | How to output variable file imports                                                                                                             |
+| `-u`, `--unused`     | `include` / `exclude` / `only` | `include` | How to output unused file imports                                                                                                               |
+| `-v`, `--verbose`    |                                |           | Show more log output. When provided twice: Show even more log output                                                                            |
 
 ## Contributing
 
