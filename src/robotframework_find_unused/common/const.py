@@ -53,6 +53,7 @@ class VariableData:
     """Data structure for Variables"""
 
     name: str
+    type: str | None
     normalized_name: str
     resolved_name: str
     use_count: int

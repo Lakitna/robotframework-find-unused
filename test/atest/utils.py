@@ -7,6 +7,8 @@ from pathlib import Path
 
 import click
 import pytest
+import robot
+from packaging.version import Version
 
 
 class AcceptanceTest:
@@ -16,7 +18,11 @@ class AcceptanceTest:
         expected_output_path: str,
         test_file_path: str,
         expected_exit_code: int = 0,
+        min_robot_version: str | None = None,
     ):
+        if self._skip_for_robot_version(min_robot_version):
+            pytest.skip("Skipped due to Robot version")
+
         test_folder = Path(test_file_path).parent
         test_data_folder = test_folder.joinpath(cli_options[1])
         sys.path.append(str(test_data_folder))
@@ -52,6 +58,14 @@ class AcceptanceTest:
                     f"Subprocess stdout below:\n{p.stdout}\n"
                 ),
             )
+
+    def _skip_for_robot_version(self, min_version: str | None) -> bool:
+        if min_version is None:
+            return False
+
+        min_v = Version(min_version)
+        robot_v = Version(robot.get_version())
+        return robot_v < min_v
 
     def _assert_logs(self, actual: str, expected: str) -> None:
         actual_lines = actual.splitlines()
