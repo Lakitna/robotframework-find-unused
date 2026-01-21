@@ -639,6 +639,20 @@ def files(  # noqa: PLR0913
 
     \b
         from hello import hello_world
+
+    ----------
+
+    Limitation 4: Variable dynamic imports are ignored
+
+    Files can be dynamically imported with the keywords `Import Resource`, `Import Library`, and
+    `Import Variables`. These keywords are supported, but not when the import path contains a
+    variable.
+
+    Example: The import to file `hello.resource` is ignored because of the `${greeting}` variable.
+
+    \b
+        VAR  ${greeting} =    hello
+        Import Resource    ${greeting}.resource
     """
     options = FileOptions(
         path_filter_glob=filter,
