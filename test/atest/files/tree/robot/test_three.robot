@@ -1,2 +1,6 @@
 *** Settings ***
-Resource    gamma.resource
+Resource    gamma.robot
+
+
+*** Test Cases ***
+# Empty section

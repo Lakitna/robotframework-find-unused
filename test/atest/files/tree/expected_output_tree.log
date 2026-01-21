@@ -9,12 +9,12 @@ Printing 2 tree groups...
 │  ./alpha.resource
 │  │  ./beta.resource
 │  │  │  ./alpha.resource [Circular]
-│  │  │  ./gamma.resource
+│  │  │  ./gamma.robot
 │  ./beta.resource [Already imported]
 Tree height: 6 | Tree depth: 3 | Unique files: 4 | Circular imports: 1 | Already imported: 1
 
 [[REPOSITORY_ROOT]]/test/atest/files/tree/robot/test_three.robot
-│  ./gamma.resource
+│  ./gamma.robot
 Tree height: 2 | Tree depth: 1 | Unique files: 2 | Circular imports: 0 | Already imported: 0
 
 Found no unused files
