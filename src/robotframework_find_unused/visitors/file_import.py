@@ -7,6 +7,7 @@ from robot.api.parsing import (
     LibraryImport,
     ModelVisitor,
     ResourceImport,
+    TestCaseSection,
     VariablesImport,
 )
 
@@ -37,11 +38,9 @@ class FileImportVisitor(ModelVisitor):
         self.current_working_directory = current_working_file.parent
         current_file_path_normalized = normalize_file_path(current_working_file)
 
-        file_ext = current_working_file.suffix.lstrip(".").lower()
-        if file_ext not in ["robot", "resource"]:
+        file_type = self._get_file_type(node, current_working_file)
+        if file_type is None:
             return None
-
-        file_type = "SUITE" if file_ext == "robot" else "RESOURCE"
 
         if current_file_path_normalized in self.files:
             # Already found as import
@@ -56,6 +55,28 @@ class FileImportVisitor(ModelVisitor):
             self.files[current_file_path_normalized] = self.current_working_file
 
         return self.generic_visit(node)
+
+    def _get_file_type(
+        self,
+        file_node: File,
+        file_path: Path,
+    ) -> Literal["SUITE", "RESOURCE"] | None:
+        file_extension = file_path.suffix.lstrip(".").lower()
+
+        if file_extension == "robot":
+            has_test_section = any(
+                isinstance(section, TestCaseSection) for section in file_node.sections
+            )
+            if has_test_section:
+                return "SUITE"
+
+            # Assumption: .robot file used as resource file.
+            return "RESOURCE"
+
+        if file_extension == "resource":
+            return "RESOURCE"
+
+        return None
 
     def visit_LibraryImport(self, node: LibraryImport):  # noqa: N802
         """Find out which libraries are actually used"""

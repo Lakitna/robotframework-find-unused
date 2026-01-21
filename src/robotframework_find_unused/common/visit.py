@@ -35,7 +35,7 @@ def parse_robot_file(file_path: Path, parse_sections: SectionsList | Literal["al
     """
     Parse a file using the Robot parser.
 
-    Can skip entire sections.
+    Can skip entire sections but keeps the section headers.
     """
     if parse_sections == "all" or file_path.suffix.lower() not in [".robot", ".resource"]:
         return robot.api.parsing.get_model(file_path, data_only=True)
@@ -50,7 +50,8 @@ def _get_partial_file_content(file_path: Path, parse_sections: SectionsList) -> 
     """
     Get partial raw file content.
 
-    Output is a .robot or .resource file with only specific *** sections ***
+    Output is a .robot or .resource file with only specific *** sections ***. Section headers are
+    always included.
     """
     with file_path.open(encoding="utf8") as f:
         raw_file_content = f.readlines()
@@ -63,6 +64,10 @@ def _get_partial_file_content(file_path: Path, parse_sections: SectionsList) -> 
             if not cur_section.endswith("s"):
                 # Is an old singular section header. Make plural
                 cur_section += "s"
+
+            # Always keep section headings
+            file_content += line
+            continue
 
         if cur_section and cur_section not in parse_sections:
             continue
