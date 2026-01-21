@@ -34,7 +34,7 @@ def _count_file_uses(file_paths: list[Path]) -> list[FileUseData]:
     visit_robot_files(
         file_paths,
         visitor,
-        parse_sections=["settings"],
+        parse_sections=["settings", "keywords", "test cases", "tasks"],
     )
     files = visitor.files
 
