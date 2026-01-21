@@ -1,0 +1,16 @@
+Discovering files in `./robot` using Robocop config...
+Parsing file imports...
+[ DONE ] Parsed 6 files
+Building 1 file import trees...
+Printing 1 tree groups...
+
+[[REPOSITORY_ROOT]]/test/atest/files/dynamic_import/robot/test.robot
+│  ./alpha.resource
+│  │  ./beta.resource
+│  │  ./library.py
+│  ./beta.resource [Already imported]
+│  ./variable.py
+Tree height: 6 | Tree depth: 2 | Unique files: 5 | Circular imports: 0 | Already imported: 1
+
+Found 1 unused files:
+  ./gamma.resource
