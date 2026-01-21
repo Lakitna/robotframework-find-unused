@@ -38,11 +38,9 @@ class FileImportVisitor(ModelVisitor):
         self.current_working_directory = current_working_file.parent
         current_file_path_normalized = normalize_file_path(current_working_file)
 
-        file_ext = current_working_file.suffix.lstrip(".").lower()
-        if file_ext not in ["robot", "resource"]:
+        file_type = self._get_file_type(node, current_working_file)
+        if file_type is None:
             return None
-
-        file_type = "SUITE" if self._file_is_suite(node, file_ext) else "RESOURCE"
 
         if current_file_path_normalized in self.files:
             # Already found as import
@@ -58,11 +56,27 @@ class FileImportVisitor(ModelVisitor):
 
         return self.generic_visit(node)
 
-    def _file_is_suite(self, node: File, file_extension: str) -> bool:
-        if file_extension != "robot":
-            return False
+    def _get_file_type(
+        self,
+        file_node: File,
+        file_path: Path,
+    ) -> Literal["SUITE", "RESOURCE"] | None:
+        file_extension = file_path.suffix.lstrip(".").lower()
 
-        return any(isinstance(section, TestCaseSection) for section in node.sections)
+        if file_extension == "robot":
+            has_test_section = any(
+                isinstance(section, TestCaseSection) for section in file_node.sections
+            )
+            if has_test_section:
+                return "SUITE"
+
+            # Assumption: .robot file used as resource file.
+            return "RESOURCE"
+
+        if file_extension == "resource":
+            return "RESOURCE"
+
+        return None
 
     def visit_LibraryImport(self, node: LibraryImport):  # noqa: N802
         """Find out which libraries are actually used"""
