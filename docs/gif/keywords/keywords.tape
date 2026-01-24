@@ -1,7 +1,7 @@
-Output keywords/keywords.gif
+Output "/app/docs/gif/keywords/keywords.gif"
 
 Set Shell "bash"
-Set FontSize 20
+Set FontSize 18
 Set Width 1000
 Set Height 600
 Set Padding 20
@@ -9,17 +9,13 @@ Set Margin 0
 Set CursorBlink false
 
 Hide
-    Type "cd ./keywords/robot && clear"
+    Type "pip install -r requirements.txt --editable /app"
+    Enter
+    Wait
+
+    Type "clear"
     Enter
 Show
-
-Type "echo TODO"
-Enter
-Sleep 10s
-
-
-
-
 
 Type "robotunused keywords"
 Sleep 200ms

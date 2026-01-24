@@ -1,7 +1,7 @@
-Output variables/variables.gif
+Output "/app/docs/gif/variables/variables.gif"
 
 Set Shell "bash"
-Set FontSize 20
+Set FontSize 18
 Set Width 1000
 Set Height 600
 Set Padding 20
@@ -9,7 +9,11 @@ Set Margin 0
 Set CursorBlink false
 
 Hide
-    Type "cd ./variables/robot && clear"
+    Type "pip install -r requirements.txt --editable /app"
+    Enter
+    Wait
+
+    Type "clear"
     Enter
 Show
 

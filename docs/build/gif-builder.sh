@@ -1,16 +1,16 @@
 #!/usr/bin/env bash
 
+# File to run inside the gif builder Docker image. Project root at `/app`
+
 # Bail early
 set -e
-# CD to this script dir
-cd "$(dirname "$0")"
 
 ########################
 
-cd ../gif
+cd /app/test/projects/tilavarauspalvelu-robot
 
-vhs ./arguments/arguments.tape
-vhs ./files/files.tape
-vhs ./keywords/keywords.tape
-vhs ./returns/returns.tape
-vhs ./variables/variables.tape
+vhs /app/docs/gif/arguments/arguments.tape
+vhs /app/docs/gif/files/files.tape
+vhs /app/docs/gif/keywords/keywords.tape
+vhs /app/docs/gif/returns/returns.tape
+vhs /app/docs/gif/variables/variables.tape
