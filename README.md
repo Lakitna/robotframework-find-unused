@@ -211,3 +211,13 @@ To run all tests, use the following command:
 ```shell
 uv run pytest -n auto
 ```
+
+### Generate gifs
+
+The gifs that are part of the documentation are automatically generated.
+
+To generate new gifs, use the following command:
+
+```shell
+powershell docs/build/build-gifs.ps1
+```
