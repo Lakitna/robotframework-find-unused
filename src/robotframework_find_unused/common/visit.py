@@ -1,11 +1,20 @@
 from functools import cache
 from pathlib import Path
-from typing import Literal
+from typing import Literal, TypeAlias
 
 import robot.api.parsing
 
+RobotFileSectionName: TypeAlias = Literal[
+    "comments",
+    "settings",
+    "variables",
+    "keywords",
+    "test cases",
+    "tasks",
+]
 
-class SectionsList(list):
+
+class SectionsList(list[RobotFileSectionName]):
     """Hashable list for Robot Framework `*** Section ***` names"""
 
     def __hash__(self) -> int:  # pyright: ignore[reportIncompatibleVariableOverride]  # noqa: D105
@@ -15,7 +24,7 @@ class SectionsList(list):
 def visit_robot_files(
     file_paths: list[Path],
     visitor: robot.api.parsing.ModelVisitor,
-    parse_sections: list[str] | Literal["all"] = "all",
+    parse_sections: list[RobotFileSectionName] | Literal["all"] = "all",
 ):
     """
     Use Robotframework to traverse files with a visitor.

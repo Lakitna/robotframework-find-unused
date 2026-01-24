@@ -4,6 +4,7 @@ from typing import Literal
 import click
 from robot.api.parsing import (
     File,
+    KeywordCall,
     LibraryImport,
     ModelVisitor,
     ResourceImport,
@@ -13,7 +14,7 @@ from robot.api.parsing import (
 
 from robotframework_find_unused.common.const import ERROR_MARKER, FileUseData
 from robotframework_find_unused.common.impossible_state_error import ImpossibleStateError
-from robotframework_find_unused.common.normalize import normalize_file_path
+from robotframework_find_unused.common.normalize import normalize_file_path, normalize_keyword_name
 
 
 class FileImportVisitor(ModelVisitor):
@@ -80,39 +81,71 @@ class FileImportVisitor(ModelVisitor):
 
     def visit_LibraryImport(self, node: LibraryImport):  # noqa: N802
         """Find out which libraries are actually used"""
+        self._register_library_file(node.name)
+
+    def _register_library_file(self, import_string: str) -> None:
         if self.current_working_directory is None:
             msg = "Found library import outside a .robot or .resource file"
             raise ImpossibleStateError(msg)
 
-        lib_name = node.name
+        lib_name = import_string
         if not lib_name.endswith(".py"):
-            # Limitation 1.
-            # A downloaded lib. We don't care
+            # Limitation: Importing a downloaded lib. We don't care.
             return
 
         lib_path = self.current_working_directory.joinpath(lib_name)
 
-        # Limitation 2: No python module syntax
+        # Limitation: No python module syntax
 
         self._register_file_use(lib_path, file_type="LIBRARY")
 
     def visit_ResourceImport(self, node: ResourceImport):  # noqa: N802
         """Find out which resource files are actually used"""
+        self._register_resource_file(node.name)
+
+    def _register_resource_file(self, import_string: str) -> None:
         if self.current_working_directory is None:
             msg = "Found resource import outside a .robot or .resource file"
             raise ImpossibleStateError(msg)
 
-        resource_path = self.current_working_directory.joinpath(node.name)
+        resource_path = self.current_working_directory.joinpath(import_string)
         self._register_file_use(resource_path, file_type="RESOURCE")
 
     def visit_VariablesImport(self, node: VariablesImport):  # noqa: N802
         """Find out which variable files are actually used"""
+        self._register_variables_file(node.name)
+
+    def _register_variables_file(self, import_string: str) -> None:
         if self.current_working_directory is None:
             msg = "Found variables import outside a .robot or .resource file"
             raise ImpossibleStateError(msg)
 
-        resource_path = self.current_working_directory.joinpath(node.name)
+        resource_path = self.current_working_directory.joinpath(import_string)
         self._register_file_use(resource_path, file_type="VARIABLE")
+
+    def visit_KeywordCall(self, node: KeywordCall):  # noqa: N802
+        """Find dynamic import keywords"""
+        if not node.args:
+            return
+
+        import_string = node.args[0]
+        if (
+            "${" in import_string
+            or "@{" in import_string
+            or "%{" in import_string
+            or "&{" in import_string
+        ):
+            # Limitation: Dynamic imports with variables are ignored
+            return
+
+        keyword_name = normalize_keyword_name(node.keyword)
+
+        if keyword_name == "importresource":
+            self._register_resource_file(import_string)
+        if keyword_name == "importlibrary":
+            self._register_library_file(import_string)
+        if keyword_name == "importvariables":
+            self._register_variables_file(import_string)
 
     def _register_file_use(
         self,
