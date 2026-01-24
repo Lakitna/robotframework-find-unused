@@ -13,7 +13,7 @@ from robotframework_find_unused.visitors.python_keyword_visitor import (
 def enrich_python_keyword_data(libdoc: LibraryDoc) -> list[EnrichedKeywordDoc]:
     """Gather data on Python keyword returns"""
     source_path = Path(cast(str, libdoc.source))
-    with source_path.open() as f:
+    with source_path.open(encoding="utf8") as f:
         raw_python_source = f.read()
     model = ast.parse(raw_python_source)
 
