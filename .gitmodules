@@ -1,0 +1,3 @@
+[submodule "test/projects/tilavarauspalvelu-robot"]
+	path = test/projects/tilavarauspalvelu-robot
+	url = https://github.com/City-of-Helsinki/tilavarauspalvelu-robot.git
