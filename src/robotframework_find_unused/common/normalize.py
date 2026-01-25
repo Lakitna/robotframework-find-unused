@@ -17,7 +17,7 @@ def normalize_keyword_name(name: str) -> str:
     """
     Normalize Robot keyword name. Output is suitable for matching and sorting purposes
     """
-    return name.replace(" ", "").replace("_", "").lower()
+    return name.replace(" ", "").lower()
 
 
 def normalize_library_name(name: str) -> str:
