@@ -8,13 +8,12 @@ Gathering downloaded library keyword definitions...
 Counting keyword usage...
 [ DONE ] Processed 12 keyword calls
 [ WARNING ] Found 1 called keywords without a definition
+[ NOTE ] Excluding downloaded library keywords
 
 use_count	keyword_name
-1	BuiltIn.Log
 1	Unknown keyword
 1	keywords.Keyword with ${foo}
 1	keywords.Keyword with ${foo} and ${bar}
 1	keywords.Keyword with ${foo} and something specific
 1	keywords.Keyword without embedded args & some @ weird & characters % in it
 2	keywords.A Basic ${adjective} Keyword
-4	BuiltIn.No Operation
