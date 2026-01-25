@@ -5,19 +5,20 @@ Parsing files with LibDoc...
     1 files of type CUSTOM_RESOURCE
     1 files of type CUSTOM_SUITE
 Gathering custom keyword definitions...
-[ DONE ] Found 3 custom keyword definitions
-    3 keywords of type CUSTOM_RESOURCE
+[ DONE ] Found 6 custom keyword definitions
+    6 keywords of type CUSTOM_RESOURCE
 Gathering downloaded library keyword definitions...
 [ DONE ] Found 1 downloaded libraries
     BuiltIn: [[MASK]] keywords
 Counting keyword usage...
-[ DONE ] Processed 8 keyword calls
-    6 calls to keywords of type CUSTOM_RESOURCE
+[ DONE ] Processed 14 keyword calls
+    12 calls to keywords of type CUSTOM_RESOURCE
     2 calls to keywords of type LIBRARY
-[ DONE ] Found 5 unique keywords (keyword definitions and calls)
+[ DONE ] Found 7 unique keywords (keyword definitions and calls)
 [ NOTE ] Excluding downloaded library keywords
 [ NOTE ] Excluding unused keywords
 [ NOTE ] Only showing returning keywords
 
-Found 1 unused keyword returns:
+Found 2 unused keyword returns:
   keywords.Beautiful Keyword With Unused Return
+  keywords.Elegant Keyword With ${embedded_arg} And Unused Return
