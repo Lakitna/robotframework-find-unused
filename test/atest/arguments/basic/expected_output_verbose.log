@@ -4,18 +4,22 @@ Parsing files with LibDoc...
 [ DONE ] Parsed 1 files
     1 files of type CUSTOM_SUITE
 Gathering custom keyword definitions...
-[ DONE ] Found 1 custom keyword definitions
-    1 keywords of type CUSTOM_SUITE
+[ DONE ] Found 2 custom keyword definitions
+    2 keywords of type CUSTOM_SUITE
 Gathering downloaded library keyword definitions...
 [ DONE ] Found 1 downloaded libraries
     BuiltIn: [[MASK]] keywords
 Counting keyword usage...
-[ DONE ] Processed 3 keyword calls
-    2 calls to keywords of type CUSTOM_SUITE
-    1 calls to keywords of type LIBRARY
-[ DONE ] Found 2 unique keywords (keyword definitions and calls)
+[ DONE ] Processed 6 keyword calls
+    4 calls to keywords of type CUSTOM_SUITE
+    2 calls to keywords of type LIBRARY
+[ DONE ] Found 3 unique keywords (keyword definitions and calls)
 [ NOTE ] Excluding downloaded library keywords
 [ NOTE ] Excluding unused keywords
+
+Test.Keyword With ${embedded} Arguments
+    Unchanged arguments: 1 of 3
+        optional_unsed=${True}
 
 Test.Keyword With Arguments
     Unchanged arguments: 1 of 3
