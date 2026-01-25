@@ -1,13 +1,16 @@
 from .const import VariableData
 from .normalize import normalize_variable_name
 
-supported_builtin_vars = {
+SUPPORTED_BUILTIN_VARS = {
     "true": "True",
     "false": "False",
     "none": "None",
     "empty": "",
     "space": " ",
 }
+
+# Shortest possible var: `${x}`
+MIN_VAR_CHAR_COUNT = 4
 
 
 def get_variables_in_string(input_string: str) -> list[str]:
@@ -28,8 +31,12 @@ def get_variables_in_string(input_string: str) -> list[str]:
 
 
 def _find_variable_start(string: str) -> str:
-    while len(string) > 0 and string[0] not in "$&@%":
+    while len(string) >= MIN_VAR_CHAR_COUNT and string[0:2] not in ["${", "&{", "@{", "%{"]:
         string = string[1:]
+
+    if len(string) < MIN_VAR_CHAR_COUNT:
+        return ""
+
     return string
 
 
@@ -92,8 +99,8 @@ def resolve_variables(
 
 
 def _get_value_of_builtin_var(normalized_name: str) -> str:
-    if normalized_name in supported_builtin_vars:
-        return supported_builtin_vars[normalized_name]
+    if normalized_name in SUPPORTED_BUILTIN_VARS:
+        return SUPPORTED_BUILTIN_VARS[normalized_name]
 
     stripped_var = normalized_name.removeprefix("{").removesuffix("}")
     try:
