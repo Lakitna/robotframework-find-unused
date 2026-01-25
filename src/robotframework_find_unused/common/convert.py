@@ -66,9 +66,9 @@ def get_keyword_name_match_pattern(name_parts: list[str]) -> re.Pattern:
     pattern = "^"
     for part in name_parts:
         if part == "__VARIABLE__":
-            pattern += "(.+?)"
+            pattern += ".+?"
         else:
-            pattern += part
+            pattern += re.escape(part)
     pattern += "$"
     return re.compile(pattern)
 
