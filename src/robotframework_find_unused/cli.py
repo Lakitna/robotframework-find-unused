@@ -348,18 +348,7 @@ def arguments(  # noqa: PLR0913
 
     ----------
 
-    Limitation 1: Arguments for keywords with embedded arguments are not counted
-
-    Example: The argument ${beautiful} is not counted because the keyword contains the embedded
-    argument ${something}:
-
-    \b
-        Do ${something} amazing
-            [Arguments]    ${beautiful}=${True}
-
-    ----------
-
-    Limitation 2: Most keywords used as an argument for another keyword are counted, but some may
+    Limitation 1: Most keywords used as an argument for another keyword are counted, but some may
     not be. This includes the arguments used by the inner keyword.
 
     Example: 'Beautiful keyword' is not recognized as a keyword. Because of this, the ${hello}
