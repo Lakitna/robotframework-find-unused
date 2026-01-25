@@ -1,3 +1,4 @@
+import re
 from collections.abc import Iterable
 from dataclasses import dataclass
 from pathlib import Path
@@ -24,6 +25,8 @@ class KeywordData:
 
     name: str
     normalized_name: str
+    name_parts: list[str]
+    name_match_pattern: re.Pattern | None
     type: Literal[
         "CUSTOM_SUITE",
         "CUSTOM_LIBRARY",

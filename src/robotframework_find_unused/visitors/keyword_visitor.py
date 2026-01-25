@@ -357,6 +357,8 @@ class KeywordVisitor(ModelVisitor):
         self.keywords[normalized_name] = KeywordData(
             name=name,
             normalized_name=normalized_name,
+            name_parts=[],
+            name_match_pattern=None,
             argument_use_count=None,
             deprecated=None,
             private=False,
