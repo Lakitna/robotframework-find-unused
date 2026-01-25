@@ -1,3 +1,4 @@
+import functools
 from collections.abc import Iterable
 from dataclasses import dataclass
 from typing import Any, Literal
@@ -46,6 +47,7 @@ class KeywordVisitor(ModelVisitor):
     """
 
     keywords: dict[str, KeywordData]
+    keywords_with_embedded_args: list[KeywordData]
     downloaded_libraries: list[LibraryData]
     normalized_keyword_names: set[str]
 
@@ -56,9 +58,13 @@ class KeywordVisitor(ModelVisitor):
     ) -> None:
         self.normalized_keyword_names = set()
         self.keywords = {}
+        self.keywords_with_embedded_args = []
+
         for kw in custom_keywords:
             self.keywords[kw.normalized_name] = kw
             self.normalized_keyword_names.add(kw.normalized_name)
+            if len(kw.name_parts) > 1 and kw.name_match_pattern is not None:
+                self.keywords_with_embedded_args.append(kw)
 
         self.downloaded_libraries = downloaded_library_keywords
         for lib in self.downloaded_libraries:
@@ -151,19 +157,77 @@ class KeywordVisitor(ModelVisitor):
         name = self._remove_lib_from_name(name)
         normalized_name = normalize_keyword_name(name)
 
-        if normalized_name not in self.keywords:
-            # Found a previously unused:
-            # - downloaded library keyword
-            # - out-of-scope keyword
-            # or found a:
-            # - keyword with embedded argument
+        if normalized_name in self.keywords:
+            # Matched to a keyword (without embedded args)
+            return self.keywords[normalized_name]
 
-            if normalized_name in self.normalized_keyword_names:
-                self._register_downloaded_library_keyword(name, normalized_name)
-            else:
-                self._register_unknown_keyword(name, normalized_name)
+        if normalized_name in self.normalized_keyword_names:
+            # Matched to a previously unused downloaded library keyword
+            return self._register_downloaded_library_keyword(name, normalized_name)
 
-        return self.keywords[normalized_name]
+        keyword = self._find_keyword_with_embedded_args(normalized_name)
+        if keyword is not None:
+            # Matched to a keyword with embedded arguments
+            return keyword
+
+        # Found a previously unused:
+        # - non-existing keyword
+        # - out-of-scope keyword
+        return self._register_unknown_keyword(name, normalized_name)
+
+    def _find_keyword_with_embedded_args(self, normalized_name: str) -> KeywordData | None:
+        matches = self._find_keyword_with_embedded_args_matches(normalized_name)
+
+        if len(matches) == 0:
+            return None
+        if len(matches) == 1:
+            return matches[0]
+
+        def match_sorter(a: KeywordData, b: KeywordData) -> int:
+            # Using same logic as in `robot/running/namespace.py`:
+            # "Embedded match is considered better than another if the other matches
+            # it, but it doesn't match the other."
+            if self._keyword_call_matches_keyword_definition(
+                a.normalized_name,
+                b,
+            ) and not self._keyword_call_matches_keyword_definition(
+                b.normalized_name,
+                a,
+            ):
+                return -1
+            return 1
+
+        match_order = sorted(matches, key=functools.cmp_to_key(match_sorter))
+        return match_order[0]
+
+    def _find_keyword_with_embedded_args_matches(self, normalized_name: str) -> list[KeywordData]:
+        """
+        Find matching keyword definitions for the keyword name.
+        """
+        # Fast, inconclusive pre-selection
+        candidates = list(
+            filter(
+                lambda kw: kw.name_parts[0] == "__VARIABLE__"
+                or normalized_name.startswith(kw.name_parts[0]),
+                self.keywords_with_embedded_args,
+            ),
+        )
+        if len(candidates) == 0:
+            return []
+
+        # Slow, conclusive selection
+        matches: list[KeywordData] = []
+        for kw in candidates:
+            if self._keyword_call_matches_keyword_definition(normalized_name, kw):
+                matches.append(kw)
+        return matches
+
+    def _keyword_call_matches_keyword_definition(self, call: str, definition: KeywordData) -> bool:
+        if definition.name_match_pattern is None:
+            msg = "Attempted to match keyword call to keyword definition without name match pattern"
+            raise ValueError(msg)
+
+        return definition.name_match_pattern.fullmatch(call) is not None
 
     def _count_keyword_call(
         self,
@@ -324,7 +388,7 @@ class KeywordVisitor(ModelVisitor):
 
         return tuple(output)
 
-    def _register_downloaded_library_keyword(self, name: str, normalized_name: str) -> None:
+    def _register_downloaded_library_keyword(self, name: str, normalized_name: str) -> KeywordData:
         """
         Register as a downloaded library keyword.
         """
@@ -349,8 +413,9 @@ class KeywordVisitor(ModelVisitor):
             raise Exception(msg)  # noqa: TRY002
 
         self.keywords[library_keyword.normalized_name] = library_keyword
+        return self.keywords[library_keyword.normalized_name]
 
-    def _register_unknown_keyword(self, name: str, normalized_name: str) -> None:
+    def _register_unknown_keyword(self, name: str, normalized_name: str) -> KeywordData:
         """
         Register as an unknown keyword with minimum data that does not look weird.
         """
@@ -369,6 +434,7 @@ class KeywordVisitor(ModelVisitor):
             arguments=None,
             library="",
         )
+        return self.keywords[normalized_name]
 
     def _parse_args(
         self,
