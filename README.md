@@ -216,6 +216,8 @@ uv run pytest -n auto
 
 The gifs that are part of the documentation are automatically generated.
 
+Made for Windows. Requires Docker and Powershell.
+
 To generate new gifs, use the following command:
 
 ```shell
