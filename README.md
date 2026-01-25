@@ -11,6 +11,7 @@ Allows you to find unused:
 - Keyword arguments
 - Keyword return statements
 - Global variables
+- Files
 
 ## Installation
 
@@ -32,6 +33,8 @@ This is a command-line tool.
     ```
 
 ### Find unused keywords
+
+![Keywords command demo gif](./docs/gif/keywords/keywords.gif)
 
 Walk through your `.robot`, `.resource`, and `.py` files. In those files, count how often each
 keyword is used (called). Keywords with 0 uses are logged.
@@ -60,6 +63,8 @@ robotunused keywords --help
 | `-v`, `--verbose`        |                                |           | Show more log output. When provided twice: Show even more log output                 |
 
 ### Find unused keyword arguments
+
+![Arguments command demo gif](./docs/gif/arguments/arguments.gif)
 
 Walk through your `.robot`, `.resource`, and `.py` files. In those files, count how often each
 argument is used during a keyword call. Arguments with 0 uses are logged.
@@ -90,6 +95,8 @@ robotunused arguments --help
 | `-v`, `--verbose`    |                                |           | Show more log output. When provided twice: Show even more log output                 |
 
 ### Find unused keyword return statements
+
+![Returns command demo gif](./docs/gif/returns/returns.gif)
 
 Walk through your `.robot`, `.resource`, and `.py` files. In those files, count how often each
 keyword return value is used (assigned to a variable). Keywords whose return value is never useds
@@ -122,6 +129,8 @@ robotunused returns --help
 
 ### Find unused global variables
 
+![Variables command demo gif](./docs/gif/variables/variables.gif)
+
 Walk through your `.robot` and `.resource` files. In those files, count how often each
 variable is used. Variables defined in a variables section or variable file with 0 uses are logged.
 
@@ -145,6 +154,8 @@ robotunused variables --help
 | `-v`, `--verbose`    |              |         | Show more log output. When provided twice: Show even more log output                                 |
 
 ### Find unused files
+
+![Files command demo gif](./docs/gif/files/files.gif)
 
 For each of your `.robot` files, follow the full chain of imports. Files that are never (indirectly)
 imported by a `.robot` file are logged.
@@ -199,4 +210,16 @@ To run all tests, use the following command:
 
 ```shell
 uv run pytest -n auto
+```
+
+### Generate gifs
+
+The gifs that are part of the documentation are automatically generated.
+
+Made for Windows. Requires Docker and Powershell.
+
+To generate new gifs, use the following command:
+
+```shell
+powershell docs/build/build-gifs.ps1
 ```
