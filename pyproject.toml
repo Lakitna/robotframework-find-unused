@@ -41,7 +41,7 @@ build-backend = "uv_build"
 
 [tool.pytest.ini_options]
 addopts = ["--import-mode=importlib"]
-norecursedirs = ['robot', 'src']
+norecursedirs = ['robot', 'src', 'test/projects']
 python_files = '*.py'
 
 [tool.ruff]

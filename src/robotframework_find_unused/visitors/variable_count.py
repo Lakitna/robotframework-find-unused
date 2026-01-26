@@ -13,10 +13,10 @@ from robot.api.parsing import (
 
 from robotframework_find_unused.common.const import VariableData
 from robotframework_find_unused.common.normalize import normalize_variable_name
-from robotframework_find_unused.common.parse import (
-    get_variables_in_string,
+from robotframework_find_unused.common.parse import get_variables_in_string
+from robotframework_find_unused.common.resolve_variables import (
+    SUPPORTED_BUILTIN_VARS,
     resolve_variable_name,
-    supported_builtin_vars,
 )
 
 
@@ -153,7 +153,7 @@ class VariableCountVisitor(ModelVisitor):
             except ValueError:
                 pass
 
-            if var in supported_builtin_vars:
+            if var in SUPPORTED_BUILTIN_VARS:
                 continue
 
             (var, used_vars) = resolve_variable_name(var, self.variables)

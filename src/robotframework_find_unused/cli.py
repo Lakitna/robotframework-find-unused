@@ -113,16 +113,7 @@ def keywords(  # noqa: PLR0913
 
     ----------
 
-    Limitation 1: Keywords with embedded arguments are not counted
-
-    Example: This keyword is not counted because it contains the embedded argument ${something}:
-
-    \b
-        Do ${something} amazing
-
-    ----------
-
-    Limitation 2: Library prefixes are ignored.
+    Limitation 1: Library prefixes are ignored.
 
     Example: The following keywords are counted as the same keyword:
 
@@ -132,7 +123,7 @@ def keywords(  # noqa: PLR0913
 
     ----------
 
-    Limitation 3: Most keywords used as an argument for another keyword are counted, but some may
+    Limitation 2: Most keywords used as an argument for another keyword are counted, but some may
     not be.
 
     Example: 'Beautiful keyword' is not counted.
@@ -357,18 +348,7 @@ def arguments(  # noqa: PLR0913
 
     ----------
 
-    Limitation 1: Arguments for keywords with embedded arguments are not counted
-
-    Example: The argument ${beautiful} is not counted because the keyword contains the embedded
-    argument ${something}:
-
-    \b
-        Do ${something} amazing
-            [Arguments]    ${beautiful}=${True}
-
-    ----------
-
-    Limitation 2: Most keywords used as an argument for another keyword are counted, but some may
+    Limitation 1: Most keywords used as an argument for another keyword are counted, but some may
     not be. This includes the arguments used by the inner keyword.
 
     Example: 'Beautiful keyword' is not recognized as a keyword. Because of this, the ${hello}
