@@ -11,7 +11,7 @@ from robotframework_find_unused.common.const import (
     VariableData,
 )
 from robotframework_find_unused.common.normalize import normalize_variable_name
-from robotframework_find_unused.common.parse import resolve_variable_name
+from robotframework_find_unused.common.resolve_variables import resolve_variable_name
 from robotframework_find_unused.common.visit import visit_robot_files
 from robotframework_find_unused.visitors.variable_definition import VariableDefinitionVisitor
 
