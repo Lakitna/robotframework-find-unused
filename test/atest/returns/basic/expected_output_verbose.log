@@ -14,7 +14,7 @@ Counting keyword usage...
 [ DONE ] Processed 15 keyword calls
     12 calls to keywords of type CUSTOM_RESOURCE
     3 calls to keywords of type LIBRARY
-[ DONE ] Found 7 unique keywords (keyword definitions and calls)
+[ DONE ] Found 8 unique keywords (keyword definitions and calls)
 [ NOTE ] Excluding downloaded library keywords
 [ NOTE ] Excluding unused keywords
 [ NOTE ] Only showing returning keywords
