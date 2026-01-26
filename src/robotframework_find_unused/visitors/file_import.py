@@ -12,7 +12,7 @@ from robot.api.parsing import (
     VariablesImport,
 )
 
-from robotframework_find_unused.common.const import ERROR_MARKER, FileUseData, VariableValue
+from robotframework_find_unused.common.const import ERROR_MARKER, FileUseData
 from robotframework_find_unused.common.impossible_state_error import ImpossibleStateError
 from robotframework_find_unused.common.normalize import normalize_file_path, normalize_keyword_name
 from robotframework_find_unused.common.resolve_import_string import resolve_import_string
