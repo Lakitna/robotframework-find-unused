@@ -12,9 +12,10 @@ from robot.api.parsing import (
     VariablesImport,
 )
 
-from robotframework_find_unused.common.const import ERROR_MARKER, FileUseData
+from robotframework_find_unused.common.const import ERROR_MARKER, FileUseData, VariableValue
 from robotframework_find_unused.common.impossible_state_error import ImpossibleStateError
 from robotframework_find_unused.common.normalize import normalize_file_path, normalize_keyword_name
+from robotframework_find_unused.common.resolve_variables import resolve_variables
 
 
 class FileImportVisitor(ModelVisitor):
@@ -84,16 +85,12 @@ class FileImportVisitor(ModelVisitor):
         self._register_library_file(node.name)
 
     def _register_library_file(self, import_string: str) -> None:
-        if self.current_working_directory is None:
-            msg = "Found library import outside a .robot or .resource file"
-            raise ImpossibleStateError(msg)
-
         lib_name = import_string
         if not lib_name.endswith(".py"):
             # Limitation: Importing a downloaded lib. We don't care.
             return
 
-        lib_path = self.current_working_directory.joinpath(lib_name)
+        lib_path = self._resolve_import_string(lib_name)
 
         # Limitation: No python module syntax
 
@@ -104,11 +101,7 @@ class FileImportVisitor(ModelVisitor):
         self._register_resource_file(node.name)
 
     def _register_resource_file(self, import_string: str) -> None:
-        if self.current_working_directory is None:
-            msg = "Found resource import outside a .robot or .resource file"
-            raise ImpossibleStateError(msg)
-
-        resource_path = self.current_working_directory.joinpath(import_string)
+        resource_path = self._resolve_import_string(import_string)
         self._register_file_use(resource_path, file_type="RESOURCE")
 
     def visit_VariablesImport(self, node: VariablesImport):  # noqa: N802
@@ -116,11 +109,7 @@ class FileImportVisitor(ModelVisitor):
         self._register_variables_file(node.name)
 
     def _register_variables_file(self, import_string: str) -> None:
-        if self.current_working_directory is None:
-            msg = "Found variables import outside a .robot or .resource file"
-            raise ImpossibleStateError(msg)
-
-        resource_path = self.current_working_directory.joinpath(import_string)
+        resource_path = self._resolve_import_string(import_string)
         self._register_file_use(resource_path, file_type="VARIABLE")
 
     def visit_KeywordCall(self, node: KeywordCall):  # noqa: N802
@@ -179,3 +168,15 @@ class FileImportVisitor(ModelVisitor):
             type={file_type},
             used_by=[self.current_working_file],
         )
+
+    def _resolve_import_string(self, import_str: str) -> Path:
+        if self.current_working_directory is None:
+            msg = "Found import outside a .robot or .resource file"
+            raise ImpossibleStateError(msg)
+
+        variables = {
+            "curdir": VariableValue(normalized_name="curdir", value="."),
+        }
+        (import_str, _) = resolve_variables(import_str, variables)
+
+        return self.current_working_directory.joinpath(import_str)
