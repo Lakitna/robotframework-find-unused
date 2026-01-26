@@ -15,7 +15,7 @@ from robot.api.parsing import (
 from robotframework_find_unused.common.const import ERROR_MARKER, FileUseData, VariableValue
 from robotframework_find_unused.common.impossible_state_error import ImpossibleStateError
 from robotframework_find_unused.common.normalize import normalize_file_path, normalize_keyword_name
-from robotframework_find_unused.common.resolve_variables import resolve_variables
+from robotframework_find_unused.common.resolve_import_string import resolve_import_string
 
 
 class FileImportVisitor(ModelVisitor):
@@ -174,9 +174,4 @@ class FileImportVisitor(ModelVisitor):
             msg = "Found import outside a .robot or .resource file"
             raise ImpossibleStateError(msg)
 
-        variables = {
-            "curdir": VariableValue(normalized_name="curdir", value="."),
-        }
-        (import_str, _) = resolve_variables(import_str, variables)
-
-        return self.current_working_directory.joinpath(import_str)
+        return resolve_import_string(import_str, self.current_working_directory)
