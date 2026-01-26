@@ -3,7 +3,7 @@ Amazing Keyword With Used Return
     RETURN    hello
 
 Beautiful Keyword With Unused Return
-    RETURN    hello
+    Return From Keyword    hello
 
 Cute Keyword Without Return
     No Operation
