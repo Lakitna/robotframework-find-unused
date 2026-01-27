@@ -153,6 +153,15 @@ class KeywordVisitor(ModelVisitor):
             name = name.split(".", 1)[1]
         return name
 
+    def _remove_bdd_prefix_from_name(self, name: str, normalized_name: str) -> str:
+        bdd_prefixes = ["given", "when", "then", "and", "but"]
+
+        for prefix in bdd_prefixes:
+            if normalized_name.startswith(prefix):
+                length = len(prefix)
+                return name[length:].lstrip()
+        return name
+
     def _get_keyword_data(self, name: str) -> KeywordData:
         name = self._remove_lib_from_name(name)
         normalized_name = normalize_keyword_name(name)
@@ -169,6 +178,11 @@ class KeywordVisitor(ModelVisitor):
         if keyword is not None:
             # Matched to a keyword with embedded arguments
             return keyword
+
+        name_without_bdd_prefix = self._remove_bdd_prefix_from_name(name, normalized_name)
+        if name_without_bdd_prefix != name:
+            # It may be BDD syntax. Retry without BDD prefix
+            return self._get_keyword_data(name_without_bdd_prefix)
 
         # Found a previously unused:
         # - non-existing keyword
