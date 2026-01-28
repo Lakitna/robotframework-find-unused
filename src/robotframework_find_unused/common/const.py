@@ -52,17 +52,23 @@ VariableDefinedInType: TypeAlias = Literal["variables_section", "variable_file",
 
 
 @dataclass
-class VariableData:
+class VariableValue:
+    """Data structure for Variable resolution"""
+
+    normalized_name: str
+    value: Iterable[str]
+
+
+@dataclass
+class VariableData(VariableValue):
     """Data structure for Variables"""
 
     name: str
     type: str | None
-    normalized_name: str
     resolved_name: str
     use_count: int
     defined_in_type: VariableDefinedInType
     defined_in: str
-    value: Iterable[str]
 
 
 @dataclass
