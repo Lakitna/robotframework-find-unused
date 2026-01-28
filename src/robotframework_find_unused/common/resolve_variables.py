@@ -4,6 +4,7 @@ from .const import VariableValue
 from .normalize import normalize_variable_name
 from .parse import get_variables_in_string
 
+# Limitation: No localisation
 SUPPORTED_BUILTIN_VARS = {
     "true": "True",
     "false": "False",

@@ -144,6 +144,13 @@ def keywords(  # noqa: PLR0913
 
     \b
         Amazing    ${True}    inner_keyword=Beautiful keyword
+
+    ----------
+
+    Limitation 3: No localisation
+
+    Robot Framework localization is not supported. Any language other than English will produce
+    unexpected results.
     """
     options = KeywordOptions(
         source_path=file_path,
@@ -263,6 +270,13 @@ def variables(
     \b
         person = "Pekka"
         message = "Hello " + person
+
+    ----------
+
+    Limitation 4: No localisation
+
+    Robot Framework localization is not supported. Any language other than English will produce
+    unexpected results.
     """
     options = VariableOptions(
         source_path=file_path,
@@ -374,6 +388,13 @@ def arguments(  # noqa: PLR0913
 
     Note how the script assumes that all arguments after ${inner_keyword} are arguments for
     'Beautiful keyword'.
+
+    ----------
+
+    Limitation 2: No localisation
+
+    Robot Framework localization is not supported. Any language other than English will produce
+    unexpected results.
     """
     options = ArgumentsOptions(
         source_path=file_path,
@@ -472,6 +493,13 @@ def returns(  # noqa: PLR0913
         ${returned_value} =    Run Keyword    Beautiful keyword
 
     This situation can't be counted without knowing what exactly `Run Keyword` does.
+
+    ----------
+
+    Limitation 2: No localisation
+
+    Robot Framework localization is not supported. Any language other than English will produce
+    unexpected results.
     """
     options = ReturnOptions(
         source_path=file_path,
@@ -633,6 +661,13 @@ def files(  # noqa: PLR0913
     \b
         VAR  ${greeting} =    hello
         Import Resource    ${greeting}.resource
+
+    ----------
+
+    Limitation 5: No localisation
+
+    Robot Framework localization is not supported. Any language other than English will produce
+    unexpected results.
     """
     options = FileOptions(
         path_filter_glob=filter,
