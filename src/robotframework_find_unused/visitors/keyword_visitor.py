@@ -73,7 +73,7 @@ class KeywordVisitor(ModelVisitor):
         for lib in self.downloaded_libraries:
             self.normalized_keyword_names.update(lib.keyword_names_normalized)
 
-        # Limitation: No Robot Framework translations/localization
+        # Limitation: No localisation
         language = Language.from_name("English")
         self.bdd_prefixes = {normalize_keyword_name(s) for s in language.bdd_prefixes}
 
@@ -331,6 +331,7 @@ class KeywordVisitor(ModelVisitor):
             # Not a known keyword name
             return False
 
+        # Limitation: No localisation
         if "keyword" in keyword.normalized_name:
             return arg_val
 
@@ -344,6 +345,7 @@ class KeywordVisitor(ModelVisitor):
             return False
 
         arg_name = arg_name.lower()
+        # Limitation: No localisation
         if "keyword" in arg_name:
             return arg_val
 

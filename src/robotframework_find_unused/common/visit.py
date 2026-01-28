@@ -4,6 +4,7 @@ from typing import Literal, TypeAlias
 
 import robot.api.parsing
 
+# Limitation: No localisation
 RobotFileSectionName: TypeAlias = Literal[
     "comments",
     "settings",
@@ -70,6 +71,8 @@ def _get_partial_file_content(file_path: Path, parse_sections: SectionsList) -> 
     for line in raw_file_content:
         if line.startswith("***"):
             cur_section = line.strip("* \n").lower()
+
+            # Limitation: No localisation
             if not cur_section.endswith("s"):
                 # Is an old singular section header. Make plural
                 cur_section += "s"
