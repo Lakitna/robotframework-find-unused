@@ -1,4 +1,6 @@
-from .const import VariableData
+from collections.abc import Mapping
+
+from .const import VariableValue
 from .normalize import normalize_variable_name
 from .parse import get_variables_in_string
 
@@ -13,7 +15,7 @@ SUPPORTED_BUILTIN_VARS = {
 
 def resolve_variables(
     robot_input: str,
-    variables: dict[str, VariableData],
+    variables: Mapping[str, VariableValue],
 ) -> tuple[str, list[str]]:
     """
     Resolve variables in the given string.
@@ -69,7 +71,7 @@ def _get_value_of_builtin_var(normalized_name: str) -> str:
 
 def resolve_variable_name(
     var_name: str,
-    variables: dict[str, VariableData],
+    variables: Mapping[str, VariableValue],
 ) -> tuple[str, list[str]]:
     """
     Resolve variable name.

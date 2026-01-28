@@ -1,2 +1,2 @@
 *** Settings ***
-Resource    ./beta.resource
+Resource    ${CURDIR}/beta.resource

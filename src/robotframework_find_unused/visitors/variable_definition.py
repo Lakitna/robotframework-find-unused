@@ -20,6 +20,7 @@ from robotframework_find_unused.common.const import (
 )
 from robotframework_find_unused.common.impossible_state_error import ImpossibleStateError
 from robotframework_find_unused.common.normalize import normalize_variable_name
+from robotframework_find_unused.common.resolve_import_string import resolve_import_string
 
 
 class VariableDefinitionVisitor(ModelVisitor):
@@ -73,9 +74,9 @@ class VariableDefinitionVisitor(ModelVisitor):
             raise ImpossibleStateError(msg)
 
         import_path = node.name
-        if "/" in import_path or "\\" in import_path:
+        if "/" in import_path or "\\" in import_path or import_path.endswith(".py"):
             # Is a file path. Make it absolute
-            import_path = self.current_working_directory.joinpath(node.name)
+            import_path = resolve_import_string(import_path, self.current_working_directory)
 
         try:
             self._import_variable_file(Path(import_path), node.args)
