@@ -3,6 +3,7 @@ from collections.abc import Iterable
 from dataclasses import dataclass
 from typing import Any, Literal
 
+from robot.api import Language
 from robot.api.parsing import (
     Keyword,
     KeywordCall,
@@ -51,6 +52,8 @@ class KeywordVisitor(ModelVisitor):
     downloaded_libraries: list[LibraryData]
     normalized_keyword_names: set[str]
 
+    bdd_prefixes: set[str]
+
     def __init__(
         self,
         custom_keywords: list[KeywordData],
@@ -69,6 +72,10 @@ class KeywordVisitor(ModelVisitor):
         self.downloaded_libraries = downloaded_library_keywords
         for lib in self.downloaded_libraries:
             self.normalized_keyword_names.update(lib.keyword_names_normalized)
+
+        # Limitation: No Robot Framework translations/localization
+        language = Language.from_name("English")
+        self.bdd_prefixes = {normalize_keyword_name(s) for s in language.bdd_prefixes}
 
     def visit_Keyword(self, node: Keyword):  # noqa: N802
         """Keyword definition"""
@@ -154,9 +161,8 @@ class KeywordVisitor(ModelVisitor):
         return name
 
     def _remove_bdd_prefix_from_name(self, name: str, normalized_name: str) -> str:
-        bdd_prefixes = ["given", "when", "then", "and", "but"]
-
-        for prefix in bdd_prefixes:
+        """Remove BDD prefix from print name"""
+        for prefix in self.bdd_prefixes:
             if normalized_name.startswith(prefix):
                 length = len(prefix)
                 return name[length:].lstrip()
