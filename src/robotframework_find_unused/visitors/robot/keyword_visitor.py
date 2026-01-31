@@ -25,7 +25,7 @@ from robot.running.arguments.argumentmapper import DefaultValue
 
 from robotframework_find_unused.common.const import KeywordData
 from robotframework_find_unused.common.normalize import normalize_keyword_name
-from robotframework_find_unused.visitors.library_import import LibraryData
+from robotframework_find_unused.visitors.robot.library_import import LibraryData
 
 
 @dataclass
@@ -38,13 +38,14 @@ class KeywordCallData:
     args: tuple[str, ...]
 
 
-class KeywordVisitor(ModelVisitor):
+class RobotVisitorKeywords(ModelVisitor):
     """
     A Robot Framework visitor.
 
     Gathers keywords
     Counts keyword usage
     Counts keyword argument usage
+    Counts keyword return usage
     """
 
     keywords: dict[str, KeywordData]

@@ -15,10 +15,10 @@ from robot.api.parsing import (
 from robotframework_find_unused.common.const import ERROR_MARKER, FileUseData
 from robotframework_find_unused.common.impossible_state_error import ImpossibleStateError
 from robotframework_find_unused.common.normalize import normalize_file_path, normalize_keyword_name
-from robotframework_find_unused.common.resolve_import_string import resolve_import_string
+from robotframework_find_unused.resolve.resolve_import_string import resolve_import_string
 
 
-class FileImportVisitor(ModelVisitor):
+class RobotVisitorFileImports(ModelVisitor):
     """
     Gather file imports
     """
