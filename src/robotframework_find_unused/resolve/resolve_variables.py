@@ -1,8 +1,8 @@
 from collections.abc import Mapping
 
-from .const import VariableValue
-from .normalize import normalize_variable_name
-from .parse import get_variables_in_string
+from robotframework_find_unused.common.const import VariableValue
+from robotframework_find_unused.common.normalize import normalize_variable_name
+from robotframework_find_unused.parse.parse_variable import get_variables_in_string
 
 # Limitation: No localisation
 SUPPORTED_BUILTIN_VARS = {
