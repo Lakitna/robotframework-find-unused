@@ -6,9 +6,10 @@ from typing import Any, Literal, cast
 
 from robot.libdocpkg.model import KeywordDoc
 
+from robotframework_find_unused.parse.parse_variable import get_variables_in_string
+
 from .const import KeywordData
 from .normalize import normalize_keyword_name
-from .parse import get_variables_in_string
 
 
 def libdoc_keyword_to_keyword_data(

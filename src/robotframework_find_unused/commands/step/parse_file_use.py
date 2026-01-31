@@ -11,7 +11,7 @@ from robotframework_find_unused.common.const import (
 )
 from robotframework_find_unused.common.normalize import normalize_file_path
 from robotframework_find_unused.common.visit import visit_robot_files
-from robotframework_find_unused.visitors.file_import import FileImportVisitor
+from robotframework_find_unused.visitors.robot.file_import import RobotVisitorFileImports
 
 
 def cli_step_parse_file_use(file_paths: list[Path], *, verbose: int):
@@ -30,7 +30,7 @@ def _count_file_uses(file_paths: list[Path]) -> list[FileUseData]:
     """
     Walk through all robot files to keep track of imports.
     """
-    visitor = FileImportVisitor()
+    visitor = RobotVisitorFileImports()
     visit_robot_files(
         file_paths,
         visitor,

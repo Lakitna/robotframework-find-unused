@@ -10,7 +10,10 @@ from robotframework_find_unused.common.const import (
     WARN_MARKER,
 )
 from robotframework_find_unused.common.visit import visit_robot_files
-from robotframework_find_unused.visitors.library_import import LibraryData, LibraryImportVisitor
+from robotframework_find_unused.visitors.robot.library_import import (
+    LibraryData,
+    RobotVisitorLibraryImports,
+)
 
 
 def cli_step_get_downloaded_lib_keywords(
@@ -28,7 +31,7 @@ def cli_step_get_downloaded_lib_keywords(
 
     robot_file_paths = [p for p in file_paths if p.suffix in (".resource", ".robot")]
 
-    visitor = LibraryImportVisitor(enrich_py_keywords=enrich_py_keywords)
+    visitor = RobotVisitorLibraryImports(enrich_py_keywords=enrich_py_keywords)
     visit_robot_files(robot_file_paths, visitor)
     downloaded_library = list(visitor.downloaded_libraries.values())
 
