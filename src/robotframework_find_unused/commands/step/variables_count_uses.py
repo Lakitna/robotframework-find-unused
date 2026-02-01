@@ -9,7 +9,7 @@ from robotframework_find_unused.common.const import (
     VERBOSE_NO,
     VariableData,
 )
-from robotframework_find_unused.common.visit import visit_robot_files
+from robotframework_find_unused.visitors.robot import visit_robot_files
 from robotframework_find_unused.visitors.robot.variable_count import RobotVisitorVariableUses
 
 

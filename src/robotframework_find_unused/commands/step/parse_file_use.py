@@ -10,7 +10,7 @@ from robotframework_find_unused.common.const import (
     FileUseData,
 )
 from robotframework_find_unused.common.normalize import normalize_file_path
-from robotframework_find_unused.common.visit import visit_robot_files
+from robotframework_find_unused.visitors.robot import visit_robot_files
 from robotframework_find_unused.visitors.robot.file_import import RobotVisitorFileImports
 
 

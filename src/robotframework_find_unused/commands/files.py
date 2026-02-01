@@ -9,13 +9,9 @@ from pathlib import Path
 import click
 
 from robotframework_find_unused.common.cli import cli_hard_exit, pretty_file_path
-from robotframework_find_unused.common.const import (
-    NOTE_MARKER,
-    FileUseData,
-    FilterOption,
-)
-from robotframework_find_unused.common.convert import to_relative_path
+from robotframework_find_unused.common.const import NOTE_MARKER, FileUseData, FilterOption
 from robotframework_find_unused.common.normalize import normalize_file_path
+from robotframework_find_unused.convert.convert_path import to_relative_path
 
 from .step.discover_files import cli_discover_file_paths
 from .step.file_import_filter import cli_filter_file_imports

@@ -10,7 +10,7 @@ from robotframework_find_unused.common.const import (
     KeywordData,
     LibraryData,
 )
-from robotframework_find_unused.common.visit import visit_robot_files
+from robotframework_find_unused.visitors.robot import visit_robot_files
 from robotframework_find_unused.visitors.robot.keyword_visitor import RobotVisitorKeywords
 
 
