@@ -21,7 +21,7 @@ def pretty_kw_name(keyword: KeywordData) -> str:
     return name
 
 
-def pretty_file_path(path: str, file_types: set[FileUseType]) -> str:
+def pretty_file_path(path: str, file_types: set[FileUseType]) -> str:  # noqa: PLR0911
     """
     Format file path for output to the user
     """
