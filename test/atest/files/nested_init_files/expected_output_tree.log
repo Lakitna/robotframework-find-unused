@@ -1,0 +1,22 @@
+Discovering files in `./robot` using Robocop config...
+Parsing file imports...
+[ DONE ] Parsed 6 files
+Building 3 file import trees...
+Printing 3 tree groups...
+
+[[REPOSITORY_ROOT]]/test/atest/files/nested_init_files/robot/some_test.robot
+│  ./__init__.robot
+Tree height: 2 | Tree depth: 1 | Unique files: 2 | Circular imports: 0 | Already imported: 0
+
+[[REPOSITORY_ROOT]]/test/atest/files/nested_init_files/robot/bar/some_test.robot
+│  ../__init__.robot
+│  ./__init__.robot
+Tree height: 3 | Tree depth: 1 | Unique files: 3 | Circular imports: 0 | Already imported: 0
+
+[[REPOSITORY_ROOT]]/test/atest/files/nested_init_files/robot/bar/baz/some_test.robot
+│  ../../__init__.robot
+│  ../__init__.robot
+│  ./__init__.robot
+Tree height: 4 | Tree depth: 1 | Unique files: 4 | Circular imports: 0 | Already imported: 0
+
+Found no unused files
