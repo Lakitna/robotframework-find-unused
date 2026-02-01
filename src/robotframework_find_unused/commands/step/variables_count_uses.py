@@ -9,8 +9,8 @@ from robotframework_find_unused.common.const import (
     VERBOSE_NO,
     VariableData,
 )
-from robotframework_find_unused.common.visit import visit_robot_files
-from robotframework_find_unused.visitors.variable_count import VariableCountVisitor
+from robotframework_find_unused.visitors.robot import visit_robot_files
+from robotframework_find_unused.visitors.robot.variable_count import RobotVisitorVariableUses
 
 
 def cli_count_variable_uses(
@@ -36,7 +36,7 @@ def _count_variable_uses(
     """
     Walk through all robot files to count keyword uses.
     """
-    visitor = VariableCountVisitor(variables)
+    visitor = RobotVisitorVariableUses(variables)
     visit_robot_files(file_paths, visitor)
 
     return list(visitor.variables.values())

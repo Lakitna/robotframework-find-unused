@@ -9,8 +9,8 @@ import click
 
 from robotframework_find_unused.common.cli import pretty_file_path
 from robotframework_find_unused.common.const import FileUseData
-from robotframework_find_unused.common.convert import to_relative_path
 from robotframework_find_unused.common.normalize import normalize_file_path
+from robotframework_find_unused.convert.convert_path import to_relative_path
 
 
 @dataclass

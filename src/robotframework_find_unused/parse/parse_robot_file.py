@@ -15,33 +15,11 @@ RobotFileSectionName: TypeAlias = Literal[
 ]
 
 
-class SectionsList(list[RobotFileSectionName]):
-    """Hashable list for Robot Framework `*** Section ***` names"""
-
-    def __hash__(self) -> int:  # pyright: ignore[reportIncompatibleVariableOverride]  # noqa: D105
-        return hash("|".join(iter(self)))
-
-
-def visit_robot_files(
-    file_paths: list[Path],
-    visitor: robot.api.parsing.ModelVisitor,
-    parse_sections: list[RobotFileSectionName] | Literal["all"] = "all",
-):
-    """
-    Use Robotframework to traverse files with a visitor.
-
-    See Robotframework docs on Visitors for details.
-    """
-    if isinstance(parse_sections, list):
-        parse_sections = SectionsList(parse_sections)
-
-    for file_path in file_paths:
-        model = parse_robot_file(file_path, parse_sections)
-        visitor.visit(model)
-
-
 @cache
-def parse_robot_file(file_path: Path, parse_sections: SectionsList | Literal["all"] = "all"):
+def parse_robot_file(
+    file_path: Path,
+    parse_sections: tuple[RobotFileSectionName, ...] | Literal["all"] = "all",
+):
     """
     Parse a file using the Robot parser.
 
@@ -56,7 +34,10 @@ def parse_robot_file(file_path: Path, parse_sections: SectionsList | Literal["al
     return model
 
 
-def _get_partial_file_content(file_path: Path, parse_sections: SectionsList) -> str:
+def _get_partial_file_content(
+    file_path: Path,
+    parse_sections: tuple[RobotFileSectionName, ...] | Literal["all"],
+) -> str:
     """
     Get partial raw file content.
 

@@ -10,8 +10,8 @@ from robotframework_find_unused.common.const import (
     KeywordData,
     LibraryData,
 )
-from robotframework_find_unused.common.visit import visit_robot_files
-from robotframework_find_unused.visitors.keyword_visitor import KeywordVisitor
+from robotframework_find_unused.visitors.robot import visit_robot_files
+from robotframework_find_unused.visitors.robot.keyword_visitor import RobotVisitorKeywords
 
 
 def cli_count_keyword_uses(
@@ -47,7 +47,7 @@ def _count_keyword_uses(
     """
     Walk through all robot files to count keyword uses.
     """
-    visitor = KeywordVisitor(keywords, downloaded_library_keywords)
+    visitor = RobotVisitorKeywords(keywords, downloaded_library_keywords)
     visit_robot_files(file_paths, visitor)
     return list(visitor.keywords.values())
 

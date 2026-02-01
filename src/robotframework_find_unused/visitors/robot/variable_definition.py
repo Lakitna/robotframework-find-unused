@@ -20,10 +20,10 @@ from robotframework_find_unused.common.const import (
 )
 from robotframework_find_unused.common.impossible_state_error import ImpossibleStateError
 from robotframework_find_unused.common.normalize import normalize_variable_name
-from robotframework_find_unused.common.resolve_import_string import resolve_import_string
+from robotframework_find_unused.resolve.resolve_import_string import resolve_import_string
 
 
-class VariableDefinitionVisitor(ModelVisitor):
+class RobotVisitorVariableDefinitions(ModelVisitor):
     """
     Visit file and discover variable definitions.
     """

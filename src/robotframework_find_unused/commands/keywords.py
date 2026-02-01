@@ -15,7 +15,7 @@ from .step.keyword_count_uses import cli_count_keyword_uses
 from .step.keyword_definitions import cli_step_get_custom_keyword_definitions
 from .step.keyword_filter import cli_filter_keywords
 from .step.lib_keyword_definitions import cli_step_get_downloaded_lib_keywords
-from .step.parse_files import cli_step_parse_files
+from .step.parse_files import cli_step_parse_files_with_libdoc
 
 
 @dataclass
@@ -42,7 +42,7 @@ def cli_keywords(options: KeywordOptions) -> int:
     if len(file_paths) == 0:
         return cli_hard_exit(options.verbose)
 
-    files = cli_step_parse_files(
+    files = cli_step_parse_files_with_libdoc(
         file_paths,
         verbose=options.verbose,
     )

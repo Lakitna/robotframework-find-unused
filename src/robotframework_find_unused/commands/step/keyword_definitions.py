@@ -12,8 +12,10 @@ from robotframework_find_unused.common.const import (
     VERBOSE_SINGLE,
     KeywordData,
 )
-from robotframework_find_unused.common.convert import libdoc_keyword_to_keyword_data
-from robotframework_find_unused.common.enrich_python_keywords import enrich_python_keyword_data
+from robotframework_find_unused.convert.convert_keyword import libdoc_keyword_to_keyword_data
+from robotframework_find_unused.resolve.resolve_python_keyword_data import (
+    enrich_python_keyword_data,
+)
 
 
 def cli_step_get_custom_keyword_definitions(

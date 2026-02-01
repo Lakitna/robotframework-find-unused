@@ -11,9 +11,11 @@ from robotframework_find_unused.common.const import (
     VariableData,
 )
 from robotframework_find_unused.common.normalize import normalize_variable_name
-from robotframework_find_unused.common.resolve_variables import resolve_variable_name
-from robotframework_find_unused.common.visit import visit_robot_files
-from robotframework_find_unused.visitors.variable_definition import VariableDefinitionVisitor
+from robotframework_find_unused.resolve.resolve_variables import resolve_variable_name
+from robotframework_find_unused.visitors.robot import visit_robot_files
+from robotframework_find_unused.visitors.robot.variable_definition import (
+    RobotVisitorVariableDefinitions,
+)
 
 
 def cli_get_variable_definitions(
@@ -35,7 +37,7 @@ def _get_variable_definitions(file_paths: list[Path]) -> dict[str, VariableData]
     """
     Walk through all robot files to discover non-local variable definitions.
     """
-    visitor = VariableDefinitionVisitor()
+    visitor = RobotVisitorVariableDefinitions()
     visit_robot_files(file_paths, visitor)
 
     return _resolve_vars_in_var_name(visitor.variables)

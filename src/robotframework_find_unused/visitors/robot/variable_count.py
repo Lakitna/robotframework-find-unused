@@ -13,14 +13,14 @@ from robot.api.parsing import (
 
 from robotframework_find_unused.common.const import VariableData
 from robotframework_find_unused.common.normalize import normalize_variable_name
-from robotframework_find_unused.common.parse import get_variables_in_string
-from robotframework_find_unused.common.resolve_variables import (
+from robotframework_find_unused.parse.parse_variable import get_variables_in_string
+from robotframework_find_unused.resolve.resolve_variables import (
     SUPPORTED_BUILTIN_VARS,
     resolve_variable_name,
 )
 
 
-class VariableCountVisitor(ModelVisitor):
+class RobotVisitorVariableUses(ModelVisitor):
     """
     Visit file and count variable usage.
     """

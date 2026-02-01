@@ -1,6 +1,7 @@
 from pathlib import Path
 
-from .const import VariableValue
+from robotframework_find_unused.common.const import VariableValue
+
 from .resolve_variables import resolve_variables
 
 

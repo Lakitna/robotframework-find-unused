@@ -7,12 +7,14 @@ from robot.libdoc import LibraryDocumentation
 from robot.libdocpkg.model import KeywordDoc, LibraryDoc
 
 from robotframework_find_unused.common.const import ERROR_MARKER, LibraryData
-from robotframework_find_unused.common.convert import libdoc_keyword_to_keyword_data
-from robotframework_find_unused.common.enrich_python_keywords import enrich_python_keyword_data
 from robotframework_find_unused.common.normalize import normalize_library_name
+from robotframework_find_unused.convert.convert_keyword import libdoc_keyword_to_keyword_data
+from robotframework_find_unused.resolve.resolve_python_keyword_data import (
+    enrich_python_keyword_data,
+)
 
 
-class LibraryImportVisitor(ModelVisitor):
+class RobotVisitorLibraryImports(ModelVisitor):
     """
     Gather downloaded library imports
     """

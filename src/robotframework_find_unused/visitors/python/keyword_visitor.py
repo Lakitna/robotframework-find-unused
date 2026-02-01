@@ -6,7 +6,7 @@ from robotframework_find_unused.common.impossible_state_error import ImpossibleS
 
 
 class EnrichedKeywordDoc:
-    """Wrap Libdocs KeywordDoc to add more data points."""
+    """Wrap Libdocs KeywordDoc to add more data."""
 
     returns: bool | None = None
 
