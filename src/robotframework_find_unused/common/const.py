@@ -83,6 +83,7 @@ class LibraryData:
 
 FileUseType: TypeAlias = Literal[
     "SUITE",
+    "SUITE_INIT",
     "RESOURCE",
     "LIBRARY",
     "VARIABLE",

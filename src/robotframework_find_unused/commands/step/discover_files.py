@@ -31,6 +31,12 @@ def cli_discover_file_paths(input_path: str, *, verbose: int) -> list[Path]:
 
     file_paths = [path[0] for path in robocop_config.paths]
     sorted_file_paths = sorted(file_paths, key=lambda f: f)
+    sorted_file_paths = sorted(
+        sorted_file_paths,
+        key=lambda p: len(p.parts)
+        # __init__ files should always be before the files they apply to
+        + (-0.5 if p.stem == "__init__" else 0),
+    )
 
     _log_file_stats(sorted_file_paths, input_path, verbose)
     return sorted_file_paths

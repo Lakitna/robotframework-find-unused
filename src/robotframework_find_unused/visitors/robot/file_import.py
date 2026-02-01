@@ -23,12 +23,16 @@ class RobotVisitorFileImports(ModelVisitor):
     Gather file imports
     """
 
+    root_directory: Path
     files: dict[str, FileUseData]
+    init_files: dict[Path, FileUseData]
     current_working_file: FileUseData | None = None
     current_working_directory: Path | None = None
 
-    def __init__(self) -> None:
+    def __init__(self, root_directory: Path) -> None:
+        self.root_directory = root_directory.absolute()
         self.files = {}
+        self.init_files = {}
         super().__init__()
 
     def visit_File(self, node: File):  # noqa: N802
@@ -48,21 +52,60 @@ class RobotVisitorFileImports(ModelVisitor):
             # Already found as import
             self.current_working_file = self.files[current_file_path_normalized]
         else:
-            self.current_working_file = FileUseData(
-                normalize_file_path(current_working_file),
-                path_absolute=current_working_file,
-                type={file_type},
-                used_by=[],
+            self.current_working_file = self._register_file(
+                current_file_path_normalized,
+                file_type,
+                current_working_file,
             )
-            self.files[current_file_path_normalized] = self.current_working_file
 
         return self.generic_visit(node)
+
+    def _register_file(
+        self,
+        current_file_path_normalized: str,
+        file_type: Literal["SUITE", "SUITE_INIT", "RESOURCE"],
+        current_working_file: Path,
+    ) -> FileUseData:
+        """Register a file"""
+        file = FileUseData(
+            id=current_file_path_normalized,
+            path_absolute=current_working_file,
+            type={file_type},
+            used_by=[],
+        )
+
+        if file_type == "SUITE_INIT":
+            self.init_files[current_working_file.parent] = file
+
+            # Assumption: Due to file path sorting, `__init__` is always processed before any suite
+            # file it applies to.
+
+        if file_type == "SUITE":
+            self._register_use_of_suite_init(file)
+
+        self.files[current_file_path_normalized] = file
+        return file
+
+    def _register_use_of_suite_init(self, file: FileUseData) -> None:
+        """Register use of suite __init__ files"""
+        root_dir_parts_len = len(self.root_directory.parts)
+
+        path = file.path_absolute
+        while len(path.parts) >= root_dir_parts_len:
+            path = path.parent
+            init_file = self.init_files.get(path, None)
+
+            if init_file:
+                init_file.used_by.append(file)
 
     def _get_file_type(
         self,
         file_node: File,
         file_path: Path,
-    ) -> Literal["SUITE", "RESOURCE"] | None:
+    ) -> Literal["SUITE", "SUITE_INIT", "RESOURCE"] | None:
+        if file_path.stem == "__init__":
+            return "SUITE_INIT"
+
         file_extension = file_path.suffix.lstrip(".").lower()
 
         if file_extension == "robot":

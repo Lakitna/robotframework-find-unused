@@ -46,7 +46,11 @@ def cli_files(options: FileOptions):
     if len(file_paths) == 0:
         return cli_hard_exit(options.verbose)
 
-    files = cli_step_parse_file_use(file_paths, verbose=options.verbose)
+    files = cli_step_parse_file_use(
+        file_paths,
+        Path(options.source_path),
+        verbose=options.verbose,
+    )
 
     if options.show_tree:
         _cli_print_grouped_file_trees(files, options)

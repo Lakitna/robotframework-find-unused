@@ -36,6 +36,8 @@ def pretty_file_path(path: str, file_types: set[FileUseType]) -> str:
         return click.style(path, fg="bright_cyan")
     if file_type == "SUITE":
         return path
+    if file_type == "SUITE_INIT":
+        return path
     if file_type == "LIBRARY":
         return click.style(path, fg="bright_magenta")
     if file_type == "VARIABLE":

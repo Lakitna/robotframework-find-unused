@@ -14,23 +14,23 @@ from robotframework_find_unused.visitors.robot import visit_robot_files
 from robotframework_find_unused.visitors.robot.file_import import RobotVisitorFileImports
 
 
-def cli_step_parse_file_use(file_paths: list[Path], *, verbose: int):
+def cli_step_parse_file_use(file_paths: list[Path], source_path: Path, *, verbose: int):
     """
     Parse files and keep the user up-to-date on progress
     """
     click.echo("Parsing file imports...")
 
-    files = _count_file_uses(file_paths)
+    files = _count_file_uses(file_paths, source_path)
 
     _log_file_stats(files, verbose)
     return files
 
 
-def _count_file_uses(file_paths: list[Path]) -> list[FileUseData]:
+def _count_file_uses(file_paths: list[Path], source_path: Path) -> list[FileUseData]:
     """
     Walk through all robot files to keep track of imports.
     """
-    visitor = RobotVisitorFileImports()
+    visitor = RobotVisitorFileImports(source_path)
     visit_robot_files(
         file_paths,
         visitor,
