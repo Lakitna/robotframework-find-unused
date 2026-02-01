@@ -1,15 +1,11 @@
-import functools
-import os
 import re
-from pathlib import Path
 from typing import Any, Literal, cast
 
 from robot.libdocpkg.model import KeywordDoc
 
+from robotframework_find_unused.common.const import KeywordData
+from robotframework_find_unused.common.normalize import normalize_keyword_name
 from robotframework_find_unused.parse.parse_variable import get_variables_in_string
-
-from .const import KeywordData
-from .normalize import normalize_keyword_name
 
 
 def libdoc_keyword_to_keyword_data(
@@ -72,17 +68,3 @@ def get_keyword_name_match_pattern(name_parts: list[str]) -> re.Pattern:
             pattern += re.escape(part)
     pattern += "$"
     return re.compile(pattern)
-
-
-@functools.cache
-def to_relative_path(parent: Path, child: Path) -> str:
-    """
-    Get relative file path from parent to child. Output suitable for user output.
-    """
-    rel_path = os.path.relpath(child.resolve(), parent.resolve())
-    rel_path = Path(rel_path).as_posix()
-
-    if not rel_path.startswith("."):
-        rel_path = f"./{rel_path}"
-
-    return rel_path
