@@ -88,10 +88,13 @@ class RobotVisitorFileImports(ModelVisitor):
 
     def _register_use_of_suite_init(self, file: FileUseData) -> None:
         """Register use of suite __init__ files"""
+        if len(self.init_files) == 0:
+            return
+
         root_dir_parts_len = len(self.root_directory.parts)
 
         path = file.path_absolute
-        while len(path.parts) >= root_dir_parts_len:
+        while len(path.parts) > root_dir_parts_len:
             path = path.parent
             init_file = self.init_files.get(path, None)
 
