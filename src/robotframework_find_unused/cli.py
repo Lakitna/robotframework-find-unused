@@ -8,7 +8,8 @@ import sys
 
 import click
 
-from .commands import (
+from robotframework_find_unused.__version__ import __version__
+from robotframework_find_unused.commands import (
     ArgumentsOptions,
     FileOptions,
     KeywordOptions,
@@ -20,7 +21,7 @@ from .commands import (
     cli_returns,
     cli_variables,
 )
-from .common.const import FilterOption
+from robotframework_find_unused.common.const import FilterOption
 
 click_choice_filter_option = click.Choice(
     ["include", "exclude", "only"],
@@ -33,6 +34,7 @@ click_choice_filter_option = click.Choice(
         "help_option_names": ["-h", "--help"],
     },
 )
+@click.version_option(__version__, message="v%(version)s")
 def cli():
     """
     Find unused parts of your Robot Framework project.

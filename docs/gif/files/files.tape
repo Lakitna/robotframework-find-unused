@@ -8,14 +8,7 @@ Set Padding 20
 Set Margin 0
 Set CursorBlink false
 
-Hide
-    Type "pip install -r requirements.txt --editable /app"
-    Enter
-    Wait
-
-    Type "clear"
-    Enter
-Show
+Require robotunused
 
 Type "robotunused files"
 Sleep 200ms

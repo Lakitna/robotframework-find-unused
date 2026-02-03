@@ -26,6 +26,7 @@ dev = [
     "pytest-xdist (>=3.8.0,<4.0.0)",
     "pyyaml (>=6.0.3,<7.0.0)",
     "packaging>=25.0",
+    "invoke>=2.2.1",
 ]
 
 [project.urls]
@@ -42,7 +43,7 @@ build-backend = "uv_build"
 [tool.pytest.ini_options]
 addopts = ["--import-mode=importlib"]
 norecursedirs = ['robot', 'src', 'test/projects']
-python_files = '*.py'
+python_files = ['test/**/*.py']
 
 [tool.ruff]
 line-length = 100
@@ -86,3 +87,4 @@ ignore = [
 "find_unused/cli.py" = ["PLR0913", "FBT001", "D213", "D301"]
 "test/atest/**" = ['D101', 'D102', 'INP001']
 "test/utest/**" = ['D101', 'D102', 'INP001']
+"./tasks.py" = ['T201', 'D103']
