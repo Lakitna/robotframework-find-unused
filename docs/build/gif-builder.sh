@@ -9,6 +9,10 @@ set -e
 
 cd /app/test/projects/tilavarauspalvelu-robot
 
+echo "Installing demo project dependencies..."
+pip install --quiet -r requirements.txt
+echo "DONE"
+
 vhs /app/docs/gif/arguments/arguments.tape
 vhs /app/docs/gif/files/files.tape
 vhs /app/docs/gif/keywords/keywords.tape

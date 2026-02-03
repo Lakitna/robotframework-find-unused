@@ -58,7 +58,37 @@ def build_source(c: Context):
 
 @task
 def build_gifs(c: Context):
-    c.run("powershell ./docs/build/build-gifs.ps1")
+    update_submodules(c)
+
+    c.run(
+        " ".join(
+            (
+                "docker build",
+                f"-f {Path('./docs/build/gif-builder.dockerfile').absolute().as_posix()}",
+                "-t vhs-robotunused",
+                ".",
+            ),
+        ),
+    )
+    c.run(
+        " ".join(
+            (
+                "docker run",
+                "-i",
+                "--rm",
+                f"-v {Path().absolute().as_posix()}:/app",
+                "vhs-robotunused",
+                "/app/docs/build/gif-builder.sh",
+            ),
+        ),
+    )
+
+
+@task
+def update_submodules(c: Context):
+    print("Updating submodules")
+    c.run("git submodule update --init --recursive")
+    c.run("git submodule status")
 
 
 ##########
@@ -82,6 +112,7 @@ ns = Collection(
     set_version,
     set_version_pyproject,
     set_version_python,
+    update_submodules,
     lint,
     test,
 )

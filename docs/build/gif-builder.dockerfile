@@ -24,7 +24,6 @@ RUN pip install --upgrade pip
 
 # Install project
 RUN pip install .
-
 # Hard fail if install was unsuccesful
 RUN robotunused --help >/dev/null
 
