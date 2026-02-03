@@ -1,0 +1,23 @@
+Discovering files in `./robot` using Robocop config...
+Parsing files with LibDoc...
+[ DONE ] Parsed 2 files
+Gathering custom keyword definitions...
+[ DONE ] Found 2 custom keyword definitions
+Gathering downloaded library keyword definitions...
+[ DONE ] Found 1 downloaded libraries
+Counting keyword usage...
+[ DONE ] Processed 5 keyword calls
+[ NOTE ] Excluding downloaded library keywords
+[ NOTE ] Excluding unused keywords
+
+Settings Template.Settings Template Keyword
+    use_count	argument
+    5		var
+    2		used_optional_var=${True}
+    0		unused_optional_var=${True}
+
+Test Template.Test Template Keyword
+    use_count	argument
+    5		var
+    2		used_optional_var=${True}
+    0		unused_optional_var=${True}

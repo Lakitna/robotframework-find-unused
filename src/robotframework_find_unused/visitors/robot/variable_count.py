@@ -7,6 +7,7 @@ from robot.api.parsing import (
     If,
     KeywordCall,
     ModelVisitor,
+    TemplateArguments,
     Variable,
     VariableSection,
 )
@@ -71,6 +72,14 @@ class RobotVisitorVariableUses(ModelVisitor):
             self._count_used_vars_in_eval(node.args[0])
         else:
             self._count_used_vars_in_args(node.args)
+
+        return self.generic_visit(node)
+
+    def visit_TemplateArguments(self, node: TemplateArguments):  # noqa: N802
+        """
+        Look for used variables in templated tests.
+        """
+        self._count_used_vars_in_args(node.args)
 
         return self.generic_visit(node)
 
