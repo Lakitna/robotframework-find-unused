@@ -54,7 +54,7 @@ class RobotVisitorKeywords(ModelVisitor):
     keywords_with_embedded_args: list[KeywordData]
     downloaded_libraries: list[LibraryData]
     normalized_keyword_names: set[str]
-    file_template_keyword: str | None
+    suite_template_keyword: str | None
 
     bdd_prefixes: set[str]
 
@@ -66,7 +66,7 @@ class RobotVisitorKeywords(ModelVisitor):
         self.normalized_keyword_names = set()
         self.keywords = {}
         self.keywords_with_embedded_args = []
-        self.file_template_keyword = None
+        self.suite_template_keyword = None
 
         for kw in custom_keywords:
             self.keywords[kw.normalized_name] = kw
@@ -84,7 +84,7 @@ class RobotVisitorKeywords(ModelVisitor):
 
     def visit_File(self, node: File):  # noqa: N802
         """Visit new file"""
-        self.file_template_keyword = None
+        self.suite_template_keyword = None
 
         return self.generic_visit(node)
 
@@ -148,9 +148,9 @@ class RobotVisitorKeywords(ModelVisitor):
     def visit_TestTemplate(self, node: TestTemplate):  # noqa: N802
         """Count keyword use in test template setting"""
         if node.value:
-            self.file_template_keyword = node.value
+            self.suite_template_keyword = node.value
             self._count_keyword_call(
-                self.file_template_keyword,
+                self.suite_template_keyword,
                 # Arguments are not allowed here
                 args=(),
                 count_call_arguments=False,
@@ -180,10 +180,10 @@ class RobotVisitorKeywords(ModelVisitor):
             )
             for args in template_args_set:
                 self._count_keyword_call(test_template_keyword, args, count_keyword=False)
-        elif self.file_template_keyword is not None:
+        elif self.suite_template_keyword is not None:
             # There is a Template defined in *** settings ***
             for args in template_args_set:
-                self._count_keyword_call(self.file_template_keyword, args, count_keyword=False)
+                self._count_keyword_call(self.suite_template_keyword, args, count_keyword=False)
 
         return self.generic_visit(node)
 
