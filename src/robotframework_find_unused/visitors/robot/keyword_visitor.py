@@ -145,16 +145,21 @@ class RobotVisitorKeywords(ModelVisitor):
         """Count keyword use in suite teardown"""
         self._count_keyword_call(node.name, node.args)
 
+        return self.generic_visit(node)
+
     def visit_TestTemplate(self, node: TestTemplate):  # noqa: N802
         """Count keyword use in test template setting"""
-        if node.value:
-            self.suite_template_keyword = node.value
-            self._count_keyword_call(
-                self.suite_template_keyword,
-                # Arguments are not allowed here
-                args=(),
-                count_call_arguments=False,
-            )
+        if not node.value:
+            return self.generic_visit(node)
+
+        self.suite_template_keyword = node.value
+        self._count_keyword_call(
+            self.suite_template_keyword,
+            # Arguments are not allowed here
+            args=(),
+            count_call_arguments=False,
+        )
+        return self.generic_visit(node)
 
     def visit_TestCase(self, node: TestCase):  # noqa: N802
         """Count templated test cases"""
