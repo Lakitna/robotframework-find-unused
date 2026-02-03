@@ -5,6 +5,7 @@ from typing import Any, Literal
 
 from robot.api import Language
 from robot.api.parsing import (
+    File,
     Keyword,
     KeywordCall,
     ModelVisitor,
@@ -17,6 +18,7 @@ from robot.api.parsing import (
     TestCase,
     TestSetup,
     TestTeardown,
+    TestTemplate,
     Token,
 )
 from robot.libdocpkg.model import ArgumentSpec
@@ -52,6 +54,7 @@ class RobotVisitorKeywords(ModelVisitor):
     keywords_with_embedded_args: list[KeywordData]
     downloaded_libraries: list[LibraryData]
     normalized_keyword_names: set[str]
+    template_keyword: str | None
 
     bdd_prefixes: set[str]
 
@@ -63,6 +66,7 @@ class RobotVisitorKeywords(ModelVisitor):
         self.normalized_keyword_names = set()
         self.keywords = {}
         self.keywords_with_embedded_args = []
+        self.template_keyword = None
 
         for kw in custom_keywords:
             self.keywords[kw.normalized_name] = kw
@@ -77,6 +81,12 @@ class RobotVisitorKeywords(ModelVisitor):
         # Limitation: No localisation
         language = Language.from_name("English")
         self.bdd_prefixes = {normalize_keyword_name(s) for s in language.bdd_prefixes}
+
+    def visit_File(self, node: File):  # noqa: N802
+        """Visit new file"""
+        self.template_keyword = None
+
+        return self.generic_visit(node)
 
     def visit_Keyword(self, node: Keyword):  # noqa: N802
         """Keyword definition"""
@@ -135,13 +145,20 @@ class RobotVisitorKeywords(ModelVisitor):
         """Count keyword use in suite teardown"""
         self._count_keyword_call(node.name, node.args)
 
+    def visit_TestTemplate(self, node: TestTemplate):  # noqa: N802
+        """Count keyword use in test template setting"""
+        if node.value:
+            # Arguments are counted in the testcase instead
+            self._count_keyword_call(node.value, (), count_call_arguments=False)
+            self.template_keyword = node.value
+
     def visit_TestCase(self, node: TestCase):  # noqa: N802
         """Count templated test cases"""
-        template_keyword = None
+        test_template_keyword = None
         template_args_set = []
         for child in node.body:
             if isinstance(child, Template):
-                template_keyword = str(child.get_token(Token.NAME))
+                test_template_keyword = str(child.get_token(Token.NAME))
                 continue
             if isinstance(child, TemplateArguments):
                 args = child.get_tokens(Token.ARGUMENT)
@@ -149,10 +166,13 @@ class RobotVisitorKeywords(ModelVisitor):
                 template_args_set.append(args)
                 continue
 
-        if template_keyword is not None:
-            self._count_keyword_call(template_keyword, ())
+        if test_template_keyword is not None:
+            self._count_keyword_call(test_template_keyword, (), count_call_arguments=False)
             for args in template_args_set:
-                self._count_keyword_call(template_keyword, args, count_keyword=False)
+                self._count_keyword_call(test_template_keyword, args, count_keyword=False)
+        elif self.template_keyword is not None:
+            for args in template_args_set:
+                self._count_keyword_call(self.template_keyword, args, count_keyword=False)
 
         return self.generic_visit(node)
 
@@ -257,6 +277,7 @@ class RobotVisitorKeywords(ModelVisitor):
         *,
         return_value_assigned: bool = False,
         count_keyword: bool = True,
+        count_call_arguments: bool = True,
     ) -> None:
         """
         Count the keyword.
@@ -274,7 +295,8 @@ class RobotVisitorKeywords(ModelVisitor):
         for inner in inner_keywords:
             self._count_keyword_call(inner.keyword, inner.args)
 
-        self._count_keyword_call_args(keyword, args)
+        if count_call_arguments:
+            self._count_keyword_call_args(keyword, args)
 
     def _get_keyword_reference_in_argument(
         self,
