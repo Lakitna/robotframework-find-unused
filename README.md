@@ -221,5 +221,5 @@ Made for Windows. Requires Docker and Powershell.
 To generate new gifs, use the following command:
 
 ```shell
-powershell docs/build/build-gifs.ps1
+uv run invoke build-gifs
 ```
