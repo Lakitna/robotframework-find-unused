@@ -212,14 +212,18 @@ To run all tests, use the following command:
 uv run pytest -n auto
 ```
 
-### Generate gifs
+### Tasks
 
-The gifs that are part of the documentation are automatically generated.
+To manage various things, we use Invoke as a task runner.
 
-Made for Windows. Requires Docker and Powershell.
-
-To generate new gifs, use the following command:
+To get a full list of available tasks, run:
 
 ```shell
-uv run invoke build-gifs
+uv run invoke --list
+```
+
+To run a task, run:
+
+```shell
+uv run invoke build
 ```
