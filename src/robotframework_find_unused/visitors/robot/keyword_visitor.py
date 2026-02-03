@@ -157,7 +157,7 @@ class RobotVisitorKeywords(ModelVisitor):
             self.suite_template_keyword,
             # Arguments are not allowed here
             args=(),
-            count_call_arguments=False,
+            count_arguments=False,
         )
         return self.generic_visit(node)
 
@@ -181,7 +181,7 @@ class RobotVisitorKeywords(ModelVisitor):
                 test_template_keyword,
                 # Arguments are not allowed here
                 (),
-                count_call_arguments=False,
+                count_arguments=False,
             )
             for args in template_args_set:
                 self._count_keyword_call(test_template_keyword, args, count_keyword=False)
@@ -293,7 +293,7 @@ class RobotVisitorKeywords(ModelVisitor):
         *,
         return_value_assigned: bool = False,
         count_keyword: bool = True,
-        count_call_arguments: bool = True,
+        count_arguments: bool = True,
     ) -> None:
         """
         Count the keyword.
@@ -311,7 +311,7 @@ class RobotVisitorKeywords(ModelVisitor):
         for inner in inner_keywords:
             self._count_keyword_call(inner.keyword, inner.args)
 
-        if count_call_arguments:
+        if count_arguments:
             self._count_keyword_call_args(keyword, args)
 
     def _get_keyword_reference_in_argument(
