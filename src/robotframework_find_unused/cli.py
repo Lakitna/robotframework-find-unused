@@ -8,6 +8,7 @@ import sys
 
 import click
 
+from robotframework_find_unused.__version__ import __version__
 from robotframework_find_unused.commands import (
     ArgumentsOptions,
     FileOptions,
@@ -21,8 +22,6 @@ from robotframework_find_unused.commands import (
     cli_variables,
 )
 from robotframework_find_unused.common.const import FilterOption
-
-__version__ = "0.6.0"
 
 click_choice_filter_option = click.Choice(
     ["include", "exclude", "only"],
