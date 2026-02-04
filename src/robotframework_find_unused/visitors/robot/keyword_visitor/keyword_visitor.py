@@ -1,9 +1,7 @@
-import functools
-from collections.abc import Generator, Iterable
+from collections.abc import Iterable
 from dataclasses import dataclass
 from typing import Any, Literal
 
-from robot.api import Language
 from robot.api.parsing import (
     File,
     Keyword,
@@ -29,6 +27,8 @@ from robotframework_find_unused.common.const import KeywordData
 from robotframework_find_unused.common.normalize import normalize_keyword_name
 from robotframework_find_unused.visitors.robot.library_import import LibraryData
 
+from .keyword_definition_manager import KeywordDefinitionManager
+
 
 @dataclass
 class KeywordCallData:
@@ -50,37 +50,18 @@ class RobotVisitorKeywords(ModelVisitor):
     Counts keyword return usage
     """
 
-    keywords: dict[str, KeywordData]
-    keywords_with_embedded_args: list[KeywordData]
-    downloaded_libraries: list[LibraryData]
-    normalized_keyword_names: set[str]
-    suite_template_keyword: str | None
-
-    bdd_prefixes: set[str]
+    kw_matcher: KeywordDefinitionManager
 
     def __init__(
         self,
         custom_keywords: list[KeywordData],
         downloaded_library_keywords: list[LibraryData],
     ) -> None:
-        self.normalized_keyword_names = set()
-        self.keywords = {}
-        self.keywords_with_embedded_args = []
-        self.suite_template_keyword = None
+        self.kw_matcher = KeywordDefinitionManager(custom_keywords, downloaded_library_keywords)
 
-        for kw in custom_keywords:
-            self.keywords[kw.normalized_name] = kw
-            self.normalized_keyword_names.add(kw.normalized_name)
-            if len(kw.name_parts) > 1 and kw.name_match_pattern is not None:
-                self.keywords_with_embedded_args.append(kw)
-
-        self.downloaded_libraries = downloaded_library_keywords
-        for lib in self.downloaded_libraries:
-            self.normalized_keyword_names.update(lib.keyword_names_normalized)
-
-        # Limitation: No localisation
-        language = Language.from_name("English")
-        self.bdd_prefixes = {normalize_keyword_name(s) for s in language.bdd_prefixes}
+    @property
+    def keywords(self):  # noqa: D102
+        return self.kw_matcher.keywords
 
     def visit_File(self, node: File):  # noqa: N802
         """Visit new file"""
@@ -90,7 +71,7 @@ class RobotVisitorKeywords(ModelVisitor):
 
     def visit_Keyword(self, node: Keyword):  # noqa: N802
         """Keyword definition"""
-        keyword = self._get_keyword_data(node.name)
+        keyword = self.kw_matcher.get_keyword_definition(node.name)
         keyword.returns = self._get_keyword_returns(node)
 
         return self.generic_visit(node)
@@ -192,119 +173,6 @@ class RobotVisitorKeywords(ModelVisitor):
 
         return self.generic_visit(node)
 
-    def _remove_lib_from_name(self, name: str) -> str:
-        """Remove Library prefix from keyword name"""
-        if "." in name:
-            return name.split(".", maxsplit=1)[1]
-        return name
-
-    def _remove_bdd_prefix_from_name(self, name: str, normalized_name: str) -> str:
-        """Remove BDD prefix from keyword name"""
-        for prefix in self.bdd_prefixes:
-            if normalized_name.startswith(prefix):
-                length = len(prefix)
-                return name[length:].lstrip()
-        return name
-
-    def _get_keyword_match_options(self, name: str) -> Generator[tuple[str, str]]:
-        # Unchanged
-        name_unchanged = name
-        normalized_name_unchanged = normalize_keyword_name(name)
-        yield (name, normalized_name_unchanged)
-
-        # Without BDD prefix
-        name_without_bdd = self._remove_bdd_prefix_from_name(
-            name_unchanged,
-            normalized_name_unchanged,
-        )
-        if name_without_bdd != name_unchanged:
-            yield (
-                name_without_bdd,
-                normalize_keyword_name(name_without_bdd),
-            )
-
-        # Without BDD and library prefix
-        name_without_lib = self._remove_lib_from_name(name_without_bdd)
-        if name_without_lib != name_without_bdd:
-            yield (
-                name_without_lib,
-                normalize_keyword_name(name_without_lib),
-            )
-
-    def _get_keyword_data(self, keyword_name: str) -> KeywordData:
-        for name, normalized_name in self._get_keyword_match_options(keyword_name):
-            if normalized_name in self.keywords:
-                # Matched to a keyword (without embedded args)
-                return self.keywords[normalized_name]
-
-            if normalized_name in self.normalized_keyword_names:
-                # Matched to a previously unused downloaded library keyword
-                return self._register_downloaded_library_keyword(name, normalized_name)
-
-            keyword = self._find_keyword_with_embedded_args(normalized_name)
-            if keyword is not None:
-                # Matched to a keyword with embedded arguments
-                return keyword
-
-        # Found a previously unused:
-        # - non-existing keyword
-        # - out-of-scope keyword
-        return self._register_unknown_keyword(keyword_name, normalize_keyword_name(keyword_name))
-
-    def _find_keyword_with_embedded_args(self, normalized_name: str) -> KeywordData | None:
-        matches = self._find_keyword_with_embedded_args_matches(normalized_name)
-
-        if len(matches) == 0:
-            return None
-        if len(matches) == 1:
-            return matches[0]
-
-        def match_sorter(a: KeywordData, b: KeywordData) -> int:
-            # Using same logic as in `robot/running/namespace.py`:
-            # "Embedded match is considered better than another if the other matches
-            # it, but it doesn't match the other."
-            if self._keyword_call_matches_keyword_definition(
-                a.normalized_name,
-                b,
-            ) and not self._keyword_call_matches_keyword_definition(
-                b.normalized_name,
-                a,
-            ):
-                return -1
-            return 1
-
-        match_order = sorted(matches, key=functools.cmp_to_key(match_sorter))
-        return match_order[0]
-
-    def _find_keyword_with_embedded_args_matches(self, normalized_name: str) -> list[KeywordData]:
-        """
-        Find matching keyword definitions for the keyword name.
-        """
-        # Fast, inconclusive pre-selection
-        candidates = list(
-            filter(
-                lambda kw: kw.name_parts[0] == "__VARIABLE__"
-                or normalized_name.startswith(kw.name_parts[0]),
-                self.keywords_with_embedded_args,
-            ),
-        )
-        if len(candidates) == 0:
-            return []
-
-        # Slow, conclusive selection
-        matches: list[KeywordData] = []
-        for kw in candidates:
-            if self._keyword_call_matches_keyword_definition(normalized_name, kw):
-                matches.append(kw)
-        return matches
-
-    def _keyword_call_matches_keyword_definition(self, call: str, definition: KeywordData) -> bool:
-        if definition.name_match_pattern is None:
-            msg = "Attempted to match keyword call to keyword definition without name match pattern"
-            raise ValueError(msg)
-
-        return definition.name_match_pattern.fullmatch(call) is not None
-
     def _count_keyword_call(
         self,
         name: str,
@@ -319,7 +187,7 @@ class RobotVisitorKeywords(ModelVisitor):
 
         For keywords that take other keywords as arguments: Recursively handle inner keyword.
         """
-        keyword = self._get_keyword_data(name)
+        keyword = self.kw_matcher.get_keyword_definition(name)
         if count_keyword:
             keyword.use_count += 1
 
@@ -384,8 +252,8 @@ class RobotVisitorKeywords(ModelVisitor):
             # Remove library prefix
             arg_val = arg_val.split(".", 1)[1]
 
-        normalized_name = normalize_keyword_name(arg_val)
-        if normalized_name not in self.normalized_keyword_names:
+        keyword_definition = self.kw_matcher.search_keyword_definition(arg_val)
+        if not keyword_definition:
             # Not a known keyword name
             return False
 
@@ -467,54 +335,6 @@ class RobotVisitorKeywords(ModelVisitor):
             raise ValueError(msg)
 
         return tuple(output)
-
-    def _register_downloaded_library_keyword(self, name: str, normalized_name: str) -> KeywordData:
-        """
-        Register as a downloaded library keyword.
-        """
-        library = None
-        for lib in self.downloaded_libraries:
-            if normalized_name in lib.keyword_names_normalized:
-                library = lib
-                break
-
-        if library is None:
-            msg = f"Can't find library for keyword '{name}'"
-            raise Exception(msg)  # noqa: TRY002
-
-        library_keyword = None
-        for kw in library.keywords:
-            if kw.normalized_name == normalized_name:
-                library_keyword = kw
-                break
-
-        if library_keyword is None:
-            msg = f"Can't find keyword '{name}' in library '{library.name}'"
-            raise Exception(msg)  # noqa: TRY002
-
-        self.keywords[library_keyword.normalized_name] = library_keyword
-        return self.keywords[library_keyword.normalized_name]
-
-    def _register_unknown_keyword(self, name: str, normalized_name: str) -> KeywordData:
-        """
-        Register as an unknown keyword with minimum data that does not look weird.
-        """
-        self.keywords[normalized_name] = KeywordData(
-            name=name,
-            normalized_name=normalized_name,
-            name_parts=[],
-            name_match_pattern=None,
-            argument_use_count=None,
-            deprecated=None,
-            private=False,
-            use_count=0,
-            returns=None,
-            return_use_count=0,
-            type="UNKNOWN",
-            arguments=None,
-            library="",
-        )
-        return self.keywords[normalized_name]
 
     def _parse_args(
         self,
