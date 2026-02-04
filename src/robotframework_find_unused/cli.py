@@ -661,7 +661,7 @@ def files(  # noqa: PLR0913
         ${True}     ${False}    ${NONE}    ${NULL}    ${EMPTY}
         ${SPACE}    ${/}        ${:}       ${\\n}      ${CURDIR}
 
-    Import paths with an unsupported variable are ingored.
+    Import paths with an unsupported variable are ignored.
 
     Example: The import to file `GoodDayLibrary` is ignored because of the unsupported
     `${GREETING}` variable.
