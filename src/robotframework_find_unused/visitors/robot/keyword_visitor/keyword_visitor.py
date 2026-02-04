@@ -247,10 +247,6 @@ class RobotVisitorKeywords(ModelVisitor):
             # Is a named arg
             (arg_name, arg_val) = arg.split("=", 1)
 
-        if "." in arg_val:
-            # Remove library prefix
-            arg_val = arg_val.split(".", 1)[1]
-
         keyword_definition = self.kw_matcher.search_keyword_definition(arg_val)
         if not keyword_definition:
             # Not a known keyword name
