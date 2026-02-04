@@ -652,13 +652,29 @@ def files(  # noqa: PLR0913
 
     ----------
 
-    Limitation 4: Variable dynamic imports are ignored
+    Limitation 4: Import paths with variables are ignored
 
-    Files can be dynamically imported with the keywords `Import Resource`, `Import Library`, and
-    `Import Variables`. These keywords are supported, but not when the import path contains a
-    variable.
+    Resource and Library import paths can contain variables. In these import paths, only the
+    following built-in variables are supported:
 
-    Example: The import to file `hello.resource` is ignored because of the `${greeting}` variable.
+    \b
+        ${True}     ${False}    ${NONE}    ${NULL}    ${EMPTY}
+        ${SPACE}    ${/}        ${:}       ${\\n}      ${CURDIR}
+
+    Import paths with an unsupported variable are ingored.
+
+    Example: The import to file `GoodDayLibrary` is ignored because of the unsupported
+    `${GREETING}` variable.
+
+    \b
+        *** Settings ***
+        Library    ${GREETING}Library
+    \b
+        *** Variables ***
+        ${GREETING}    GoodDay
+
+    Example: The import to file `hello.resource` is ignored because of the unsupported
+    `${greeting}` variable.
 
     \b
         VAR  ${greeting} =    hello
