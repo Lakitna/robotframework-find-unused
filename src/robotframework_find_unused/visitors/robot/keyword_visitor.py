@@ -1,5 +1,5 @@
 import functools
-from collections.abc import Iterable
+from collections.abc import Generator, Iterable
 from dataclasses import dataclass
 from typing import Any, Literal
 
@@ -193,44 +193,63 @@ class RobotVisitorKeywords(ModelVisitor):
         return self.generic_visit(node)
 
     def _remove_lib_from_name(self, name: str) -> str:
+        """Remove Library prefix from keyword name"""
         if "." in name:
-            name = name.split(".", 1)[1]
+            return name.split(".", maxsplit=1)[1]
         return name
 
     def _remove_bdd_prefix_from_name(self, name: str, normalized_name: str) -> str:
-        """Remove BDD prefix from print name"""
+        """Remove BDD prefix from keyword name"""
         for prefix in self.bdd_prefixes:
             if normalized_name.startswith(prefix):
                 length = len(prefix)
                 return name[length:].lstrip()
         return name
 
-    def _get_keyword_data(self, name: str) -> KeywordData:
-        name = self._remove_lib_from_name(name)
-        normalized_name = normalize_keyword_name(name)
+    def _get_keyword_match_options(self, name: str) -> Generator[tuple[str, str]]:
+        # Unchanged
+        name_unchanged = name
+        normalized_name_unchanged = normalize_keyword_name(name)
+        yield (name, normalized_name_unchanged)
 
-        if normalized_name in self.keywords:
-            # Matched to a keyword (without embedded args)
-            return self.keywords[normalized_name]
+        # Without BDD prefix
+        name_without_bdd = self._remove_bdd_prefix_from_name(
+            name_unchanged,
+            normalized_name_unchanged,
+        )
+        if name_without_bdd != name_unchanged:
+            yield (
+                name_without_bdd,
+                normalize_keyword_name(name_without_bdd),
+            )
 
-        if normalized_name in self.normalized_keyword_names:
-            # Matched to a previously unused downloaded library keyword
-            return self._register_downloaded_library_keyword(name, normalized_name)
+        # Without BDD and library prefix
+        name_without_lib = self._remove_lib_from_name(name_without_bdd)
+        if name_without_lib != name_without_bdd:
+            yield (
+                name_without_lib,
+                normalize_keyword_name(name_without_lib),
+            )
 
-        keyword = self._find_keyword_with_embedded_args(normalized_name)
-        if keyword is not None:
-            # Matched to a keyword with embedded arguments
-            return keyword
+    def _get_keyword_data(self, keyword_name: str) -> KeywordData:
+        for name, normalized_name in self._get_keyword_match_options(keyword_name):
+            if normalized_name in self.keywords:
+                # Matched to a keyword (without embedded args)
+                return self.keywords[normalized_name]
 
-        name_without_bdd_prefix = self._remove_bdd_prefix_from_name(name, normalized_name)
-        if name_without_bdd_prefix != name:
-            # It may be BDD syntax. Retry without BDD prefix
-            return self._get_keyword_data(name_without_bdd_prefix)
+            if normalized_name in self.normalized_keyword_names:
+                # Matched to a previously unused downloaded library keyword
+                return self._register_downloaded_library_keyword(name, normalized_name)
+
+            keyword = self._find_keyword_with_embedded_args(normalized_name)
+            if keyword is not None:
+                # Matched to a keyword with embedded arguments
+                return keyword
 
         # Found a previously unused:
         # - non-existing keyword
         # - out-of-scope keyword
-        return self._register_unknown_keyword(name, normalized_name)
+        return self._register_unknown_keyword(keyword_name, normalize_keyword_name(keyword_name))
 
     def _find_keyword_with_embedded_args(self, normalized_name: str) -> KeywordData | None:
         matches = self._find_keyword_with_embedded_args_matches(normalized_name)
