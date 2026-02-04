@@ -1,3 +1,4 @@
+import os
 from collections.abc import Mapping
 
 from robotframework_find_unused.common.const import VariableValue
@@ -9,8 +10,12 @@ SUPPORTED_BUILTIN_VARS = {
     "true": "True",
     "false": "False",
     "none": "None",
+    "null": "None",
     "empty": "",
     "space": " ",
+    "/": os.sep,
+    ":": os.pathsep,
+    "\\n": os.linesep,
 }
 
 
