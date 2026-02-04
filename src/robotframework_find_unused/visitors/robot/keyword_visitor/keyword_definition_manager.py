@@ -3,9 +3,8 @@ from collections.abc import Generator
 
 from robot.api import Language
 
-from robotframework_find_unused.common.const import KeywordData
+from robotframework_find_unused.common.const import KeywordData, LibraryData
 from robotframework_find_unused.common.normalize import normalize_keyword_name
-from robotframework_find_unused.visitors.robot.library_import import LibraryData
 
 
 class KeywordDefinitionManager:
