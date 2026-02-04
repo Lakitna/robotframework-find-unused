@@ -11,7 +11,7 @@ Counting keyword usage...
 
 use_count	keyword_name
 1	BuiltIn.Log
-1	Undefined keyword
+1	When Undefined keyword
 1	keywords.Beautiful Keyword
 2	BuiltIn.No Operation
 2	keywords.Amazing Keyword
