@@ -8,9 +8,7 @@ Gathering downloaded library keyword definitions...
 Counting keyword usage...
 [ DONE ] Processed 3 keyword calls
 [ WARNING ] Found 1 called keywords without a definition
+[ NOTE ] Excluding downloaded library keywords
 
-use_count	keyword_name
-0	Test.Cute Keyword
-1	String.Replace String
-1	Test.FakeLibrary.Cute Keyword
-1	XML.Element To String
+Found 1 unused keywords:
+  Test.Cute Keyword

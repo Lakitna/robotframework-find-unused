@@ -4,18 +4,21 @@ Parsing files with LibDoc...
 [ DONE ] Parsed 1 files
     1 files of type CUSTOM_SUITE
 Gathering custom keyword definitions...
-[ ERROR ] Found 0 custom keyword definitions
+[ DONE ] Found 2 custom keyword definitions
+    2 keywords of type CUSTOM_SUITE
 Gathering downloaded library keyword definitions...
 [ DONE ] Found 3 downloaded libraries
     BuiltIn: [[MASK]] keywords
     Collections: [[MASK]] keywords
     String: [[MASK]] keywords
 Counting keyword usage...
-[ DONE ] Processed 2 keyword calls
+[ DONE ] Processed 3 keyword calls
+    1 calls to keywords of type CUSTOM_SUITE
     1 calls to keywords of type LIBRARY
     1 calls to keywords of type UNKNOWN
-[ DONE ] Found 2 unique keywords (keyword definitions and calls)
+[ DONE ] Found 4 unique keywords (keyword definitions and calls)
 [ WARNING ] Found 1 called keywords without a definition
-    Element To String
+    XML.Element To String
 
-Found 0 unused keywords:
+Found 1 unused keywords:
+  Test.Cute Keyword
