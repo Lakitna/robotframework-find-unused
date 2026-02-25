@@ -30,7 +30,7 @@ def _count_file_uses(file_paths: list[Path], source_path: Path) -> list[FileUseD
     """
     Walk through all robot files to keep track of imports.
     """
-    visitor = RobotVisitorFileImports(source_path)
+    visitor = RobotVisitorFileImports(source_path, set(file_paths))
     visit_robot_files(
         file_paths,
         visitor,

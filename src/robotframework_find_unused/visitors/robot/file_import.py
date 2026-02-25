@@ -24,13 +24,15 @@ class RobotVisitorFileImports(ModelVisitor):
     """
 
     root_directory: Path
+    file_paths: set[Path]
     files: dict[str, FileUseData]
     init_files: dict[Path, FileUseData]
     current_working_file: FileUseData | None = None
     current_working_directory: Path | None = None
 
-    def __init__(self, root_directory: Path) -> None:
+    def __init__(self, root_directory: Path, file_paths: set[Path]) -> None:
         self.root_directory = root_directory.absolute()
+        self.file_paths = file_paths
         self.files = {}
         self.init_files = {}
         super().__init__()
@@ -131,16 +133,9 @@ class RobotVisitorFileImports(ModelVisitor):
         self._register_library_file(node.name)
 
     def _register_library_file(self, import_string: str) -> None:
-        lib_name = import_string
-        if not lib_name.endswith(".py"):
-            # Limitation: Importing a downloaded lib. We don't care.
-            return
-
-        lib_path = self._resolve_import_string(lib_name)
-
-        # Limitation: No python module syntax
-
-        self._register_file_use(lib_path, file_type="LIBRARY")
+        lib_path = self._resolve_import_string(import_string)
+        if lib_path:
+            self._register_file_use(lib_path, file_type="LIBRARY")
 
     def visit_ResourceImport(self, node: ResourceImport):  # noqa: N802
         """Find out which resource files are actually used"""
@@ -148,15 +143,17 @@ class RobotVisitorFileImports(ModelVisitor):
 
     def _register_resource_file(self, import_string: str) -> None:
         resource_path = self._resolve_import_string(import_string)
-        self._register_file_use(resource_path, file_type="RESOURCE")
+        if resource_path:
+            self._register_file_use(resource_path, file_type="RESOURCE")
 
     def visit_VariablesImport(self, node: VariablesImport):  # noqa: N802
         """Find out which variable files are actually used"""
         self._register_variables_file(node.name)
 
     def _register_variables_file(self, import_string: str) -> None:
-        resource_path = self._resolve_import_string(import_string)
-        self._register_file_use(resource_path, file_type="VARIABLE")
+        variables_path = self._resolve_import_string(import_string)
+        if variables_path:
+            self._register_file_use(variables_path, file_type="VARIABLE")
 
     def visit_KeywordCall(self, node: KeywordCall):  # noqa: N802
         """Find dynamic import keywords"""
@@ -215,9 +212,16 @@ class RobotVisitorFileImports(ModelVisitor):
             used_by=[self.current_working_file],
         )
 
-    def _resolve_import_string(self, import_str: str) -> Path:
+    def _resolve_import_string(self, import_str: str) -> Path | None:
         if self.current_working_directory is None:
             msg = "Found import outside a .robot or .resource file"
             raise ImpossibleStateError(msg)
 
-        return resolve_import_string(import_str, self.current_working_directory)
+        try:
+            return resolve_import_string(
+                import_str,
+                self.current_working_directory,
+                self.file_paths,
+            )
+        except ImportError as e:
+            click.echo(f"{ERROR_MARKER} {e}")
