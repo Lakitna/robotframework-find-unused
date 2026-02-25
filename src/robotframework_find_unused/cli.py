@@ -188,6 +188,24 @@ def keywords(  # noqa: PLR0913
     ),
 )
 @click.option(
+    "--pythonpath",
+    type=click.types.STRING,
+    default=[],
+    multiple=True,
+    show_default=False,
+    metavar="<path>",
+    envvar="PYTHONPATH",
+    help="""
+        Same as --pythonpath in Robotframework:
+        Additional locations (directories, ZIPs) where to
+        search libraries and other extensions when they are
+        imported. Multiple paths can be given by separating
+        them with a colon (`:`) or by using this option
+        several times. Given path can also be a glob pattern
+        matching multiple paths.
+    """,
+)
+@click.option(
     "-v",
     "--verbose",
     default=False,
@@ -199,6 +217,7 @@ def variables(
     show_count: bool,
     filter: str | None,  # noqa: A002
     verbose: int,
+    pythonpath: list[str],
     file_path: str,
 ):
     """
@@ -284,6 +303,7 @@ def variables(
         source_path=file_path,
         show_all_count=show_count,
         filter_glob=filter,
+        pythonpath=pythonpath,
         verbose=verbose,
     )
     exit_code = cli_variables(options)
