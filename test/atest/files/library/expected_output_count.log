@@ -1,8 +1,9 @@
 Discovering files in `./robot` using Robocop config...
 Parsing file imports...
-[ DONE ] Parsed 4 files
+[ DONE ] Parsed 5 files
 
 import_count	file
-0	./gamma.py
+0	./delta.py
+1	./Gamma.py
 1	./alpha.py
 1	./beta.py
