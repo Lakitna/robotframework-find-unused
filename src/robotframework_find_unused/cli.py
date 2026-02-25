@@ -583,6 +583,24 @@ def returns(  # noqa: PLR0913
     help="How to output unused file imports",
 )
 @click.option(
+    "--pythonpath",
+    type=click.types.STRING,
+    default=[],
+    multiple=True,
+    show_default=False,
+    metavar="<path>",
+    envvar="PYTHONPATH",
+    help="""
+        Same as --pythonpath in Robotframework:
+        Additional locations (directories, ZIPs) where to
+        search libraries and other extensions when they are
+        imported. Multiple paths can be given by separating
+        them with a colon (`:`) or by using this option
+        several times. Given path can also be a glob pattern
+        matching multiple paths.
+    """,
+)
+@click.option(
     "-v",
     "--verbose",
     default=False,
@@ -600,6 +618,7 @@ def files(  # noqa: PLR0913
     library: FilterOption,
     variable: FilterOption,
     unused: FilterOption,
+    pythonpath: list[str],
     verbose: int,
     file_path: str,
 ):
@@ -699,6 +718,7 @@ def files(  # noqa: PLR0913
         tree_max_height=tree_max_height,
         verbose=verbose,
         source_path=file_path,
+        pythonpath=pythonpath,
     )
     exit_code = cli_files(options)
     sys.exit(exit_code)
