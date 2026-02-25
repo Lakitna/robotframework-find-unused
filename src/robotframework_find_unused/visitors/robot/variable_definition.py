@@ -31,8 +31,10 @@ class RobotVisitorVariableDefinitions(ModelVisitor):
     variables: dict[str, VariableData]
     current_working_file: Path | None = None
     current_working_directory: Path | None = None
+    file_paths: set[Path]
 
-    def __init__(self) -> None:
+    def __init__(self, file_paths: set[Path]) -> None:
+        self.file_paths = file_paths
         self.variables = {}
         super().__init__()
 
@@ -73,18 +75,19 @@ class RobotVisitorVariableDefinitions(ModelVisitor):
             msg = "Found variables file import outside a .robot or .resource file"
             raise ImpossibleStateError(msg)
 
-        import_path = node.name
-        if "/" in import_path or "\\" in import_path or import_path.endswith(".py"):
-            # Is a file path. Make it absolute
-            import_path = resolve_import_string(import_path, self.current_working_directory)
-
-        try:
-            self._import_variable_file(Path(import_path), node.args)
-        except Exception as e:  # noqa: BLE001
-            click.echo(f"{ERROR_MARKER} Failed to import variables from variables file.")
-            click.echo(f"{ERROR_MARKER} Something went very wrong. Details below:")
-            click.echo(f"{ERROR_MARKER} {e}")
-            click.echo()
+        import_path = resolve_import_string(
+            node.name,
+            self.current_working_directory,
+            self.file_paths,
+        )
+        if import_path:
+            try:
+                self._import_variable_file(Path(import_path), node.args)
+            except Exception as e:  # noqa: BLE001
+                click.echo(f"{ERROR_MARKER} Failed to import variables from variables file.")
+                click.echo(f"{ERROR_MARKER} Something went very wrong. Details below:")
+                click.echo(f"{ERROR_MARKER} {e}")
+                click.echo()
 
         return self.generic_visit(node)
 

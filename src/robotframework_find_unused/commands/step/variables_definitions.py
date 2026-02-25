@@ -37,7 +37,7 @@ def _get_variable_definitions(file_paths: list[Path]) -> dict[str, VariableData]
     """
     Walk through all robot files to discover non-local variable definitions.
     """
-    visitor = RobotVisitorVariableDefinitions()
+    visitor = RobotVisitorVariableDefinitions(set(file_paths))
     visit_robot_files(file_paths, visitor)
 
     return _resolve_vars_in_var_name(visitor.variables)
