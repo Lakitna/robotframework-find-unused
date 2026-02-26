@@ -1,5 +1,5 @@
 # Nothing to see here
 
 
-class Gamma:
+class Epsilon:
     pass

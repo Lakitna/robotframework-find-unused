@@ -7,7 +7,7 @@ Printing 1 tree groups...
 [[REPOSITORY_ROOT]]/test/atest/files/library/robot/test.robot
 │  ./alpha.py
 │  ./beta.py
-│  ./Gamma.py
+│  ./Epsilon.py
 Tree height: 4 | Tree depth: 1 | Unique files: 4 | Circular imports: 0 | Already imported: 0
 
 Found 1 unused files:

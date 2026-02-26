@@ -2,7 +2,7 @@
 Library     Collections
 Library     alpha.py    AS    a
 Library     ./beta.py    AS    b
-Library     Gamma    AS    g
+Library     Epsilon    AS    e
 
 
 *** Test Cases ***
