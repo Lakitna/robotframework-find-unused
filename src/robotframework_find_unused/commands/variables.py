@@ -3,9 +3,12 @@ Implementation of the 'variables' command
 """
 
 import fnmatch
+import sys
 from dataclasses import dataclass
+from pathlib import Path
 
 import click
+from robot.conf import RobotSettings
 
 from robotframework_find_unused.common.cli import cli_hard_exit, pretty_variable
 from robotframework_find_unused.common.const import INDENT, VariableData
@@ -24,6 +27,7 @@ class VariableOptions:
     show_all_count: bool
     filter_glob: str | None
     verbose: int
+    pythonpath: list[str]
     source_path: str
 
 
@@ -31,11 +35,19 @@ def cli_variables(options: VariableOptions):
     """
     Entry point for the CLI command
     """
+    settings = RobotSettings({"pythonpath": options.pythonpath})
+    if settings.pythonpath:
+        sys.path = settings.pythonpath + sys.path
+
     file_paths = cli_discover_file_paths(options.source_path, verbose=options.verbose)
     if len(file_paths) == 0:
         return cli_hard_exit(options.verbose)
 
-    variables = cli_get_variable_definitions(file_paths, verbose=options.verbose)
+    variables = cli_get_variable_definitions(
+        file_paths,
+        Path(options.source_path),
+        verbose=options.verbose,
+    )
     if len(variables) == 0:
         return cli_hard_exit(options.verbose)
 

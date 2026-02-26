@@ -24,9 +24,6 @@ class AcceptanceTest:
             pytest.skip("Skipped due to Robot version")
 
         test_folder = Path(test_file_path).parent
-        test_data_folder = test_folder.joinpath(cli_options[1])
-        sys.path.append(str(test_data_folder))
-
         expected_output_path_absolute: Path = test_folder.joinpath(expected_output_path)
         with expected_output_path_absolute.open(encoding="utf8") as f:
             expected_output = f.read()

@@ -188,6 +188,24 @@ def keywords(  # noqa: PLR0913
     ),
 )
 @click.option(
+    "--pythonpath",
+    type=click.types.STRING,
+    default=[],
+    multiple=True,
+    show_default=False,
+    metavar="<path>",
+    envvar="PYTHONPATH",
+    help="""
+        Same as --pythonpath in Robotframework:
+        Additional locations (directories, ZIPs) where to
+        search libraries and other extensions when they are
+        imported. Multiple paths can be given by separating
+        them with a colon (`:`) or by using this option
+        several times. Given path can also be a glob pattern
+        matching multiple paths.
+    """,
+)
+@click.option(
     "-v",
     "--verbose",
     default=False,
@@ -199,6 +217,7 @@ def variables(
     show_count: bool,
     filter: str | None,  # noqa: A002
     verbose: int,
+    pythonpath: list[str],
     file_path: str,
 ):
     """
@@ -284,6 +303,7 @@ def variables(
         source_path=file_path,
         show_all_count=show_count,
         filter_glob=filter,
+        pythonpath=pythonpath,
         verbose=verbose,
     )
     exit_code = cli_variables(options)
@@ -583,6 +603,24 @@ def returns(  # noqa: PLR0913
     help="How to output unused file imports",
 )
 @click.option(
+    "--pythonpath",
+    type=click.types.STRING,
+    default=[],
+    multiple=True,
+    show_default=False,
+    metavar="<path>",
+    envvar="PYTHONPATH",
+    help="""
+        Same as --pythonpath in Robotframework:
+        Additional locations (directories, ZIPs) where to
+        search libraries and other extensions when they are
+        imported. Multiple paths can be given by separating
+        them with a colon (`:`) or by using this option
+        several times. Given path can also be a glob pattern
+        matching multiple paths.
+    """,
+)
+@click.option(
     "-v",
     "--verbose",
     default=False,
@@ -600,6 +638,7 @@ def files(  # noqa: PLR0913
     library: FilterOption,
     variable: FilterOption,
     unused: FilterOption,
+    pythonpath: list[str],
     verbose: int,
     file_path: str,
 ):
@@ -624,23 +663,7 @@ def files(  # noqa: PLR0913
 
     ----------
 
-    Limitation 2: No Python module syntax
-
-    Libraries can be imported with both a path-like syntax (e.g. ./foo/bar.resource) and Python
-    module syntax (e.g. foo.bar). Python module syntax is not supported.
-
-    This does not impact Resource file imports.
-
-    Example: The custom library 'TestLibrary' is ignored since it's imported using the Python module
-    syntax.
-
-    \b
-        *** Settings ***
-        Library    my.package.TestLibrary
-
-    ----------
-
-    Limitation 3: Imports in python files are ignored
+    Limitation 2: Imports in python files are ignored
 
     Only imports in `.robot` and `.resource` files are considered. Imports in other files are
     ignored.
@@ -652,7 +675,7 @@ def files(  # noqa: PLR0913
 
     ----------
 
-    Limitation 4: Import paths with variables are ignored
+    Limitation 3: Import paths with variables are ignored
 
     Resource and Library import paths can contain variables. In these import paths, only the
     following built-in variables are supported:
@@ -682,7 +705,7 @@ def files(  # noqa: PLR0913
 
     ----------
 
-    Limitation 5: No localisation
+    Limitation 4: No localisation
 
     Robot Framework localization is not supported. Any language other than English will produce
     unexpected results.
@@ -699,6 +722,7 @@ def files(  # noqa: PLR0913
         tree_max_height=tree_max_height,
         verbose=verbose,
         source_path=file_path,
+        pythonpath=pythonpath,
     )
     exit_code = cli_files(options)
     sys.exit(exit_code)

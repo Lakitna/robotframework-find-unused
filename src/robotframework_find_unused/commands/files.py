@@ -3,10 +3,12 @@ Implementation of the 'files' command
 """
 
 import fnmatch
+import sys
 from dataclasses import dataclass
 from pathlib import Path
 
 import click
+from robot.conf import RobotSettings
 
 from robotframework_find_unused.common.cli import cli_hard_exit, pretty_file_path
 from robotframework_find_unused.common.const import NOTE_MARKER, FileUseData, FilterOption
@@ -36,12 +38,17 @@ class FileOptions:
     tree_max_height: int
     verbose: int
     source_path: str
+    pythonpath: list[str]
 
 
 def cli_files(options: FileOptions):
     """
     Entry point for the CLI command
     """
+    settings = RobotSettings({"pythonpath": options.pythonpath})
+    if settings.pythonpath:
+        sys.path = settings.pythonpath + sys.path
+
     file_paths = cli_discover_file_paths(options.source_path, verbose=options.verbose)
     if len(file_paths) == 0:
         return cli_hard_exit(options.verbose)

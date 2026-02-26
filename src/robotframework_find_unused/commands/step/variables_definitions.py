@@ -20,6 +20,7 @@ from robotframework_find_unused.visitors.robot.variable_definition import (
 
 def cli_get_variable_definitions(
     file_paths: list[Path],
+    source_path: Path,
     *,
     verbose: int,
 ):
@@ -27,17 +28,17 @@ def cli_get_variable_definitions(
     Walk through all robot files to discover non-local variable definitions and show progress
     """
     click.echo("Gathering variables definitions...")
-    variables = _get_variable_definitions(file_paths)
+    variables = _get_variable_definitions(file_paths, source_path)
 
     _log_variable_stats(list(variables.values()), verbose)
     return variables
 
 
-def _get_variable_definitions(file_paths: list[Path]) -> dict[str, VariableData]:
+def _get_variable_definitions(file_paths: list[Path], source_path: Path) -> dict[str, VariableData]:
     """
     Walk through all robot files to discover non-local variable definitions.
     """
-    visitor = RobotVisitorVariableDefinitions()
+    visitor = RobotVisitorVariableDefinitions(source_path, set(file_paths))
     visit_robot_files(file_paths, visitor)
 
     return _resolve_vars_in_var_name(visitor.variables)
