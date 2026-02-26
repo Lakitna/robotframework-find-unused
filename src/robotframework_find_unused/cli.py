@@ -663,23 +663,7 @@ def files(  # noqa: PLR0913
 
     ----------
 
-    Limitation 2: No Python module syntax
-
-    Libraries can be imported with both a path-like syntax (e.g. ./foo/bar.resource) and Python
-    module syntax (e.g. foo.bar). Python module syntax is not supported.
-
-    This does not impact Resource file imports.
-
-    Example: The custom library 'TestLibrary' is ignored since it's imported using the Python module
-    syntax.
-
-    \b
-        *** Settings ***
-        Library    my.package.TestLibrary
-
-    ----------
-
-    Limitation 3: Imports in python files are ignored
+    Limitation 2: Imports in python files are ignored
 
     Only imports in `.robot` and `.resource` files are considered. Imports in other files are
     ignored.
@@ -691,7 +675,7 @@ def files(  # noqa: PLR0913
 
     ----------
 
-    Limitation 4: Import paths with variables are ignored
+    Limitation 3: Import paths with variables are ignored
 
     Resource and Library import paths can contain variables. In these import paths, only the
     following built-in variables are supported:
@@ -721,7 +705,7 @@ def files(  # noqa: PLR0913
 
     ----------
 
-    Limitation 5: No localisation
+    Limitation 4: No localisation
 
     Robot Framework localization is not supported. Any language other than English will produce
     unexpected results.
