@@ -49,6 +49,8 @@ def cli_files(options: FileOptions):
     if settings.pythonpath:
         sys.path = settings.pythonpath + sys.path
 
+    print(sys.path)
+
     file_paths = cli_discover_file_paths(options.source_path, verbose=options.verbose)
     if len(file_paths) == 0:
         return cli_hard_exit(options.verbose)
