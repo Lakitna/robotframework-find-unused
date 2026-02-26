@@ -15,6 +15,7 @@ from robot.api.parsing import (
 from robotframework_find_unused.common.const import ERROR_MARKER, FileUseData
 from robotframework_find_unused.common.impossible_state_error import ImpossibleStateError
 from robotframework_find_unused.common.normalize import normalize_file_path, normalize_keyword_name
+from robotframework_find_unused.convert.convert_path import to_relative_path
 from robotframework_find_unused.resolve.resolve_import_string import resolve_import_string
 
 
@@ -24,15 +25,15 @@ class RobotVisitorFileImports(ModelVisitor):
     """
 
     root_directory: Path
-    file_paths: set[Path]
+    discovered_files: set[Path]
     files: dict[str, FileUseData]
     init_files: dict[Path, FileUseData]
     current_working_file: FileUseData | None = None
     current_working_directory: Path | None = None
 
-    def __init__(self, root_directory: Path, file_paths: set[Path]) -> None:
+    def __init__(self, root_directory: Path, discovered_files: set[Path] | None = None) -> None:
         self.root_directory = root_directory.absolute()
-        self.file_paths = file_paths
+        self.discovered_files = discovered_files or set()
         self.files = {}
         self.init_files = {}
         super().__init__()
@@ -133,7 +134,7 @@ class RobotVisitorFileImports(ModelVisitor):
         self._register_library_file(node.name)
 
     def _register_library_file(self, import_string: str) -> None:
-        lib_path = self._resolve_import_string(import_string)
+        lib_path = self._resolve_import_string(import_string, import_type="Library")
         if lib_path:
             self._register_file_use(lib_path, file_type="LIBRARY")
 
@@ -142,7 +143,7 @@ class RobotVisitorFileImports(ModelVisitor):
         self._register_resource_file(node.name)
 
     def _register_resource_file(self, import_string: str) -> None:
-        resource_path = self._resolve_import_string(import_string)
+        resource_path = self._resolve_import_string(import_string, import_type="Resource")
         if resource_path:
             self._register_file_use(resource_path, file_type="RESOURCE")
 
@@ -151,7 +152,7 @@ class RobotVisitorFileImports(ModelVisitor):
         self._register_variables_file(node.name)
 
     def _register_variables_file(self, import_string: str) -> None:
-        variables_path = self._resolve_import_string(import_string)
+        variables_path = self._resolve_import_string(import_string, import_type="Variables")
         if variables_path:
             self._register_file_use(variables_path, file_type="VARIABLE")
 
@@ -198,13 +199,6 @@ class RobotVisitorFileImports(ModelVisitor):
             existing.used_by.append(self.current_working_file)
             return
 
-        if not file_path.exists():
-            click.echo(
-                f"{ERROR_MARKER} File does not exist. {normalized_path} "
-                f"(imported from {normalize_file_path(self.current_working_file.path_absolute)})",
-            )
-            return
-
         self.files[normalized_path] = FileUseData(
             id=normalize_file_path(file_path),
             path_absolute=file_path,
@@ -212,8 +206,12 @@ class RobotVisitorFileImports(ModelVisitor):
             used_by=[self.current_working_file],
         )
 
-    def _resolve_import_string(self, import_str: str) -> Path | None:
-        if self.current_working_directory is None:
+    def _resolve_import_string(
+        self,
+        import_str: str,
+        import_type: Literal["Library", "Resource", "Variables"],
+    ) -> Path | None:
+        if self.current_working_directory is None or self.current_working_file is None:
             msg = "Found import outside a .robot or .resource file"
             raise ImpossibleStateError(msg)
 
@@ -221,7 +219,14 @@ class RobotVisitorFileImports(ModelVisitor):
             return resolve_import_string(
                 import_str,
                 self.current_working_directory,
-                self.file_paths,
+                self.root_directory,
+                self.discovered_files,
             )
-        except ImportError as e:
-            click.echo(f"{ERROR_MARKER} {e}")
+        except ImportError:
+            from_path = to_relative_path(
+                self.root_directory,
+                self.current_working_file.path_absolute,
+            )
+            click.echo(
+                f"{ERROR_MARKER} `{import_type}  {import_str}` <- could not find. From {from_path}",
+            )

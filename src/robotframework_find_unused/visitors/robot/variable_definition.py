@@ -20,6 +20,7 @@ from robotframework_find_unused.common.const import (
 )
 from robotframework_find_unused.common.impossible_state_error import ImpossibleStateError
 from robotframework_find_unused.common.normalize import normalize_variable_name
+from robotframework_find_unused.convert.convert_path import to_relative_path
 from robotframework_find_unused.resolve.resolve_import_string import resolve_import_string
 
 
@@ -28,13 +29,15 @@ class RobotVisitorVariableDefinitions(ModelVisitor):
     Visit file and discover variable definitions.
     """
 
+    root_directory: Path
+    discovered_files: set[Path]
     variables: dict[str, VariableData]
     current_working_file: Path | None = None
     current_working_directory: Path | None = None
-    file_paths: set[Path]
 
-    def __init__(self, file_paths: set[Path]) -> None:
-        self.file_paths = file_paths
+    def __init__(self, root_directory: Path, discovered_files: set[Path] | None = None) -> None:
+        self.root_directory = root_directory.absolute()
+        self.discovered_files = discovered_files or set()
         self.variables = {}
         super().__init__()
 
@@ -71,15 +74,24 @@ class RobotVisitorVariableDefinitions(ModelVisitor):
         """
         Look for variable declarations in variable files.
         """
-        if self.current_working_directory is None:
+        if self.current_working_directory is None or self.current_working_file is None:
             msg = "Found variables file import outside a .robot or .resource file"
             raise ImpossibleStateError(msg)
 
-        import_path = resolve_import_string(
-            node.name,
-            self.current_working_directory,
-            self.file_paths,
-        )
+        try:
+            import_path = resolve_import_string(
+                node.name,
+                self.current_working_directory,
+                self.root_directory,
+                self.discovered_files,
+            )
+        except ImportError:
+            from_path = to_relative_path(self.root_directory, self.current_working_file)
+            click.echo(
+                f"{ERROR_MARKER} `Variables  {node.name}` <- could not find. From {from_path}",
+            )
+            import_path = None
+
         if import_path:
             try:
                 self._import_variable_file(Path(import_path), node.args)
