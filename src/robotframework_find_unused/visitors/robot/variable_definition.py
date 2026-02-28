@@ -130,7 +130,7 @@ class RobotVisitorVariableDefinitions(ModelVisitor):
         """
         Look for variables set through VAR syntax.
         """
-        if not node.scope:
+        if not node.scope or node.scope.upper() == "LOCAL":
             return
 
         if self.current_working_file is None:
