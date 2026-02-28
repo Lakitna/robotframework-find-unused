@@ -1,8 +1,8 @@
-from typing import cast
+from typing import TYPE_CHECKING, cast
 
 import click
 import robot.errors
-from robot.api.parsing import LibraryImport, ModelVisitor
+from robot.api.parsing import ModelVisitor
 from robot.libdoc import LibraryDocumentation
 from robot.libdocpkg.model import KeywordDoc, LibraryDoc
 
@@ -12,6 +12,9 @@ from robotframework_find_unused.convert.convert_keyword import libdoc_keyword_to
 from robotframework_find_unused.resolve.resolve_python_keyword_data import (
     enrich_python_keyword_data,
 )
+
+if TYPE_CHECKING:
+    from robot.api.parsing import LibraryImport
 
 
 class RobotVisitorLibraryImports(ModelVisitor):
@@ -29,7 +32,7 @@ class RobotVisitorLibraryImports(ModelVisitor):
         # Is always imported automatically by Robot
         self._register_downloaded_library("BuiltIn")
 
-    def visit_LibraryImport(self, node: LibraryImport):  # noqa: N802
+    def visit_LibraryImport(self, node: "LibraryImport"):  # noqa: N802
         """Find out which libraries are actually used"""
         lib_name = node.name
 

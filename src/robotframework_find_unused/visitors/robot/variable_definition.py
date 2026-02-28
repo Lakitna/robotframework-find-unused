@@ -1,16 +1,12 @@
 from collections.abc import Iterable
 from pathlib import Path
+from typing import TYPE_CHECKING
 
 import click
 import robot.errors
 from robot.api.parsing import (
-    File,
-    KeywordSection,
     ModelVisitor,
-    TestCaseSection,
     Variable,
-    VariableSection,
-    VariablesImport,
 )
 
 from robotframework_find_unused.common.const import (
@@ -19,9 +15,21 @@ from robotframework_find_unused.common.const import (
     VariableDefinedInType,
 )
 from robotframework_find_unused.common.impossible_state_error import ImpossibleStateError
-from robotframework_find_unused.common.normalize import normalize_variable_name
+from robotframework_find_unused.common.normalize import (
+    normalize_keyword_name,
+    normalize_variable_name,
+)
 from robotframework_find_unused.convert.convert_path import to_relative_path
 from robotframework_find_unused.resolve.resolve_import_string import resolve_import_string
+
+if TYPE_CHECKING:
+    from robot.api.parsing import (
+        File,
+        KeywordCall,
+        Var,
+        VariableSection,
+        VariablesImport,
+    )
 
 
 class RobotVisitorVariableDefinitions(ModelVisitor):
@@ -41,7 +49,7 @@ class RobotVisitorVariableDefinitions(ModelVisitor):
         self.variables = {}
         super().__init__()
 
-    def visit_File(self, node: File):  # noqa: N802
+    def visit_File(self, node: "File"):  # noqa: N802
         """Keep track of the current working file"""
         if node.source is not None:
             self.current_working_file = node.source
@@ -49,7 +57,7 @@ class RobotVisitorVariableDefinitions(ModelVisitor):
 
         return self.generic_visit(node)
 
-    def visit_VariableSection(self, node: VariableSection):  # noqa: N802
+    def visit_VariableSection(self, node: "VariableSection"):  # noqa: N802
         """
         Look for variable declarations in the variables section.
         """
@@ -70,7 +78,7 @@ class RobotVisitorVariableDefinitions(ModelVisitor):
 
         return self.generic_visit(node)
 
-    def visit_VariablesImport(self, node: VariablesImport):  # noqa: N802
+    def visit_VariablesImport(self, node: "VariablesImport"):  # noqa: N802
         """
         Look for variable declarations in variable files.
         """
@@ -103,13 +111,43 @@ class RobotVisitorVariableDefinitions(ModelVisitor):
 
         return self.generic_visit(node)
 
-    def visit_KeywordSection(self, _: KeywordSection):  # noqa: N802
-        """Don't visit anything inside keyword sections. We don't need it"""
-        return
+    def visit_KeywordCall(self, node: "KeywordCall"):  # noqa: N802
+        """
+        Look for variables set through specific builtin keywords.
+        """
+        kw_name = normalize_keyword_name(node.keyword)
+        if kw_name not in ("settestvariable", "setsuitevariable", "setglobalvariable"):
+            return
 
-    def visit_TestCaseSection(self, _: TestCaseSection):  # noqa: N802
-        """Don't visit anything inside test case sections. We don't need it"""
-        return
+        if self.current_working_file is None:
+            msg = "Found keyword call outside a .robot or .resource file"
+            raise ImpossibleStateError(msg)
+
+        (var_name, *var_value) = node.args
+        self._register_variable(
+            var_name,
+            "runtime",
+            self.current_working_file,
+            var_value,
+        )
+
+    def visit_Var(self, node: "Var"):  # noqa: N802
+        """
+        Look for variables set through VAR syntax.
+        """
+        if not node.scope or node.scope.upper() == "LOCAL":
+            return
+
+        if self.current_working_file is None:
+            msg = "Found VAR syntax outside a .robot or .resource file"
+            raise ImpossibleStateError(msg)
+
+        self._register_variable(
+            node.name,
+            "runtime",
+            self.current_working_file,
+            node.value,
+        )
 
     def _import_variable_file(self, import_path: Path, import_args: tuple[str, ...]) -> None:
         """

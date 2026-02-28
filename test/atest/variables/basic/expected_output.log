@@ -1,13 +1,16 @@
 Discovering files in `./robot` using Robocop config...
 Gathering variables definitions...
-[ DONE ] Found 12 unique non-local variables definitions
+[ DONE ] Found 18 unique non-local variables definitions
 Counting variable usage...
-[ DONE ] Found 16 variable uses of gathered variables
+[ DONE ] Found 19 variable uses of gathered variables
 
-Found 6 unused variables:
+Found 9 unused variables:
     &{dict_unused}
     ${dot}
     ${float_unused}
+    ${global_scope_var_keyword_unused}
     ${int_unused}
     @{list_unused}
     ${string_unused}
+    ${suite_scope_var_keyword_unused}
+    ${test_scope_var_keyword_unused}
