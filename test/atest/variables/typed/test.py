@@ -7,7 +7,7 @@ class TestCommandAcceptance(AcceptanceTest):
             ["variables", "./robot"],
             "./expected_output.log",
             __file__,
-            expected_exit_code=7,
+            expected_exit_code=13,
             # Typed variables where introduced in 7.3.0
             min_robot_version="7.3.0",
         )
@@ -17,7 +17,7 @@ class TestCommandAcceptance(AcceptanceTest):
             ["variables", "./robot", "--show-count"],
             "./expected_output_count.log",
             __file__,
-            expected_exit_code=7,
+            expected_exit_code=13,
             # Typed variables where introduced in 7.3.0
             min_robot_version="7.3.0",
         )
