@@ -2,7 +2,7 @@ import os
 from pathlib import Path
 
 import click
-from robocop.config import ConfigManager, FileFiltersOptions
+import robocop
 
 from robotframework_find_unused.common.const import (
     DONE_MARKER,
@@ -14,6 +14,8 @@ from robotframework_find_unused.common.const import (
     VERBOSE_SINGLE,
 )
 
+FILE_EXTENSIONS = {"*.robot", "*.resource", "*.py"}
+
 
 def cli_discover_file_paths(input_path: str, *, verbose: int) -> list[Path]:
     """
@@ -21,15 +23,11 @@ def cli_discover_file_paths(input_path: str, *, verbose: int) -> list[Path]:
     """
     click.echo(f"Discovering files in `{input_path}` using Robocop config...")
 
-    robocop_config = ConfigManager(sources=[input_path])
-
-    extensions = {"*.robot", "*.resource", "*.py"}
-    if robocop_config.default_config.file_filters:
-        robocop_config.default_config.file_filters.default_include = extensions
+    if robocop.__version__.startswith("6.") or robocop.__version__.startswith("7."):
+        file_paths = _discover_file_path_robocop_6_7(input_path)
     else:
-        robocop_config.default_config.file_filters = FileFiltersOptions(default_include=extensions)
+        file_paths = _discover_file_path_robocop(input_path)
 
-    file_paths = [path[0] for path in robocop_config.paths]
     sorted_file_paths = sorted(file_paths, key=lambda f: f)
     sorted_file_paths = sorted(
         sorted_file_paths,
@@ -40,6 +38,47 @@ def cli_discover_file_paths(input_path: str, *, verbose: int) -> list[Path]:
 
     _log_file_stats(sorted_file_paths, input_path, verbose)
     return sorted_file_paths
+
+
+def _discover_file_path_robocop_6_7(input_path: str) -> list[Path]:
+    """
+    Get file paths recursively with Robocop.
+
+    Only works for Robocop 6.x.x and 7.x.x
+    """
+    from robocop.config import ConfigManager, FileFiltersOptions  # type: ignore  # noqa: PGH003
+
+    robocop_config = ConfigManager(sources=[input_path])
+
+    extensions = FILE_EXTENSIONS
+    if robocop_config.default_config.file_filters:
+        robocop_config.default_config.file_filters.default_include = extensions
+    else:
+        robocop_config.default_config.file_filters = FileFiltersOptions(default_include=extensions)
+
+    return [path[0] for path in robocop_config.paths]
+
+
+def _discover_file_path_robocop(input_path: str) -> list[Path]:
+    """
+    Get file paths recursively with Robocop.
+
+    Works for Robocop 8.x.x and up
+    """
+    from robocop.config.builder import (
+        RawConfig,  # type: ignore  # noqa: PGH003
+        RawFileFiltersOptions,  # type: ignore  # noqa: PGH003
+    )
+    from robocop.config.manager import ConfigManager  # type: ignore  # noqa: PGH003
+
+    config_manager = ConfigManager(
+        sources=[input_path],
+        overwrite_config=RawConfig(
+            file_filters=RawFileFiltersOptions(default_include=list(FILE_EXTENSIONS)),
+        ),
+    )
+
+    return [source_file.path for source_file in config_manager.paths]
 
 
 def _log_file_stats(file_paths: list[Path], input_path: str, verbose: int) -> None:
