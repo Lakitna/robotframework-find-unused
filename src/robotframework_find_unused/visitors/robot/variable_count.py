@@ -13,7 +13,10 @@ from robot.api.parsing import (
 )
 
 from robotframework_find_unused.common.const import VariableData
-from robotframework_find_unused.common.normalize import normalize_variable_name
+from robotframework_find_unused.common.normalize import (
+    normalize_keyword_name,
+    normalize_variable_name,
+)
 from robotframework_find_unused.parse.parse_variable import get_variables_in_string
 from robotframework_find_unused.resolve.resolve_variables import (
     SUPPORTED_BUILTIN_VARS,
@@ -68,8 +71,16 @@ class RobotVisitorVariableUses(ModelVisitor):
         """
         Look for used variables called keyword arguments.
         """
-        if node.keyword.lower() == "evaluate":
+        keyword_name_normalized = normalize_keyword_name(node.keyword)
+
+        if keyword_name_normalized == "evaluate":
             self._count_used_vars_in_eval(node.args[0])
+        elif keyword_name_normalized in (
+            "settestvariable",
+            "setsuitevariable",
+            "setglobalvariable",
+        ):
+            self._count_used_vars_in_args(node.args[1:])
         else:
             self._count_used_vars_in_args(node.args)
 
