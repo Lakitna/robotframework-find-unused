@@ -24,9 +24,9 @@ def cli_discover_file_paths(input_path: str, *, verbose: int) -> list[Path]:
     click.echo(f"Discovering files in `{input_path}` using Robocop config...")
 
     if robocop.__version__.startswith("6.") or robocop.__version__.startswith("7."):
-        file_paths = _discover_file_path_robocop_6_7(input_path)
+        file_paths = _discover_file_paths_robocop_6_7(input_path)
     else:
-        file_paths = _discover_file_path_robocop(input_path)
+        file_paths = _discover_file_paths_robocop(input_path)
 
     sorted_file_paths = sorted(file_paths, key=lambda f: f)
     sorted_file_paths = sorted(
@@ -40,7 +40,7 @@ def cli_discover_file_paths(input_path: str, *, verbose: int) -> list[Path]:
     return sorted_file_paths
 
 
-def _discover_file_path_robocop_6_7(input_path: str) -> list[Path]:
+def _discover_file_paths_robocop_6_7(input_path: str) -> list[Path]:
     """
     Get file paths recursively with Robocop.
 
@@ -59,7 +59,7 @@ def _discover_file_path_robocop_6_7(input_path: str) -> list[Path]:
     return [path[0] for path in robocop_config.paths]
 
 
-def _discover_file_path_robocop(input_path: str) -> list[Path]:
+def _discover_file_paths_robocop(input_path: str) -> list[Path]:
     """
     Get file paths recursively with Robocop.
 
