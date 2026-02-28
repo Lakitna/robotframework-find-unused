@@ -1,15 +1,10 @@
 import re
 from collections.abc import Iterable
+from typing import TYPE_CHECKING
 
 from robot.api.parsing import (
-    Arguments,
-    For,
-    If,
-    KeywordCall,
     ModelVisitor,
-    TemplateArguments,
     Variable,
-    VariableSection,
 )
 
 from robotframework_find_unused.common.const import VariableData
@@ -22,6 +17,16 @@ from robotframework_find_unused.resolve.resolve_variables import (
     SUPPORTED_BUILTIN_VARS,
     resolve_variable_name,
 )
+
+if TYPE_CHECKING:
+    from robot.api.parsing import (
+        Arguments,
+        For,
+        If,
+        KeywordCall,
+        TemplateArguments,
+        VariableSection,
+    )
 
 
 class RobotVisitorVariableUses(ModelVisitor):
@@ -40,7 +45,7 @@ class RobotVisitorVariableUses(ModelVisitor):
         self.variables = variable_defs
         super().__init__()
 
-    def visit_VariableSection(self, node: VariableSection):  # noqa: N802
+    def visit_VariableSection(self, node: "VariableSection"):  # noqa: N802
         """
         Look for used variables in variable definitions.
         """
@@ -51,7 +56,7 @@ class RobotVisitorVariableUses(ModelVisitor):
 
         return self.generic_visit(node)
 
-    def visit_Arguments(self, node: Arguments):  # noqa: N802
+    def visit_Arguments(self, node: "Arguments"):  # noqa: N802
         """
         Look for used variables in the default value of keyword arguments.
         """
@@ -67,7 +72,7 @@ class RobotVisitorVariableUses(ModelVisitor):
 
         return self.generic_visit(node)
 
-    def visit_KeywordCall(self, node: KeywordCall):  # noqa: N802
+    def visit_KeywordCall(self, node: "KeywordCall"):  # noqa: N802
         """
         Look for used variables called keyword arguments.
         """
@@ -86,7 +91,7 @@ class RobotVisitorVariableUses(ModelVisitor):
 
         return self.generic_visit(node)
 
-    def visit_TemplateArguments(self, node: TemplateArguments):  # noqa: N802
+    def visit_TemplateArguments(self, node: "TemplateArguments"):  # noqa: N802
         """
         Look for used variables in templated tests.
         """
@@ -94,7 +99,7 @@ class RobotVisitorVariableUses(ModelVisitor):
 
         return self.generic_visit(node)
 
-    def visit_For(self, node: For):  # pyright: ignore[reportIncompatibleMethodOverride] # noqa: N802
+    def visit_For(self, node: "For"):  # pyright: ignore[reportIncompatibleMethodOverride] # noqa: N802
         """
         Look for used variables in for loop conditions.
         """
@@ -102,7 +107,7 @@ class RobotVisitorVariableUses(ModelVisitor):
 
         return self.generic_visit(node)
 
-    def visit_If(self, node: If):  # pyright: ignore[reportIncompatibleMethodOverride] # noqa: N802
+    def visit_If(self, node: "If"):  # pyright: ignore[reportIncompatibleMethodOverride] # noqa: N802
         """
         Look for used variables in if/else/elseif statement conditions.
         """

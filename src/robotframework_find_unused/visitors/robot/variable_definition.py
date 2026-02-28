@@ -1,16 +1,12 @@
 from collections.abc import Iterable
 from pathlib import Path
+from typing import TYPE_CHECKING
 
 import click
 import robot.errors
 from robot.api.parsing import (
-    File,
-    KeywordCall,
     ModelVisitor,
-    Var,
     Variable,
-    VariableSection,
-    VariablesImport,
 )
 
 from robotframework_find_unused.common.const import (
@@ -25,6 +21,15 @@ from robotframework_find_unused.common.normalize import (
 )
 from robotframework_find_unused.convert.convert_path import to_relative_path
 from robotframework_find_unused.resolve.resolve_import_string import resolve_import_string
+
+if TYPE_CHECKING:
+    from robot.api.parsing import (
+        File,
+        KeywordCall,
+        Var,
+        VariableSection,
+        VariablesImport,
+    )
 
 
 class RobotVisitorVariableDefinitions(ModelVisitor):
@@ -44,7 +49,7 @@ class RobotVisitorVariableDefinitions(ModelVisitor):
         self.variables = {}
         super().__init__()
 
-    def visit_File(self, node: File):  # noqa: N802
+    def visit_File(self, node: "File"):  # noqa: N802
         """Keep track of the current working file"""
         if node.source is not None:
             self.current_working_file = node.source
@@ -52,7 +57,7 @@ class RobotVisitorVariableDefinitions(ModelVisitor):
 
         return self.generic_visit(node)
 
-    def visit_VariableSection(self, node: VariableSection):  # noqa: N802
+    def visit_VariableSection(self, node: "VariableSection"):  # noqa: N802
         """
         Look for variable declarations in the variables section.
         """
@@ -73,7 +78,7 @@ class RobotVisitorVariableDefinitions(ModelVisitor):
 
         return self.generic_visit(node)
 
-    def visit_VariablesImport(self, node: VariablesImport):  # noqa: N802
+    def visit_VariablesImport(self, node: "VariablesImport"):  # noqa: N802
         """
         Look for variable declarations in variable files.
         """
@@ -106,7 +111,7 @@ class RobotVisitorVariableDefinitions(ModelVisitor):
 
         return self.generic_visit(node)
 
-    def visit_KeywordCall(self, node: KeywordCall):  # noqa: N802
+    def visit_KeywordCall(self, node: "KeywordCall"):  # noqa: N802
         """
         Look for variables set through specific builtin keywords.
         """
@@ -126,7 +131,7 @@ class RobotVisitorVariableDefinitions(ModelVisitor):
             var_value,
         )
 
-    def visit_Var(self, node: Var):  # noqa: N802
+    def visit_Var(self, node: "Var"):  # noqa: N802
         """
         Look for variables set through VAR syntax.
         """

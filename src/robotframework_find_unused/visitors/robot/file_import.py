@@ -1,15 +1,10 @@
 from pathlib import Path
-from typing import Literal
+from typing import TYPE_CHECKING, Literal
 
 import click
 from robot.api.parsing import (
-    File,
-    KeywordCall,
-    LibraryImport,
     ModelVisitor,
-    ResourceImport,
     TestCaseSection,
-    VariablesImport,
 )
 
 from robotframework_find_unused.common.const import ERROR_MARKER, FileUseData
@@ -17,6 +12,15 @@ from robotframework_find_unused.common.impossible_state_error import ImpossibleS
 from robotframework_find_unused.common.normalize import normalize_file_path, normalize_keyword_name
 from robotframework_find_unused.convert.convert_path import to_relative_path
 from robotframework_find_unused.resolve.resolve_import_string import resolve_import_string
+
+if TYPE_CHECKING:
+    from robot.api.parsing import (
+        File,
+        KeywordCall,
+        LibraryImport,
+        ResourceImport,
+        VariablesImport,
+    )
 
 
 class RobotVisitorFileImports(ModelVisitor):
@@ -38,7 +42,7 @@ class RobotVisitorFileImports(ModelVisitor):
         self.init_files = {}
         super().__init__()
 
-    def visit_File(self, node: File):  # noqa: N802
+    def visit_File(self, node: "File"):  # noqa: N802
         """Register the current file"""
         if node.source is None:
             return None
@@ -106,7 +110,7 @@ class RobotVisitorFileImports(ModelVisitor):
 
     def _get_file_type(
         self,
-        file_node: File,
+        file_node: "File",
         file_path: Path,
     ) -> Literal["SUITE", "SUITE_INIT", "RESOURCE"] | None:
         if file_path.stem == "__init__":
@@ -129,7 +133,7 @@ class RobotVisitorFileImports(ModelVisitor):
 
         return None
 
-    def visit_LibraryImport(self, node: LibraryImport):  # noqa: N802
+    def visit_LibraryImport(self, node: "LibraryImport"):  # noqa: N802
         """Find out which libraries are actually used"""
         self._register_library_file(node.name)
 
@@ -138,7 +142,7 @@ class RobotVisitorFileImports(ModelVisitor):
         if lib_path:
             self._register_file_use(lib_path, file_type="LIBRARY")
 
-    def visit_ResourceImport(self, node: ResourceImport):  # noqa: N802
+    def visit_ResourceImport(self, node: "ResourceImport"):  # noqa: N802
         """Find out which resource files are actually used"""
         self._register_resource_file(node.name)
 
@@ -147,7 +151,7 @@ class RobotVisitorFileImports(ModelVisitor):
         if resource_path:
             self._register_file_use(resource_path, file_type="RESOURCE")
 
-    def visit_VariablesImport(self, node: VariablesImport):  # noqa: N802
+    def visit_VariablesImport(self, node: "VariablesImport"):  # noqa: N802
         """Find out which variable files are actually used"""
         self._register_variables_file(node.name)
 
@@ -156,7 +160,7 @@ class RobotVisitorFileImports(ModelVisitor):
         if variables_path:
             self._register_file_use(variables_path, file_type="VARIABLE")
 
-    def visit_KeywordCall(self, node: KeywordCall):  # noqa: N802
+    def visit_KeywordCall(self, node: "KeywordCall"):  # noqa: N802
         """Find dynamic import keywords"""
         if not node.args:
             return
