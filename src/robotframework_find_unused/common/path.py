@@ -31,8 +31,7 @@ def path_in_scope(path: Path, root_directory: Path) -> bool:
     parts = [p.casefold() for p in path.parts]
     if "lib" in parts and "site-packages" in parts:  # noqa: SIM103
         # Is a downloaded dependency
-        # We can only get here if you run on a repo root using a local
-        # virtual environment folder (e.g. '.venv').
+        # We can only get here if root_directory contains a virtual environment
         return False
 
     return True

@@ -31,7 +31,7 @@ class _AbstractImportStringResolver:
         Resolve import string.
 
         Returns one of:
-        - File path
+        - Resolved file path
         - `False` when a file is found, but out of scope
         - `None` when resolve did not yield a file.
         """
@@ -54,6 +54,7 @@ class _StandardLibResolver(_AbstractImportStringResolver):
         discovered_files: set[Path],  # noqa: ARG002
         in_scope_directory: Path,  # noqa: ARG002
     ) -> Path | None | Literal[False]:
+        # Standard lib is always out of scope.
         return False
 
 
@@ -115,16 +116,13 @@ class _ModulePathResolver(_AbstractImportStringResolver):
             if path_exists(lib_path):
                 return lib_path
 
-            # Found, but out of scope
-            return False
-
         return None
 
     def _resolve_module_path(self, import_str: str) -> Path | None:
         try:
             spec = importlib.util.find_spec(*import_str.rsplit(".", maxsplit=1))
         except (ModuleNotFoundError, ImportError):
-            # Is bad import or downloaded library
+            # Is bad import or builtin library
             return None
 
         if not spec or not spec.origin:
