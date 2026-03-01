@@ -20,9 +20,34 @@ ${easyAs${abc}: str}     lorum
 
 *** Test Cases ***
 Set Variable In Test
-    VAR    ${test_scope_var}    hello    scope=TEST
-    VAR    ${suite_scope_var}    hello    scope=SUITE
-    VAR    ${global_scope_var}    hello    scope=GLOBAL
+    # Unused
+    VAR    ${local_scope_var_unused: str}    hello
+    VAR    ${test_scope_var_unused: str}    hello    scope=TEST
+    VAR    ${suite_scope_var_unused: str}    hello    scope=SUITE
+    VAR    ${global_scope_var_unused: str}    hello    scope=GLOBAL
+    ${test_local_var_keyword_unused: str}    Set Variable    hello
+    Set Test Variable    ${test_scope_var_keyword_unused: str}    hello
+    Set Suite Variable    ${suite_scope_var_keyword_unused: str}    hello
+    Set Global Variable    ${global_scope_var_keyword_unused: str}    hello
+
+    # Used
+    VAR    ${local_scope_var_used: str}    hello
+    VAR    ${test_scope_var_used: str}    hello    scope=TEST
+    VAR    ${suite_scope_var_used: str}    hello    scope=SUITE
+    VAR    ${global_scope_var_used: str}    hello    scope=GLOBAL
+    ${test_local_var_keyword_used: str}    Set Variable    hello
+    Set Test Variable    ${test_scope_var_keyword_used: str}    hello
+    Set Suite Variable    ${suite_scope_var_keyword_used: str}    hello
+    Set Global Variable    ${global_scope_var_keyword_used: str}    hello
+
+    Log    ${local_scope_var_used}
+    Log    ${test_scope_var_used}
+    Log    ${suite_scope_var_used}
+    Log    ${global_scope_var_used}
+    Log    ${test_local_var_keyword_used}
+    Log    ${test_scope_var_keyword_used}
+    Log    ${suite_scope_var_keyword_used}
+    Log    ${global_scope_var_keyword_used}
 
 Use some Variables
     Log    ${string_used}

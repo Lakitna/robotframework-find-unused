@@ -16,9 +16,22 @@ ${dot.separated.used}       bar
 
 *** Test Cases ***
 Set Variable In Test
-    VAR    ${test_scope_var}    hello    scope=TEST
-    VAR    ${suite_scope_var}    hello    scope=SUITE
-    VAR    ${global_scope_var}    hello    scope=GLOBAL
+    # Unused
+    ${test_local_var_keyword_unused}    Set Variable    hello
+    Set Test Variable    ${test_scope_var_keyword_unused}    hello
+    Set Suite Variable    ${suite_scope_var_keyword_unused}    hello
+    Set Global Variable    ${global_scope_var_keyword_unused}    hello
+
+    # Used
+    ${test_local_var_keyword_used}    Set Variable    hello
+    Set Test Variable    ${test_scope_var_keyword_used}    hello
+    Set Suite Variable    ${suite_scope_var_keyword_used}    hello
+    Set Global Variable    ${global_scope_var_keyword_used}    hello
+
+    Log    ${test_local_var_keyword_used}
+    Log    ${test_scope_var_keyword_used}
+    Log    ${suite_scope_var_keyword_used}
+    Log    ${global_scope_var_keyword_used}
 
 Use some Variables
     Log    ${string_used}

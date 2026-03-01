@@ -228,7 +228,7 @@ def variables(
 
     ----------
 
-    Limitation 1: Only globally user-defined variables.
+    Limitation 1: Only non-local user-defined variables.
 
     All of the following variables are ignored:
 
@@ -236,16 +236,9 @@ def variables(
     - Variables only provided via the command line
     - Environment variables
     - BuiltIn variables
-    - Variables only set with `Set Global Variable`
-    - Variables only set with `VAR  ...  scope=GLOBAL`
-    - Variables only set with `Set Suite Variable`
-    - Variables only set with `VAR  ...  scope=SUITE`
-    - Variables only set with `Set Test Variable`
-    - Variables only set with `VAR  ...  scope=TEST`
-    - Variables only set with `Set Task Variable`
-    - Variables only set with `VAR  ...  scope=TASK`
     - Variables only set with `Set Variable`
-    - Variables only set with `VAR  ...`
+    - Variables only set with `VAR  ...` (without scope)
+    - Variables only set with `VAR  ...  scope=LOCAL`
     - Variables only set with the return value of a keyword
 
     ----------
