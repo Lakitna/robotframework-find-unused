@@ -1,0 +1,14 @@
+Discovering files in `./robot` using Robocop config...
+Parsing file imports...
+[ DONE ] Parsed 6 files
+[ WARNING ] 1 files used multiple times with different arguments
+    Used file: ./alpha.py  AS  Aaa
+    With arguments:
+        bar    foo
+        foo    bar
+    By files:
+        ./resource.resource
+        ./test.robot
+
+Found 1 unused files:
+  ./delta.py
