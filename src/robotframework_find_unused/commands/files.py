@@ -11,7 +11,13 @@ import click
 from robot.conf import RobotSettings
 
 from robotframework_find_unused.common.cli import cli_hard_exit, pretty_file_path
-from robotframework_find_unused.common.const import NOTE_MARKER, FileUseData, FilterOption
+from robotframework_find_unused.common.const import (
+    INDENT,
+    NOTE_MARKER,
+    WARN_MARKER,
+    FileUseData,
+    FilterOption,
+)
 from robotframework_find_unused.common.normalize import normalize_file_path
 from robotframework_find_unused.convert.convert_path import to_relative_path
 
@@ -59,11 +65,53 @@ def cli_files(options: FileOptions):
         verbose=options.verbose,
     )
 
+    _cli_log_file_import_warnings(files, options)
+
     if options.show_tree:
         _cli_print_grouped_file_trees(files, options)
     _cli_log_results(files, options)
 
     return _exit_code(files)
+
+
+def _cli_log_file_import_warnings(files: list[FileUseData], options: FileOptions) -> None:
+    cwd = Path.cwd().joinpath(options.source_path)
+    log_lines = []
+    file_count = 0
+    for file in files:
+        for file_args in file.import_args.values():
+            if len(file_args.args) <= 1:
+                # Never imported with different arguments
+                continue
+
+            file_count += 1
+
+            file_path = pretty_file_path(to_relative_path(cwd, file.path_absolute), file.type)
+            if file_args.as_alias:
+                file_path += "  AS  " + file_args.as_alias
+
+            log_lines.append(f"{INDENT}Used file: {file_path}")
+            log_lines.append(f"{INDENT}With arguments:")
+            for args in sorted(file_args.args):
+                if len(args) == 0:
+                    log_lines.append(
+                        click.style(f"{INDENT}{INDENT}[No arguments]", fg="bright_black")
+                    )
+                else:
+                    log_lines.append(f"{INDENT}{INDENT}{'    '.join(args)}")
+
+            log_lines.append(f"{INDENT}By files:")
+            for used_by_file in sorted(file_args.used_by, key=lambda f: f.path_absolute.as_posix()):
+                file_path = pretty_file_path(
+                    to_relative_path(cwd, used_by_file.path_absolute),
+                    used_by_file.type,
+                )
+                log_lines.append(f"{INDENT}{INDENT}{file_path}")
+
+    if file_count:
+        click.echo(f"{WARN_MARKER} {file_count} files used multiple times with different arguments")
+        for line in log_lines:
+            click.echo(line)
 
 
 def _cli_log_results(files: list[FileUseData], options: FileOptions) -> None:

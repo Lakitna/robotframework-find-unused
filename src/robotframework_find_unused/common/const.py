@@ -91,6 +91,13 @@ FileUseType: TypeAlias = Literal[
 
 
 @dataclass
+class FileUseDataImportArgs:
+    as_alias: str | None
+    args: set[tuple[str, ...]]
+    used_by: set["FileUseData"]
+
+
+@dataclass
 class FileUseData:
     """Data structure for file imports"""
 
@@ -98,6 +105,7 @@ class FileUseData:
     path_absolute: Path
     type: set[FileUseType]
     used_by: list["FileUseData"]
+    import_args: dict[str | None, FileUseDataImportArgs]
 
     def __hash__(self) -> int:
         """Hash by id"""
