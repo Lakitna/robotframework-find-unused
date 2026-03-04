@@ -1,6 +1,5 @@
 Discovering files in `./robot` using Robocop config...
 Parsing file imports...
-[ DONE ] Parsed 6 files
+[ DONE ] Parsed 4 files
 
-Found 1 unused files:
-  ./delta.py
+Found no unused files
