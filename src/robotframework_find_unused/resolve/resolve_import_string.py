@@ -1,4 +1,5 @@
 import importlib.util
+import sys
 from abc import abstractmethod
 from pathlib import Path
 from typing import Literal
@@ -59,6 +60,8 @@ class _StandardLibResolver(_AbstractImportStringResolver):
 
 
 class _FilePathResolver(_AbstractImportStringResolver):
+    _pythonpath_paths_in_scope: list[Path] | None = None
+
     def can_handle(self, import_str: str) -> bool:
         if "/" in import_str or "\\" in import_str:
             return True
@@ -72,18 +75,34 @@ class _FilePathResolver(_AbstractImportStringResolver):
         discovered_files: set[Path],
         in_scope_directory: Path,
     ) -> Path | Literal[False] | None:
-        abs_path = relative_to.joinpath(import_str).resolve()
+        pythonpath_paths_in_scope = self._get_pythonpath_paths_in_scope(in_scope_directory)
+        relative_to_paths = [relative_to, *pythonpath_paths_in_scope]
 
-        if not path_in_scope(abs_path, in_scope_directory):
-            return False
+        for relative_to_path in relative_to_paths:
+            abs_path = relative_to_path.joinpath(import_str).resolve()
 
-        if abs_path in discovered_files:
-            return abs_path
+            if not path_in_scope(abs_path, in_scope_directory):
+                return False
 
-        if path_exists(abs_path):
-            return abs_path
+            if abs_path in discovered_files:
+                return abs_path
+
+            if path_exists(abs_path):
+                return abs_path
 
         return None
+
+    def _get_pythonpath_paths_in_scope(self, in_scope_directory: Path) -> list[Path]:
+        if self._pythonpath_paths_in_scope is not None:
+            return self._pythonpath_paths_in_scope
+
+        self._pythonpath_paths_in_scope = []
+        for p in sys.path:
+            path = Path(p)
+            if path_in_scope(path, in_scope_directory):
+                self._pythonpath_paths_in_scope.append(path)
+
+        return self._pythonpath_paths_in_scope
 
 
 class _ModulePathResolver(_AbstractImportStringResolver):
