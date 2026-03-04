@@ -7,7 +7,7 @@ from robot.api.parsing import (
     TestCaseSection,
 )
 
-from robotframework_find_unused.common.const import ERROR_MARKER, FileUseDataImportArgs, FileUseData
+from robotframework_find_unused.common.const import ERROR_MARKER, FileUseData, FileUsedByData
 from robotframework_find_unused.common.impossible_state_error import ImpossibleStateError
 from robotframework_find_unused.common.normalize import normalize_file_path, normalize_keyword_name
 from robotframework_find_unused.convert.convert_path import to_relative_path
@@ -79,7 +79,6 @@ class RobotVisitorFileImports(ModelVisitor):
             path_absolute=current_working_file,
             type={file_type},
             used_by=[],
-            import_args={},
         )
 
         if file_type == "SUITE_INIT":
@@ -107,7 +106,14 @@ class RobotVisitorFileImports(ModelVisitor):
             init_file = self.init_files.get(path, None)
 
             if init_file:
-                init_file.used_by.append(file)
+                init_file.used_by.append(
+                    FileUsedByData(
+                        file=file,
+                        as_alias=None,
+                        normalized_as_alias=None,
+                        args=(),
+                    ),
+                )
 
     def _get_file_type(
         self,
@@ -248,33 +254,25 @@ class RobotVisitorFileImports(ModelVisitor):
         normalized_path = normalize_file_path(file_path)
         normalized_import_as = normalize_keyword_name(import_as) if import_as else import_as
 
+        file_used_by = FileUsedByData(
+            file=self.current_working_file,
+            as_alias=import_as,
+            normalized_as_alias=normalized_import_as,
+            args=import_args,
+        )
+
         if normalized_path in self.files:
             existing = self.files[normalized_path]
 
             existing.type.add(file_type)
-            existing.used_by.append(self.current_working_file)
-
-            if normalized_import_as not in existing.import_args:
-                existing.import_args[normalized_import_as] = FileUseDataImportArgs(
-                    as_alias=import_as, args=set(), used_by=set()
-                )
-            existing_import_args = existing.import_args[normalized_import_as]
-            existing_import_args.args.add(import_args)
-            existing_import_args.used_by.add(self.current_working_file)
+            existing.used_by.append(file_used_by)
             return
 
         self.files[normalized_path] = FileUseData(
-            id=normalize_file_path(file_path),
+            id=normalized_path,
             path_absolute=file_path,
             type={file_type},
-            used_by=[self.current_working_file],
-            import_args={
-                normalized_import_as: FileUseDataImportArgs(
-                    as_alias=import_as,
-                    args={import_args},
-                    used_by={self.current_working_file},
-                ),
-            },
+            used_by=[file_used_by],
         )
 
     def _resolve_import_string(

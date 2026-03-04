@@ -49,7 +49,6 @@ def _count_file_uses(file_paths: list[Path], source_path: Path) -> list[FileUseD
             path_absolute=path,
             type=set(),
             used_by=[],
-            import_args={},
         )
 
     return list(files.values())

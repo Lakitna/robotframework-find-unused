@@ -4,6 +4,7 @@ Implementation of the 'files' command
 
 import fnmatch
 import sys
+from collections.abc import Generator
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -14,8 +15,10 @@ from robotframework_find_unused.common.cli import cli_hard_exit, pretty_file_pat
 from robotframework_find_unused.common.const import (
     INDENT,
     NOTE_MARKER,
+    VERBOSE_NO,
     WARN_MARKER,
     FileUseData,
+    FileUsedByData,
     FilterOption,
 )
 from robotframework_find_unused.common.normalize import normalize_file_path
@@ -76,42 +79,87 @@ def cli_files(options: FileOptions):
 
 def _cli_log_file_import_warnings(files: list[FileUseData], options: FileOptions) -> None:
     cwd = Path.cwd().joinpath(options.source_path)
-    log_lines = []
+
     file_count = 0
+    log_lines = []
     for file in files:
-        for file_args in file.import_args.values():
-            if len(file_args.args) <= 1:
+        used_by_grouped_by_alias: dict[str | None, list[FileUsedByData]] = {}
+        for used_by in file.used_by:
+            if used_by.normalized_as_alias not in used_by_grouped_by_alias:
+                used_by_grouped_by_alias[used_by.normalized_as_alias] = []
+
+            used_by_grouped_by_alias[used_by.normalized_as_alias].append(used_by)
+
+        for used_by in used_by_grouped_by_alias.values():
+            distinct_args = set()
+            for f in used_by:
+                distinct_args.add(f.args)
+
+            if len(distinct_args) <= 1:
                 # Never imported with different arguments
                 continue
 
             file_count += 1
+            log_lines += list(
+                _cli_log_file_import_warnings_lines_gen(
+                    cwd,
+                    file,
+                    used_by,
+                    distinct_args,
+                    verbose=options.verbose,
+                ),
+            )
+            log_lines.append("")
 
-            file_path = pretty_file_path(to_relative_path(cwd, file.path_absolute), file.type)
-            if file_args.as_alias:
-                file_path += "  AS  " + file_args.as_alias
+    if log_lines:
+        # Remove trailing newline
+        log_lines = log_lines[:-1]
 
-            log_lines.append(f"{INDENT}Used file: {file_path}")
-            log_lines.append(f"{INDENT}With arguments:")
-            for args in sorted(file_args.args):
-                if len(args) == 0:
-                    log_lines.append(
-                        click.style(f"{INDENT}{INDENT}[No arguments]", fg="bright_black")
-                    )
-                else:
-                    log_lines.append(f"{INDENT}{INDENT}{'    '.join(args)}")
-
-            log_lines.append(f"{INDENT}By files:")
-            for used_by_file in sorted(file_args.used_by, key=lambda f: f.path_absolute.as_posix()):
-                file_path = pretty_file_path(
-                    to_relative_path(cwd, used_by_file.path_absolute),
-                    used_by_file.type,
-                )
-                log_lines.append(f"{INDENT}{INDENT}{file_path}")
-
-    if file_count:
-        click.echo(f"{WARN_MARKER} {file_count} files used multiple times with different arguments")
+        click.echo(
+            f"{WARN_MARKER} {file_count} files used multiple times with different arguments:",
+        )
         for line in log_lines:
             click.echo(line)
+
+
+def _cli_log_file_import_warnings_lines_gen(
+    cwd: Path,
+    file: FileUseData,
+    used_by: list[FileUsedByData],
+    distinct_args: set[tuple[str, ...]],
+    *,
+    verbose: int,
+) -> Generator[str]:
+    if len(used_by) == 0:
+        return
+    import_as_alias = used_by[0].as_alias
+
+    file_path = pretty_file_path(to_relative_path(cwd, file.path_absolute), file.type)
+    if import_as_alias:
+        file_path += "  AS  " + import_as_alias
+    yield f"{INDENT}Used file: {file_path}"
+
+    yield f"{INDENT}With arguments:"
+    for args in sorted(distinct_args):
+        if len(args) == 0:
+            yield click.style(f"{INDENT}{INDENT}[No arguments]", fg="bright_black")
+        else:
+            yield f"{INDENT}{INDENT}{'    '.join(args)}"
+
+    if verbose == VERBOSE_NO:
+        yield f"{INDENT}Used by {len(used_by)} files"
+    else:
+        yield f"{INDENT}Used by {len(used_by)} files:"
+        used_by_files_sorted = sorted(
+            used_by,
+            key=lambda f: f.file.path_absolute.as_posix(),
+        )
+        for used_by_file in used_by_files_sorted:
+            file_path = pretty_file_path(
+                to_relative_path(cwd, used_by_file.file.path_absolute),
+                used_by_file.file.type,
+            )
+            yield f"{INDENT}{INDENT}{file_path}"
 
 
 def _cli_log_results(files: list[FileUseData], options: FileOptions) -> None:

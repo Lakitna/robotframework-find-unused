@@ -81,6 +81,20 @@ class LibraryData:
     keyword_names_normalized: set[str]
 
 
+@dataclass
+class FileUseData:
+    """Data structure for file imports"""
+
+    id: str
+    path_absolute: Path
+    type: set["FileUseType"]
+    used_by: list["FileUsedByData"]
+
+    def __hash__(self) -> int:
+        """Hash by id"""
+        return hash(self.id)
+
+
 FileUseType: TypeAlias = Literal[
     "SUITE",
     "SUITE_INIT",
@@ -91,22 +105,10 @@ FileUseType: TypeAlias = Literal[
 
 
 @dataclass
-class FileUseDataImportArgs:
+class FileUsedByData:
+    """Data structure for which file is using a file."""
+
+    file: FileUseData
     as_alias: str | None
-    args: set[tuple[str, ...]]
-    used_by: set["FileUseData"]
-
-
-@dataclass
-class FileUseData:
-    """Data structure for file imports"""
-
-    id: str
-    path_absolute: Path
-    type: set[FileUseType]
-    used_by: list["FileUseData"]
-    import_args: dict[str | None, FileUseDataImportArgs]
-
-    def __hash__(self) -> int:
-        """Hash by id"""
-        return hash(self.id)
+    normalized_as_alias: str | None
+    args: tuple[str, ...]
