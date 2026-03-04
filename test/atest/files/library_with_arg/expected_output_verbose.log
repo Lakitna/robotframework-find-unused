@@ -1,18 +1,27 @@
 Discovering files in `./robot` using Robocop config...
+[ DONE ] Discovered 6 files
 Parsing file imports...
 [ DONE ] Parsed 6 files
+    3 files of type LIBRARY
+    1 files of type RESOURCE
+    1 files of type SUITE
+    1 files of type UNKNOWN
 [ WARNING ] 2 files used multiple times with different arguments:
     Used file: ./alpha.py  AS  Aaa
     With arguments:
         bar    foo
         foo    bar
-    Used by 2 files
+    Used by 2 files:
+        ./resource.resource
+        ./test.robot
 
     Used file: ./alpha.py  AS  Bbb
     With arguments:
         [No arguments]
         134
-    Used by 2 files
+    Used by 2 files:
+        ./resource.resource
+        ./resource.resource
 
 Found 1 unused files:
   ./delta.py

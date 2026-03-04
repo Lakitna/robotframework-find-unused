@@ -17,3 +17,11 @@ class TestCommandAcceptance(AcceptanceTest):
             __file__,
             expected_exit_code=1,
         )
+
+    def test_files_command_library_verbose(self):
+        self.run_test(
+            ["files", "./robot", "--verbose", "--pythonpath", "./robot"],
+            "./expected_output_verbose.log",
+            __file__,
+            expected_exit_code=1,
+        )
