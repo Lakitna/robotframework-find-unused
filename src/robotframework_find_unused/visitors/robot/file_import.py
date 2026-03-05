@@ -7,7 +7,7 @@ from robot.api.parsing import (
     TestCaseSection,
 )
 
-from robotframework_find_unused.common.const import ERROR_MARKER, FileUseData
+from robotframework_find_unused.common.const import ERROR_MARKER, FileUseData, FileUsedByData
 from robotframework_find_unused.common.impossible_state_error import ImpossibleStateError
 from robotframework_find_unused.common.normalize import normalize_file_path, normalize_keyword_name
 from robotframework_find_unused.convert.convert_path import to_relative_path
@@ -106,7 +106,14 @@ class RobotVisitorFileImports(ModelVisitor):
             init_file = self.init_files.get(path, None)
 
             if init_file:
-                init_file.used_by.append(file)
+                init_file.used_by.append(
+                    FileUsedByData(
+                        file=file,
+                        as_alias=None,
+                        normalized_as_alias=None,
+                        args=(),
+                    ),
+                )
 
     def _get_file_type(
         self,
@@ -135,30 +142,60 @@ class RobotVisitorFileImports(ModelVisitor):
 
     def visit_LibraryImport(self, node: "LibraryImport"):  # noqa: N802
         """Find out which libraries are actually used"""
-        self._register_library_file(node.name)
+        self._register_library_file(node.name, node.args, node.alias, import_type="Library")
 
-    def _register_library_file(self, import_string: str) -> None:
-        lib_path = self._resolve_import_string(import_string, import_type="Library")
+    def _register_library_file(
+        self,
+        import_string: str,
+        import_args: tuple[str, ...],
+        import_as: str | None,
+        import_type: Literal["Library", "Import Library"],
+    ) -> None:
+        lib_path = self._resolve_import_string(import_string, import_type=import_type)
         if lib_path:
-            self._register_file_use(lib_path, file_type="LIBRARY")
+            self._register_file_use(
+                lib_path,
+                import_args,
+                import_as,
+                file_type="LIBRARY",
+            )
 
     def visit_ResourceImport(self, node: "ResourceImport"):  # noqa: N802
         """Find out which resource files are actually used"""
-        self._register_resource_file(node.name)
+        self._register_resource_file(node.name, import_type="Resource")
 
-    def _register_resource_file(self, import_string: str) -> None:
-        resource_path = self._resolve_import_string(import_string, import_type="Resource")
+    def _register_resource_file(
+        self,
+        import_string: str,
+        import_type: Literal["Resource", "Import Resource"],
+    ) -> None:
+        resource_path = self._resolve_import_string(import_string, import_type=import_type)
         if resource_path:
-            self._register_file_use(resource_path, file_type="RESOURCE")
+            self._register_file_use(
+                resource_path,
+                import_args=(),
+                import_as=None,
+                file_type="RESOURCE",
+            )
 
     def visit_VariablesImport(self, node: "VariablesImport"):  # noqa: N802
         """Find out which variable files are actually used"""
-        self._register_variables_file(node.name)
+        self._register_variables_file(node.name, node.args, import_type="Variables")
 
-    def _register_variables_file(self, import_string: str) -> None:
-        variables_path = self._resolve_import_string(import_string, import_type="Variables")
+    def _register_variables_file(
+        self,
+        import_string: str,
+        import_args: tuple[str, ...],
+        import_type: Literal["Variables", "Import Variables"],
+    ) -> None:
+        variables_path = self._resolve_import_string(import_string, import_type=import_type)
         if variables_path:
-            self._register_file_use(variables_path, file_type="VARIABLE")
+            self._register_file_use(
+                variables_path,
+                import_args,
+                import_as=None,
+                file_type="VARIABLE",
+            )
 
     def visit_KeywordCall(self, node: "KeywordCall"):  # noqa: N802
         """Find dynamic import keywords"""
@@ -178,16 +215,36 @@ class RobotVisitorFileImports(ModelVisitor):
         keyword_name = normalize_keyword_name(node.keyword)
 
         if keyword_name == "importresource":
-            self._register_resource_file(import_string)
+            self._register_resource_file(
+                import_string,
+                import_type="Import Resource",
+            )
         if keyword_name == "importlibrary":
-            self._register_library_file(import_string)
+            import_as = None
+            args = node.args
+            if len(args) >= 2 and "AS" in args:  # noqa: PLR2004
+                import_as = args[-1]
+                args = args[:-2]
+
+            self._register_library_file(
+                import_string,
+                args,
+                import_as,
+                import_type="Import Library",
+            )
         if keyword_name == "importvariables":
-            self._register_variables_file(import_string)
+            self._register_variables_file(
+                import_string,
+                node.args,
+                import_type="Import Variables",
+            )
 
     def _register_file_use(
         self,
         file_path: Path,
-        file_type: Literal["SUITE", "RESOURCE", "LIBRARY", "VARIABLE"],
+        import_args: tuple[str, ...],
+        import_as: str | None,
+        file_type: Literal["RESOURCE", "LIBRARY", "VARIABLE"],
     ) -> None:
         if self.current_working_file is None:
             msg = "Registering import outside a .robot or .resource file"
@@ -195,25 +252,40 @@ class RobotVisitorFileImports(ModelVisitor):
 
         file_path = file_path.resolve()
         normalized_path = normalize_file_path(file_path)
+        normalized_import_as = normalize_keyword_name(import_as) if import_as else import_as
+
+        file_used_by = FileUsedByData(
+            file=self.current_working_file,
+            as_alias=import_as,
+            normalized_as_alias=normalized_import_as,
+            args=import_args,
+        )
 
         if normalized_path in self.files:
             existing = self.files[normalized_path]
 
             existing.type.add(file_type)
-            existing.used_by.append(self.current_working_file)
+            existing.used_by.append(file_used_by)
             return
 
         self.files[normalized_path] = FileUseData(
-            id=normalize_file_path(file_path),
+            id=normalized_path,
             path_absolute=file_path,
             type={file_type},
-            used_by=[self.current_working_file],
+            used_by=[file_used_by],
         )
 
     def _resolve_import_string(
         self,
         import_str: str,
-        import_type: Literal["Library", "Resource", "Variables"],
+        import_type: Literal[
+            "Library",
+            "Import Library",
+            "Resource",
+            "Import Resource",
+            "Variables",
+            "Import Variables",
+        ],
     ) -> Path | None:
         if self.current_working_directory is None or self.current_working_file is None:
             msg = "Found import outside a .robot or .resource file"

@@ -191,7 +191,7 @@ class FileImportTreeBuilder:
 
         for file in files:
             for using_file in file.used_by:
-                file_imports_map[using_file.id].append(file)
+                file_imports_map[using_file.file.id].append(file)
 
         return file_imports_map
 
