@@ -53,7 +53,7 @@ def build(c: Context):
 
 @task
 def build_source(c: Context):
-    c.run("uv build")
+    c.run("uv build --clear")
 
 
 @task
