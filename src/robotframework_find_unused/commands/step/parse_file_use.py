@@ -1,28 +1,21 @@
 from pathlib import Path
 
-import click
-
-from robotframework_find_unused.common.const import (
-    DONE_MARKER,
-    INDENT,
-    VERBOSE_NO,
-    VERBOSE_SINGLE,
-    FileUseData,
-)
+from robotframework_find_unused.common.const import FileUseData
 from robotframework_find_unused.common.normalize import normalize_file_path
+from robotframework_find_unused.reporter.base.file_reporter import FileReporter
 from robotframework_find_unused.visitors.robot import visit_robot_files
 from robotframework_find_unused.visitors.robot.file_import import RobotVisitorFileImports
 
 
-def cli_step_parse_file_use(file_paths: list[Path], source_path: Path, *, verbose: int):
+def cli_step_parse_file_use(file_paths: list[Path], source_path: Path, *, reporter: FileReporter):
     """
     Parse files and keep the user up-to-date on progress
     """
-    click.echo("Parsing file imports...")
+    reporter.on_count_file_uses_start(file_paths, source_path)
 
     files = _count_file_uses(file_paths, source_path)
 
-    _log_file_stats(files, verbose)
+    reporter.on_count_file_uses_end(file_paths, source_path, files)
     return files
 
 
@@ -52,31 +45,3 @@ def _count_file_uses(file_paths: list[Path], source_path: Path) -> list[FileUseD
         )
 
     return list(files.values())
-
-
-def _log_file_stats(files: list[FileUseData], verbose: int) -> None:
-    """
-    Output details on parsed files to the user
-    """
-    click.echo(f"{DONE_MARKER} Parsed {len(files)} files")
-
-    if verbose == VERBOSE_NO:
-        return
-
-    file_types: dict[str, list[str]] = {}
-    for file in files:
-        file_type = "UNKNOWN" if len(file.type) == 0 else next(iter(file.type))
-
-        if file_type not in file_types:
-            file_types[file_type] = []
-        file_types[file_type].append(file.id)
-
-    for file_type, file_paths in sorted(file_types.items(), key=lambda x: len(x[1]), reverse=True):
-        click.echo(f"{INDENT}{len(file_paths)} files of type {file_type}")
-
-        if verbose == VERBOSE_SINGLE:
-            continue
-
-        sorted_file_paths = sorted(file_paths, key=lambda f: f)
-        for path in sorted_file_paths:
-            click.echo(f"{INDENT}{INDENT}{click.style(path, fg='bright_black')}")

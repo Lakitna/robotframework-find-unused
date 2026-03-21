@@ -16,12 +16,13 @@ from robotframework_find_unused.commands import (
     ReturnOptions,
     VariableOptions,
     cli_arguments,
-    cli_files,
     cli_keywords,
     cli_returns,
     cli_variables,
+    command_files,
 )
 from robotframework_find_unused.common.const import FilterOption
+from robotframework_find_unused.reporter.cli.file_reporter import FileCliReporter
 
 click_choice_filter_option = click.Choice(
     ["include", "exclude", "only"],
@@ -717,8 +718,8 @@ def files(  # noqa: PLR0913
         source_path=file_path,
         pythonpath=pythonpath,
     )
-    exit_code = cli_files(options)
-    sys.exit(exit_code)
+    reporter = FileCliReporter(options)
+    command_files(options, reporter)
 
 
 def run_cli():

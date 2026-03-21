@@ -1,27 +1,17 @@
-import os
 from pathlib import Path
 
-import click
 import robocop
 
-from robotframework_find_unused.common.const import (
-    DONE_MARKER,
-    ERROR_MARKER,
-    INDENT,
-    NOTE_MARKER,
-    VERBOSE_DOUBLE,
-    VERBOSE_NO,
-    VERBOSE_SINGLE,
-)
+from robotframework_find_unused.reporter.base.file_reporter import FileReporter
 
 FILE_EXTENSIONS = {"*.robot", "*.resource", "*.py"}
 
 
-def cli_discover_file_paths(input_path: str, *, verbose: int) -> list[Path]:
+def cli_discover_file_paths(input_path: str, *, reporter: FileReporter) -> list[Path] | None:
     """
     Get file paths recursively with Robocop excludes.
     """
-    click.echo(f"Discovering files in `{input_path}` using Robocop config...")
+    reporter.on_discover_files_start(input_path)
 
     if robocop.__version__.startswith("6.") or robocop.__version__.startswith("7."):
         file_paths = _discover_file_paths_robocop_6_7(input_path)
@@ -36,7 +26,14 @@ def cli_discover_file_paths(input_path: str, *, verbose: int) -> list[Path]:
         + (-0.5 if p.stem == "__init__" else 0),
     )
 
-    _log_file_stats(sorted_file_paths, input_path, verbose)
+    if len(sorted_file_paths) == 0:
+        reporter.on_discover_files_fail(
+            input_path,
+            [f"Found 0 files in `{input_path}`"],
+        )
+        return None
+
+    reporter.on_discover_files_success(input_path, sorted_file_paths)
     return sorted_file_paths
 
 
@@ -79,33 +76,3 @@ def _discover_file_paths_robocop(input_path: str) -> list[Path]:
     )
 
     return [source_file.path for source_file in config_manager.paths]
-
-
-def _log_file_stats(file_paths: list[Path], input_path: str, verbose: int) -> None:
-    """
-    Output details to the user
-    """
-    if len(file_paths) == 0:
-        click.echo(f"{ERROR_MARKER} Found 0 files in `{input_path}`")
-        click.echo(f"{NOTE_MARKER} All files in Robocop config `exclude` are ignored")
-        click.echo(f"{NOTE_MARKER} All files listed in `.gitignore` files are ignored")
-
-        if verbose < VERBOSE_DOUBLE:
-            return
-
-        click.echo(f"{NOTE_MARKER} All of the following files are excluded:")
-        for root, _dirs, files in os.walk(input_path):
-            for file in files:
-                click.echo(f"{INDENT}{Path(root, file).as_posix()}")
-        return
-
-    if verbose == VERBOSE_NO:
-        return
-
-    click.echo(f"{DONE_MARKER} Discovered {len(file_paths)} files")
-
-    if verbose == VERBOSE_SINGLE:
-        return
-
-    for path in file_paths:
-        click.echo(INDENT + click.style(str(path), fg="bright_black"))
