@@ -1,12 +1,14 @@
 from pathlib import Path
 from typing import TYPE_CHECKING
 
+from .partial.discover_files import PartialBaseReporterDiscoverFiles
+
 if TYPE_CHECKING:
     from robotframework_find_unused.commands.files import FileOptions
     from robotframework_find_unused.common.const import FileUseData
 
 
-class FileReporter:
+class FileReporter(PartialBaseReporterDiscoverFiles):
     """
     Base reporter class for files command.
     """
@@ -19,15 +21,6 @@ class FileReporter:
 
     def on_command_end(self, files: list["FileUseData"]):
         """When the command has done all the things"""
-
-    def on_discover_files_start(self, root_folder: str):
-        """Before files to be analyzed are discovered"""
-
-    def on_discover_files_success(self, root_folder: str, discovered_files: list[Path]):
-        """When discovering files was a success"""
-
-    def on_discover_files_fail(self, root_folder: str, errors: list[str]):
-        """When discovering files fails"""
 
     def on_count_file_uses_start(self, file_paths: list[Path], source_path: Path):
         """Before finding out which files are used"""

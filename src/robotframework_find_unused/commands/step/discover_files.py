@@ -2,12 +2,18 @@ from pathlib import Path
 
 import robocop
 
-from robotframework_find_unused.reporter.base.file_reporter import FileReporter
+from robotframework_find_unused.reporter.base.partial.discover_files import (
+    PartialBaseReporterDiscoverFiles,
+)
 
 FILE_EXTENSIONS = {"*.robot", "*.resource", "*.py"}
 
 
-def cli_discover_file_paths(input_path: str, *, reporter: FileReporter) -> list[Path] | None:
+def cli_discover_file_paths(
+    input_path: str,
+    *,
+    reporter: PartialBaseReporterDiscoverFiles,
+) -> list[Path] | None:
     """
     Get file paths recursively with Robocop excludes.
     """

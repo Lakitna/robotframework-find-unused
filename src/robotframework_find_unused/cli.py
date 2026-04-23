@@ -23,6 +23,7 @@ from robotframework_find_unused.commands import (
 )
 from robotframework_find_unused.common.const import FilterOption
 from robotframework_find_unused.reporter.cli.file_reporter import FileCliReporter
+from robotframework_find_unused.reporter.cli.keyword_reporter import KeywordCliReporter
 
 click_choice_filter_option = click.Choice(
     ["include", "exclude", "only"],
@@ -165,8 +166,8 @@ def keywords(  # noqa: PLR0913
         show_all_count=show_count,
         verbose=verbose,
     )
-    exit_code = cli_keywords(options)
-    sys.exit(exit_code)
+    reporter = KeywordCliReporter(options)
+    cli_keywords(options, reporter)
 
 
 @cli.command(name="variables")
