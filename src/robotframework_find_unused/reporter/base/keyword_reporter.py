@@ -1,23 +1,8 @@
 from pathlib import Path
 from typing import TYPE_CHECKING
 
-from robotframework_find_unused.common.const import (
-    DONE_MARKER,
-    ERROR_MARKER,
-    INDENT,
-    NOTE_MARKER,
-    VERBOSE_DOUBLE,
-    VERBOSE_NO,
-    VERBOSE_SINGLE,
-    WARN_MARKER,
-    FileUseData,
-    FileUsedByData,
-    KeywordData,
-)
-from robotframework_find_unused.visitors.robot.library_import import (
-    LibraryData,
-    RobotVisitorLibraryImports,
-)
+from robotframework_find_unused.common.const import KeywordData
+from robotframework_find_unused.visitors.robot.library_import import LibraryData
 
 from .partial.discover_files import PartialBaseReporterDiscoverFiles
 
@@ -87,12 +72,3 @@ class KeywordReporter(PartialBaseReporterDiscoverFiles):
         counted_keywords: list[KeywordData],
     ):
         """After keyword uses are counted"""
-
-    # def on_error(self, error: Exception):
-    #     """When an error is raised"""
-
-    # def on_warn(self, warning: str):
-    #     """When an warning is issues"""
-
-    # def on_exit(self, reason: str | None, code: int = 0):
-    #     """When the command is done"""
