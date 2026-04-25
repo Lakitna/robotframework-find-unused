@@ -4,8 +4,6 @@ from pathlib import Path
 
 import click
 
-from robotframework_find_unused.commands.files.options import FileOptions
-from robotframework_find_unused.commands.keywords.options import KeywordOptions
 from robotframework_find_unused.common.const import (
     DONE_MARKER,
     ERROR_MARKER,
@@ -16,17 +14,14 @@ from robotframework_find_unused.common.const import (
     VERBOSE_SINGLE,
 )
 from robotframework_find_unused.reporter.base.partial.discover_files import (
-    PartialBaseReporterDiscoverFiles,
+    PartialReporter_DiscoverFiles,
 )
 
 
-class PartialCliReporterDiscoverFiles(PartialBaseReporterDiscoverFiles):
+class PartialCliReporterDiscoverFiles(PartialReporter_DiscoverFiles):
     """
     Partial CLI reporter for discovering files.
     """
-
-    def __init__(self, options: FileOptions | KeywordOptions) -> None:
-        self.options = options
 
     def on_discover_files_start(self, root_folder: str):
         """Before files to be analyzed are discovered"""

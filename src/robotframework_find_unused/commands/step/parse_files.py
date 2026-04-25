@@ -3,13 +3,15 @@ from pathlib import Path
 from robot.libdocpkg.model import LibraryDoc
 
 from robotframework_find_unused.parse.libdoc import parse_files_with_libdoc
-from robotframework_find_unused.reporter.base.keyword_reporter import KeywordReporter
+from robotframework_find_unused.reporter.base.partial.parse_files import (
+    PartialReporter_ParseFiles,
+)
 
 
 def cli_step_parse_files_with_libdoc(
     file_paths: list[Path],
     *,
-    reporter: KeywordReporter,
+    reporter: PartialReporter_ParseFiles,
 ) -> list[LibraryDoc]:
     """
     Parse files with libdoc and keep the user up-to-date on progress

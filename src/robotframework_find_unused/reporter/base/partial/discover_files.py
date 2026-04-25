@@ -1,10 +1,18 @@
 from pathlib import Path
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from robotframework_find_unused.commands.keywords import KeywordOptions
+    from robotframework_find_unused.commands.returns import ReturnOptions
 
 
-class PartialBaseReporterDiscoverFiles:
+class PartialReporter_DiscoverFiles:  # noqa: N801
     """
     Partial base reporter for discovering files.
     """
+
+    def __init__(self, options: "KeywordOptions | ReturnOptions") -> None:
+        self.options = options
 
     def on_discover_files_start(self, root_folder: str):
         """Before files to be analyzed are discovered"""

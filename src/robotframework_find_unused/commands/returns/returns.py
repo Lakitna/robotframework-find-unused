@@ -2,70 +2,57 @@
 Implementation of the 'returns' command
 """
 
-from dataclasses import dataclass
-
 import click
 
-from robotframework_find_unused.common.cli import cli_hard_exit, pretty_kw_name
-from robotframework_find_unused.common.const import FilterOption, KeywordData
+from robotframework_find_unused.commands.step.discover_files import cli_discover_file_paths
+from robotframework_find_unused.commands.step.keyword_count_uses import cli_count_keyword_uses
+from robotframework_find_unused.commands.step.keyword_definitions import (
+    cli_step_get_custom_keyword_definitions,
+)
+from robotframework_find_unused.commands.step.keyword_filter import cli_filter_keywords
+from robotframework_find_unused.commands.step.lib_keyword_definitions import (
+    cli_step_get_downloaded_lib_keywords,
+)
+from robotframework_find_unused.commands.step.parse_files import cli_step_parse_files_with_libdoc
+from robotframework_find_unused.common.cli import pretty_kw_name
+from robotframework_find_unused.common.const import KeywordData
 from robotframework_find_unused.common.sort import sort_keywords_by_name
+from robotframework_find_unused.reporter.base.return_reporter import ReturnReporter
 
-from .step.discover_files import cli_discover_file_paths
-from .step.keyword_count_uses import cli_count_keyword_uses
-from .step.keyword_definitions import cli_step_get_custom_keyword_definitions
-from .step.keyword_filter import cli_filter_keywords
-from .step.lib_keyword_definitions import cli_step_get_downloaded_lib_keywords
-from .step.parse_files import cli_step_parse_files_with_libdoc
+from .options import ReturnOptions
 
 
-@dataclass
-class ReturnOptions:
-    """
-    Command line options for the 'returns' command
-    """
-
-    show_all_count: bool
-    deprecated_keywords: FilterOption
-    private_keywords: FilterOption
-    library_keywords: FilterOption
-    unused_keywords: FilterOption
-    keyword_filter_glob: str | None
-    verbose: int
-    source_path: str
-
-
-def cli_returns(options: ReturnOptions):
+def cli_returns(options: ReturnOptions, reporter: ReturnReporter) -> None:
     """
     Entry point for the CLI command
     """
-    file_paths = cli_discover_file_paths(options.source_path, verbose=options.verbose)
-    if len(file_paths) == 0:
-        return cli_hard_exit(options.verbose)
+    reporter.on_command_start()
 
-    files = cli_step_parse_files_with_libdoc(
-        file_paths,
-        verbose=options.verbose,
-    )
+    file_paths = cli_discover_file_paths(options.source_path, reporter=reporter)
+    if file_paths is None:
+        return
+
+    files = cli_step_parse_files_with_libdoc(file_paths, reporter=reporter)
 
     keywords = cli_step_get_custom_keyword_definitions(
         files,
-        verbose=options.verbose,
+        reporter=reporter,
         enrich_py_keywords=True,
     )
     if len(keywords) == 0:
-        return cli_hard_exit(options.verbose)
+        return
 
     downloaded_library_keywords = cli_step_get_downloaded_lib_keywords(
         file_paths,
-        verbose=options.verbose,
+        reporter=reporter,
         enrich_py_keywords=options.library_keywords != "exclude",
     )
 
     counted_keywords = cli_count_keyword_uses(
         file_paths,
         keywords,
-        downloaded_library_keywords=downloaded_library_keywords,
-        verbose=options.verbose,
+        downloaded_library_keywords,
+        reporter=reporter,
     )
 
     if options.library_keywords != "exclude" and options.unused_keywords != "exclude":
@@ -84,8 +71,8 @@ def cli_returns(options: ReturnOptions):
         filter_returns="only",
         filter_glob=options.keyword_filter_glob,
     )
-    _cli_log_results(counted_keywords, options)
-    return _exit_code(counted_keywords)
+
+    reporter.on_command_end(counted_keywords)
 
 
 def _cli_log_results(keywords: list[KeywordData], options: ReturnOptions) -> None:

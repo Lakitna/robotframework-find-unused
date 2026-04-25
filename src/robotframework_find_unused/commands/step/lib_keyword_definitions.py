@@ -1,6 +1,8 @@
 from pathlib import Path
 
-from robotframework_find_unused.reporter.base.keyword_reporter import KeywordReporter
+from robotframework_find_unused.reporter.base.partial.keyword_definitions import (
+    PartialReporter_DownloadedKeywordDefinitions,
+)
 from robotframework_find_unused.visitors.robot import visit_robot_files
 from robotframework_find_unused.visitors.robot.library_import import RobotVisitorLibraryImports
 
@@ -8,7 +10,7 @@ from robotframework_find_unused.visitors.robot.library_import import RobotVisito
 def cli_step_get_downloaded_lib_keywords(
     file_paths: list[Path],
     *,
-    reporter: KeywordReporter,
+    reporter: PartialReporter_DownloadedKeywordDefinitions,
     enrich_py_keywords: bool = False,
 ):
     """

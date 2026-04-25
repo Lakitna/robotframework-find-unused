@@ -24,6 +24,7 @@ from robotframework_find_unused.commands import (
 from robotframework_find_unused.common.const import FilterOption
 from robotframework_find_unused.reporter.cli.file_reporter import FileCliReporter
 from robotframework_find_unused.reporter.cli.keyword_reporter import KeywordCliReporter
+from robotframework_find_unused.reporter.cli.return_reporter import ReturnCliReporter
 from robotframework_find_unused.reporter.cli.variable_reporter import VariableCliReporter
 
 click_choice_filter_option = click.Choice(
@@ -529,8 +530,8 @@ def returns(  # noqa: PLR0913
         show_all_count=show_count,
         verbose=verbose,
     )
-    exit_code = cli_returns(options)
-    sys.exit(exit_code)
+    reporter = ReturnCliReporter(options)
+    cli_returns(options, reporter)
 
 
 @cli.command(name="files")

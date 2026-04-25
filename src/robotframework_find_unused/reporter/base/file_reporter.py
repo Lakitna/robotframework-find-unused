@@ -1,14 +1,14 @@
 from pathlib import Path
 from typing import TYPE_CHECKING
 
-from .partial.discover_files import PartialBaseReporterDiscoverFiles
+from .partial.discover_files import PartialReporter_DiscoverFiles
 
 if TYPE_CHECKING:
     from robotframework_find_unused.commands.files import FileOptions
     from robotframework_find_unused.common.const import FileUseData
 
 
-class FileReporter(PartialBaseReporterDiscoverFiles):
+class FileReporter(PartialReporter_DiscoverFiles):
     """
     Base reporter class for files command.
     """

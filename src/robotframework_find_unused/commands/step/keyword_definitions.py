@@ -4,7 +4,9 @@ from robot.libdocpkg.model import KeywordDoc, LibraryDoc
 
 from robotframework_find_unused.common.const import KeywordData
 from robotframework_find_unused.convert.convert_keyword import libdoc_keyword_to_keyword_data
-from robotframework_find_unused.reporter.base.keyword_reporter import KeywordReporter
+from robotframework_find_unused.reporter.base.partial.keyword_definitions import (
+    PartialReporter_CustomKeywordDefinitions,
+)
 from robotframework_find_unused.resolve.resolve_python_keyword_data import (
     enrich_python_keyword_data,
 )
@@ -13,7 +15,7 @@ from robotframework_find_unused.resolve.resolve_python_keyword_data import (
 def cli_step_get_custom_keyword_definitions(
     files: list[LibraryDoc],
     *,
-    reporter: KeywordReporter,
+    reporter: PartialReporter_CustomKeywordDefinitions,
     enrich_py_keywords: bool = False,
 ):
     """

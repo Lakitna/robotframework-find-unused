@@ -3,13 +3,13 @@ from typing import TYPE_CHECKING
 
 from robotframework_find_unused.common.const import VariableData
 
-from .partial.discover_files import PartialBaseReporterDiscoverFiles
+from .partial.discover_files import PartialReporter_DiscoverFiles
 
 if TYPE_CHECKING:
     from robotframework_find_unused.commands.variables import VariableOptions
 
 
-class VariableReporter(PartialBaseReporterDiscoverFiles):
+class VariableReporter(PartialReporter_DiscoverFiles):
     """
     Base reporter class for variable command.
     """

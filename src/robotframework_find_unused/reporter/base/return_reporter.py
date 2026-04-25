@@ -11,10 +11,10 @@ from .partial.keyword_definitions import (
 from .partial.parse_files import PartialReporter_ParseFiles
 
 if TYPE_CHECKING:
-    from robotframework_find_unused.commands.keywords import KeywordOptions
+    from robotframework_find_unused.commands.returns import ReturnOptions
 
 
-class KeywordReporter(
+class ReturnReporter(
     PartialReporter_DiscoverFiles,
     PartialReporter_ParseFiles,
     PartialReporter_CustomKeywordDefinitions,
@@ -22,10 +22,10 @@ class KeywordReporter(
     PartialReporter_CountKeywords,
 ):
     """
-    Base reporter class for keyword command.
+    Base reporter class for return command.
     """
 
-    def __init__(self, options: "KeywordOptions") -> None:
+    def __init__(self, options: "ReturnOptions") -> None:
         self.options = options
 
     def on_command_start(self):
