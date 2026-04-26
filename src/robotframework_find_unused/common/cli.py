@@ -1,9 +1,6 @@
-import sys
-from typing import Literal
-
 import click
 
-from .const import NOTE_MARKER, VERBOSE_DOUBLE, FileUseType, KeywordData, VariableData
+from .const import FileUseType, KeywordData, VariableData
 
 
 def pretty_kw_name(keyword: KeywordData) -> str:
@@ -61,13 +58,3 @@ def pretty_variable(var: VariableData) -> str:
         out += click.style(f" -> {var.resolved_name}", fg="bright_black")
 
     return out
-
-
-def cli_hard_exit(verbose: int) -> Literal[255]:
-    """
-    Immediately hard exit app. Use when something went wrong.
-    """
-    if verbose < VERBOSE_DOUBLE:
-        click.echo(f"{NOTE_MARKER} Run with `--verbose --verbose` or `-vv` for more details")
-    sys.exit(255)
-    return 255
