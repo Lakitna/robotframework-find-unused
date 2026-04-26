@@ -4,7 +4,7 @@ from typing import TYPE_CHECKING
 from .partial.discover_files import PartialReporter_DiscoverFiles
 
 if TYPE_CHECKING:
-    from robotframework_find_unused.commands.files import FileOptions
+    from robotframework_find_unused.commands.files.options import FileOptions
     from robotframework_find_unused.common.const import FileUseData
 
 

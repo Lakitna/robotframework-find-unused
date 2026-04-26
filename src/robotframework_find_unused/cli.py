@@ -4,8 +4,6 @@ CLI entry point
 
 # ruff: noqa: FBT001,D301
 
-import sys
-
 import click
 
 from robotframework_find_unused.__version__ import __version__
@@ -16,10 +14,10 @@ from robotframework_find_unused.commands import (
     ReturnOptions,
     VariableOptions,
     command_arguments,
+    command_files,
     command_keywords,
     command_returns,
     command_variables,
-    command_files,
 )
 from robotframework_find_unused.common.const import FilterOption
 from robotframework_find_unused.reporter.cli.argument_reporter import ArgumentCliReporter

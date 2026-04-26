@@ -3,16 +3,19 @@ Implementation of the 'files' command
 """
 
 from pathlib import Path
+from typing import TYPE_CHECKING
 
 from robotframework_find_unused.commands.step.discover_files import step_discover_file_paths
 from robotframework_find_unused.commands.step.parse_file_use import step_step_parse_file_use
 from robotframework_find_unused.common.pythonpath import apply_pythonpath
-from robotframework_find_unused.reporter.base.file_reporter import FileReporter
 
-from .options import FileOptions
+if TYPE_CHECKING:
+    from robotframework_find_unused.reporter.base.file_reporter import FileReporter
+
+    from .options import FileOptions
 
 
-def command_files(options: FileOptions, reporter: FileReporter) -> None:
+def command_files(options: "FileOptions", reporter: "FileReporter") -> None:
     """
     Entry point for the CLI command 'files'
     """

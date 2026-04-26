@@ -6,7 +6,7 @@ from robotframework_find_unused.common.const import VariableData
 from .partial.discover_files import PartialReporter_DiscoverFiles
 
 if TYPE_CHECKING:
-    from robotframework_find_unused.commands.variables import VariableOptions
+    from robotframework_find_unused.commands.variables.options import VariableOptions
 
 
 class VariableReporter(PartialReporter_DiscoverFiles):

@@ -1,11 +1,3 @@
 """
-Find unused variables command
+Find unused arguments command
 """
-
-from .arguments import command_arguments
-from .options import ArgumentsOptions
-
-__all__ = [
-    "ArgumentsOptions",
-    "command_arguments",
-]

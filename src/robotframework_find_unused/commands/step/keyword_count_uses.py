@@ -1,19 +1,24 @@
-from pathlib import Path
+from typing import TYPE_CHECKING
 
-from robotframework_find_unused.common.const import KeywordData, LibraryData
-from robotframework_find_unused.reporter.base.partial.count_keywords import (
-    PartialReporter_CountKeywords,
-)
+from robotframework_find_unused.commands.keywords.options import KeywordOptions
 from robotframework_find_unused.visitors.robot import visit_robot_files
 from robotframework_find_unused.visitors.robot.keyword_visitor import RobotVisitorKeywords
 
+if TYPE_CHECKING:
+    from pathlib import Path
+
+    from robotframework_find_unused.common.const import KeywordData, LibraryData
+    from robotframework_find_unused.reporter.base.partial.count_keywords import (
+        PartialReporter_CountKeywords,
+    )
+
 
 def step_count_keyword_uses(
-    file_paths: list[Path],
-    keywords: list[KeywordData],
-    downloaded_libraries: list[LibraryData],
+    file_paths: "list[Path]",
+    keywords: "list[KeywordData]",
+    downloaded_libraries: "list[LibraryData]",
     *,
-    reporter: PartialReporter_CountKeywords,
+    reporter: "PartialReporter_CountKeywords",
 ):
     """
     Walk through all robot files to count keyword uses and keep the user up-to-date on progress

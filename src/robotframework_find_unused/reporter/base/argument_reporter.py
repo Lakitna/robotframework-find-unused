@@ -11,7 +11,7 @@ from .partial.keyword_definitions import (
 from .partial.parse_files import PartialReporter_ParseFiles
 
 if TYPE_CHECKING:
-    from robotframework_find_unused.commands.arguments import ArgumentsOptions
+    from robotframework_find_unused.commands.arguments.options import ArgumentsOptions
 
 
 class ArgumentReporter(

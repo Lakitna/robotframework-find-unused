@@ -6,8 +6,8 @@ from robot.libdocpkg.model import LibraryDoc
 from robotframework_find_unused.common.const import KeywordData, LibraryData
 
 if TYPE_CHECKING:
-    from robotframework_find_unused.commands.keywords import KeywordOptions
-    from robotframework_find_unused.commands.returns import ReturnOptions
+    from robotframework_find_unused.commands.keywords.options import KeywordOptions
+    from robotframework_find_unused.commands.returns.options import ReturnOptions
 
 
 class PartialReporter_CustomKeywordDefinitions:  # noqa: N801

@@ -2,6 +2,8 @@
 Implementation of the 'arguments' command
 """
 
+from typing import TYPE_CHECKING
+
 from robotframework_find_unused.commands.step.discover_files import step_discover_file_paths
 from robotframework_find_unused.commands.step.keyword_count_uses import step_count_keyword_uses
 from robotframework_find_unused.commands.step.keyword_definitions import (
@@ -12,12 +14,14 @@ from robotframework_find_unused.commands.step.lib_keyword_definitions import (
     step_step_get_downloaded_lib_keywords,
 )
 from robotframework_find_unused.commands.step.parse_files import step_step_parse_files_with_libdoc
-from robotframework_find_unused.reporter.base.argument_reporter import ArgumentReporter
 
-from .options import ArgumentsOptions
+if TYPE_CHECKING:
+    from robotframework_find_unused.reporter.base.argument_reporter import ArgumentReporter
+
+    from .options import ArgumentsOptions
 
 
-def command_arguments(options: ArgumentsOptions, reporter: ArgumentReporter) -> None:
+def command_arguments(options: "ArgumentsOptions", reporter: "ArgumentReporter") -> None:
     """
     Entry point for the CLI command 'arguments'
     """

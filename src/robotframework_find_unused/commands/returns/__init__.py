@@ -1,11 +1,3 @@
 """
-Find unused keywords command
+Find unused returns command
 """
-
-from .options import ReturnOptions
-from .returns import command_returns
-
-__all__ = [
-    "ReturnOptions",
-    "command_returns",
-]

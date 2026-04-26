@@ -4,8 +4,8 @@ from typing import TYPE_CHECKING
 from robot.libdocpkg.model import LibraryDoc
 
 if TYPE_CHECKING:
-    from robotframework_find_unused.commands.keywords import KeywordOptions
-    from robotframework_find_unused.commands.returns import ReturnOptions
+    from robotframework_find_unused.commands.keywords.options import KeywordOptions
+    from robotframework_find_unused.commands.returns.options import ReturnOptions
 
 
 class PartialReporter_ParseFiles:  # noqa: N801
