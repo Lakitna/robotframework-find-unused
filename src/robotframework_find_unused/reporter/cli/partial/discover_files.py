@@ -51,7 +51,7 @@ class PartialCliReporterDiscoverFiles(PartialReporter_DiscoverFiles):
 
     def on_discover_files_success(
         self,
-        root_folder: str,  # noqa: ARG002
+        root_folder: str,
         discovered_files: list[Path],
     ):
         """When discovering files was a success"""

@@ -95,7 +95,6 @@ class VariableCliReporter(VariableReporter, PartialCliReporterDiscoverFiles):
                 f"{ERROR_MARKER} Found {total_uses} variable uses of gathered variables",
             )
             if self.options.verbose == VERBOSE_NO:
-                # TODO: Actually log more with --verbose --verbose (also for other reporters)
                 click.echo(
                     f"{NOTE_MARKER} Run with `--verbose --verbose` or `-vv` for more details",
                 )
