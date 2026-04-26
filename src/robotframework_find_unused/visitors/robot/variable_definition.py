@@ -2,18 +2,12 @@ from collections.abc import Iterable
 from pathlib import Path
 from typing import TYPE_CHECKING
 
-import click
-import robot.errors
 from robot.api.parsing import (
     ModelVisitor,
     Variable,
 )
 
-from robotframework_find_unused.common.const import (
-    ERROR_MARKER,
-    VariableData,
-    VariableDefinedInType,
-)
+from robotframework_find_unused.common.const import VariableData, VariableDefinedInType
 from robotframework_find_unused.common.impossible_state_error import ImpossibleStateError
 from robotframework_find_unused.common.normalize import (
     normalize_keyword_name,
@@ -31,6 +25,8 @@ if TYPE_CHECKING:
         VariablesImport,
     )
 
+    from robotframework_find_unused.reporter.base.variable_reporter import VariableReporter
+
 
 class RobotVisitorVariableDefinitions(ModelVisitor):
     """
@@ -43,9 +39,15 @@ class RobotVisitorVariableDefinitions(ModelVisitor):
     current_working_file: Path | None = None
     current_working_directory: Path | None = None
 
-    def __init__(self, root_directory: Path, discovered_files: set[Path] | None = None) -> None:
+    def __init__(
+        self,
+        root_directory: Path,
+        discovered_files: set[Path] | None,
+        reporter: "VariableReporter",
+    ) -> None:
         self.root_directory = root_directory.absolute()
         self.discovered_files = discovered_files or set()
+        self.reporter = reporter
         self.variables = {}
         super().__init__()
 
@@ -93,21 +95,11 @@ class RobotVisitorVariableDefinitions(ModelVisitor):
                 self.root_directory,
                 self.discovered_files,
             )
-        except ImportError:
-            from_path = to_relative_path(self.root_directory, self.current_working_file)
-            click.echo(
-                f"{ERROR_MARKER} `Variables  {node.name}` <- could not find. From {from_path}",
-            )
-            import_path = None
-
-        if import_path:
-            try:
+            if import_path:
                 self._import_variable_file(Path(import_path), node.args)
-            except Exception as e:  # noqa: BLE001
-                click.echo(f"{ERROR_MARKER} Failed to import variables from variables file.")
-                click.echo(f"{ERROR_MARKER} Something went very wrong. Details below:")
-                click.echo(f"{ERROR_MARKER} {e}")
-                click.echo()
+        except Exception as e:  # noqa: BLE001
+            from_path = to_relative_path(self.root_directory, self.current_working_file)
+            self.reporter.on_file_import_error(e, node.name, from_path)
 
         return self.generic_visit(node)
 
@@ -163,14 +155,10 @@ class RobotVisitorVariableDefinitions(ModelVisitor):
         var_store = VariableStore(None)
         file_setter = VariableFileSetter(var_store)
 
-        try:
-            file_setter.set(
-                str(import_path),
-                args=import_args,
-            )
-        except robot.errors.DataError as e:
-            click.echo(f"{ERROR_MARKER} {e.message.splitlines()[0]}")
-            return
+        file_setter.set(
+            str(import_path),
+            args=import_args,
+        )
 
         for var_name in var_store.as_dict(decoration=True):
             self._register_variable(var_name, "variable_file", import_path, [])

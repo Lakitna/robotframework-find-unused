@@ -268,8 +268,9 @@ class FileCliReporter(FileReporter, PartialCliReporterDiscoverFiles):
         error: ImportError,
         import_type: str,
         import_str: str,
-        import_path: str,
+        import_from_path: str,
     ):
         click.echo(
-            f"{ERROR_MARKER} `{import_type}  {import_str}` <- could not find. From {import_path}",
+            f"{ERROR_MARKER} `{import_type}  {import_str}` <- could not find. "
+            f"From {import_from_path}",
         )

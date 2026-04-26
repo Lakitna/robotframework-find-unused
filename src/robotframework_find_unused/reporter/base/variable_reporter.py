@@ -52,3 +52,15 @@ class VariableReporter(PartialReporter_DiscoverFiles):
         counted_variables: list[VariableData],
     ):
         """After variable uses are counted"""
+
+    def on_file_import_error(
+        self,
+        error: Exception,
+        import_str: str,
+        import_from_path: str,
+    ):
+        """
+        When a variable file can't be imported.
+
+        For example, because it does not exist or contains invalid Python.
+        """

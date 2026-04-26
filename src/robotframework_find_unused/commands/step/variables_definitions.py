@@ -21,7 +21,7 @@ def step_get_variable_definitions(
     """
     reporter.on_get_variable_definitions_start(file_paths, source_path)
 
-    visitor = RobotVisitorVariableDefinitions(source_path, set(file_paths))
+    visitor = RobotVisitorVariableDefinitions(source_path, set(file_paths), reporter)
     visit_robot_files(file_paths, visitor)
 
     variables = _resolve_vars_in_var_name(visitor.variables)

@@ -38,9 +38,6 @@ class FileReporter(PartialReporter_DiscoverFiles):
         error: ImportError,
         import_type: str,
         import_str: str,
-        import_path: str,
+        import_from_path: str,
     ):
         """When a file can't be imported"""
-
-    def on_exit(self, reason: str | None, code: int = 0):
-        """When the command is done"""

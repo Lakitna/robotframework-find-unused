@@ -306,8 +306,8 @@ class RobotVisitorFileImports(ModelVisitor):
                 self.discovered_files,
             )
         except ImportError as e:
-            import_path = to_relative_path(
+            from_path = to_relative_path(
                 self.root_directory,
                 self.current_working_file.path_absolute,
             )
-            self.reporter.on_file_import_error(e, import_type, import_str, import_path)
+            self.reporter.on_file_import_error(e, import_type, import_str, from_path)

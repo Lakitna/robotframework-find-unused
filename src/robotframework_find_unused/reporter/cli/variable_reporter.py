@@ -3,6 +3,7 @@ import sys
 from pathlib import Path
 
 import click
+import robot.errors
 
 from robotframework_find_unused.common.cli import pretty_variable
 from robotframework_find_unused.common.const import (
@@ -173,3 +174,19 @@ class VariableCliReporter(VariableReporter, PartialCliReporterDiscoverFiles):
         unused_variables = [var for var in counted_variables if var.use_count == 0]
         exit_code = len(unused_variables)
         sys.exit(min(exit_code, 200))
+
+    def on_file_import_error(self, error: Exception, import_str: str, import_from_path: str):
+        if isinstance(error, ImportError):
+            click.echo(
+                f"{ERROR_MARKER} `Variables  {import_str}` <- could not find. "
+                f"From {import_from_path}",
+            )
+
+        if isinstance(error, robot.errors.DataError):
+            click.echo(f"{ERROR_MARKER} {error.message.splitlines()[0]}")
+            return
+
+        click.echo(f"{ERROR_MARKER} Failed to import variables from variables file.")
+        click.echo(f"{ERROR_MARKER} Something went very wrong. Details below:")
+        click.echo(f"{ERROR_MARKER} {error}")
+        click.echo()
