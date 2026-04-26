@@ -22,6 +22,7 @@ from robotframework_find_unused.commands import (
     command_files,
 )
 from robotframework_find_unused.common.const import FilterOption
+from robotframework_find_unused.reporter.cli.argument_reporter import ArgumentCliReporter
 from robotframework_find_unused.reporter.cli.file_reporter import FileCliReporter
 from robotframework_find_unused.reporter.cli.keyword_reporter import KeywordCliReporter
 from robotframework_find_unused.reporter.cli.return_reporter import ReturnCliReporter
@@ -425,8 +426,8 @@ def arguments(  # noqa: PLR0913
         show_all_count=show_count,
         verbose=verbose,
     )
-    exit_code = cli_arguments(options)
-    sys.exit(exit_code)
+    reporter = ArgumentCliReporter(options)
+    cli_arguments(options, reporter)
 
 
 @cli.command(name="returns")
