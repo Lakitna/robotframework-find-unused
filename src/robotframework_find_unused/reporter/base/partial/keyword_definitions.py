@@ -1,6 +1,7 @@
 from pathlib import Path
 from typing import TYPE_CHECKING
 
+import robot.errors
 from robot.libdocpkg.model import LibraryDoc
 
 from robotframework_find_unused.common.const import KeywordData, LibraryData
@@ -46,3 +47,10 @@ class PartialReporter_DownloadedKeywordDefinitions:  # noqa: N801
         libraries: list[LibraryData],
     ):
         """After all downloaded (library) keyword definitions have been discovered"""
+
+    def on_library_parse_error(
+        self,
+        error: robot.errors.DataError,
+        lib_name: str,
+    ):
+        """When parsing a library fails"""

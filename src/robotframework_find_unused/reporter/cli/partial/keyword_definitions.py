@@ -2,6 +2,7 @@ import sys
 from pathlib import Path
 
 import click
+from robot.errors import DataError
 from robot.libdocpkg.model import LibraryDoc
 
 from robotframework_find_unused.common.cli import pretty_kw_name
@@ -91,3 +92,10 @@ class PartialCliReporterDownloadedKeywordDefinitions(PartialReporter_DownloadedK
                 click.echo(f"{INDENT}{lib.name}: {ERROR_MARKER}")
             else:
                 click.echo(f"{INDENT}{lib.name}: {len(lib.keywords)} keywords")
+
+    def on_library_parse_error(
+        self,
+        error: DataError,
+        lib_name: str,
+    ):
+        click.echo(f"{ERROR_MARKER} Failed to gather keywords from library `{lib_name}`")

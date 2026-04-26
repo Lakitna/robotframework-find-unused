@@ -1,16 +1,20 @@
-from pathlib import Path
+from typing import TYPE_CHECKING
 
-from robotframework_find_unused.reporter.base.partial.keyword_definitions import (
-    PartialReporter_DownloadedKeywordDefinitions,
-)
 from robotframework_find_unused.visitors.robot import visit_robot_files
 from robotframework_find_unused.visitors.robot.library_import import RobotVisitorLibraryImports
 
+if TYPE_CHECKING:
+    from pathlib import Path
+
+    from robotframework_find_unused.reporter.base.partial.keyword_definitions import (
+        PartialReporter_DownloadedKeywordDefinitions,
+    )
+
 
 def step_step_get_downloaded_lib_keywords(
-    file_paths: list[Path],
+    file_paths: "list[Path]",
     *,
-    reporter: PartialReporter_DownloadedKeywordDefinitions,
+    reporter: "PartialReporter_DownloadedKeywordDefinitions",
     enrich_py_keywords: bool = False,
 ):
     """
@@ -22,7 +26,7 @@ def step_step_get_downloaded_lib_keywords(
 
     robot_file_paths = [p for p in file_paths if p.suffix in (".resource", ".robot")]
 
-    visitor = RobotVisitorLibraryImports(enrich_py_keywords=enrich_py_keywords)
+    visitor = RobotVisitorLibraryImports(reporter, enrich_py_keywords=enrich_py_keywords)
     visit_robot_files(robot_file_paths, visitor)
     downloaded_libraries = list(visitor.downloaded_libraries.values())
 
