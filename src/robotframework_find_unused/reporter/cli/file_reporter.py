@@ -262,3 +262,14 @@ class FileCliReporter(FileReporter, PartialCliReporterDiscoverFiles):
             for tree in trees[0:-1]:
                 click.echo(normalize_file_path(tree.data.path_absolute))
             tree_builder.cli_file_use_tree(trees[-1])
+
+    def on_file_import_error(
+        self,
+        error: ImportError,
+        import_type: str,
+        import_str: str,
+        import_path: str,
+    ):
+        click.echo(
+            f"{ERROR_MARKER} `{import_type}  {import_str}` <- could not find. From {import_path}",
+        )

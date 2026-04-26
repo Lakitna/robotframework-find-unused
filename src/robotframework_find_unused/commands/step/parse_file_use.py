@@ -13,17 +13,21 @@ def step_step_parse_file_use(file_paths: list[Path], source_path: Path, *, repor
     """
     reporter.on_count_file_uses_start(file_paths, source_path)
 
-    files = _count_file_uses(file_paths, source_path)
+    files = _count_file_uses(file_paths, source_path, reporter)
 
     reporter.on_count_file_uses_end(file_paths, source_path, files)
     return files
 
 
-def _count_file_uses(file_paths: list[Path], source_path: Path) -> list[FileUseData]:
+def _count_file_uses(
+    file_paths: list[Path],
+    source_path: Path,
+    reporter: FileReporter,
+) -> list[FileUseData]:
     """
     Walk through all robot files to keep track of imports.
     """
-    visitor = RobotVisitorFileImports(source_path, set(file_paths))
+    visitor = RobotVisitorFileImports(source_path, set(file_paths), reporter)
     visit_robot_files(
         file_paths,
         visitor,
