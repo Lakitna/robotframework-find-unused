@@ -29,15 +29,30 @@ def step_count_keyword_uses(
     visit_robot_files(file_paths, visitor)
     counted_keywords = list(visitor.keywords.values())
 
-    if (
-        reporter.options.library_keywords != "exclude"
-        and reporter.options.unused_library_keywords != "exclude"
-    ):
-        for lib in downloaded_libraries:
-            for kw in lib.keywords:
-                if kw in counted_keywords:
-                    continue
-                counted_keywords.append(kw)
+    counted_keywords = _append_unused_keywords(counted_keywords, downloaded_libraries, reporter)
 
     reporter.on_count_keyword_uses_end(file_paths, keywords, downloaded_libraries, counted_keywords)
+    return counted_keywords
+
+
+def _append_unused_keywords(
+    counted_keywords: "list[KeywordData]",
+    downloaded_libraries: "list[LibraryData]",
+    reporter: "PartialReporter_CountKeywords",
+) -> "list[KeywordData]":
+    if reporter.options.library_keywords == "exclude":
+        return counted_keywords
+
+    if (
+        isinstance(reporter.options, KeywordOptions)
+        and reporter.options.unused_library_keywords == "exclude"
+    ):
+        return counted_keywords
+
+    for lib in downloaded_libraries:
+        for kw in lib.keywords:
+            if kw in counted_keywords:
+                continue
+            counted_keywords.append(kw)
+
     return counted_keywords
