@@ -7,7 +7,7 @@ from robotframework_find_unused.visitors.robot import visit_robot_files
 from robotframework_find_unused.visitors.robot.library_import import RobotVisitorLibraryImports
 
 
-def cli_step_get_downloaded_lib_keywords(
+def step_step_get_downloaded_lib_keywords(
     file_paths: list[Path],
     *,
     reporter: PartialReporter_DownloadedKeywordDefinitions,

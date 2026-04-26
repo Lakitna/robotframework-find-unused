@@ -6,7 +6,7 @@ from robotframework_find_unused.visitors.robot import visit_robot_files
 from robotframework_find_unused.visitors.robot.variable_count import RobotVisitorVariableUses
 
 
-def cli_count_variable_uses(
+def step_count_variable_uses(
     file_paths: list[Path],
     variable_defs: dict[str, VariableData],
     *,

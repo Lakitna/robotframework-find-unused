@@ -10,7 +10,7 @@ from robotframework_find_unused.visitors.robot.variable_definition import (
 )
 
 
-def cli_get_variable_definitions(
+def step_get_variable_definitions(
     file_paths: list[Path],
     source_path: Path,
     *,

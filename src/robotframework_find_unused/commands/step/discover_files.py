@@ -9,7 +9,7 @@ from robotframework_find_unused.reporter.base.partial.discover_files import (
 FILE_EXTENSIONS = {"*.robot", "*.resource", "*.py"}
 
 
-def cli_discover_file_paths(
+def step_discover_file_paths(
     input_path: str,
     *,
     reporter: PartialReporter_DiscoverFiles,

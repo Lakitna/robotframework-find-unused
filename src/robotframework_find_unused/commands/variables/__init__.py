@@ -3,9 +3,9 @@ Find unused variables command
 """
 
 from .options import VariableOptions
-from .variables import cli_variables
+from .variables import command_variables
 
 __all__ = [
     "VariableOptions",
-    "cli_variables",
+    "command_variables",
 ]

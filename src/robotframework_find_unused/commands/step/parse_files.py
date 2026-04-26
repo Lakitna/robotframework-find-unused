@@ -8,7 +8,7 @@ from robotframework_find_unused.reporter.base.partial.parse_files import (
 )
 
 
-def cli_step_parse_files_with_libdoc(
+def step_step_parse_files_with_libdoc(
     file_paths: list[Path],
     *,
     reporter: PartialReporter_ParseFiles,

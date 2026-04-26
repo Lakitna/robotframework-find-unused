@@ -12,7 +12,7 @@ from robotframework_find_unused.resolve.resolve_python_keyword_data import (
 )
 
 
-def cli_step_get_custom_keyword_definitions(
+def step_step_get_custom_keyword_definitions(
     files: list[LibraryDoc],
     *,
     reporter: PartialReporter_CustomKeywordDefinitions,

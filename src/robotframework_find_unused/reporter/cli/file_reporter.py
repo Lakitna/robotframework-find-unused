@@ -261,4 +261,4 @@ class FileCliReporter(FileReporter, PartialCliReporterDiscoverFiles):
             click.echo()
             for tree in trees[0:-1]:
                 click.echo(normalize_file_path(tree.data.path_absolute))
-            tree_builder.print_file_use_tree(trees[-1])
+            tree_builder.cli_file_use_tree(trees[-1])

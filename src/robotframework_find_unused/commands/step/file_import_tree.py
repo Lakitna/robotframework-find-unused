@@ -212,7 +212,7 @@ class FileImportTreeBuilder:
         recurse(tree)
         return nodes
 
-    def print_file_use_tree(self, tree: FileImportTreeNode):
+    def cli_file_use_tree(self, tree: FileImportTreeNode):
         """
         Output the full tree to the user
         """
@@ -230,7 +230,8 @@ class FileImportTreeBuilder:
             text = click.style(line.text, fg=line.color) if line.color else line.text
             click.echo(indent + text)
 
-        self._print_tree_summary(nodes)
+        stats: list[str] = self._get_tree_summary_stats(nodes)
+        click.echo(click.style(" | ".join(stats), fg="bright_black"))
 
     def _get_tree_print_lines(
         self,
@@ -320,10 +321,6 @@ class FileImportTreeBuilder:
 
         msg = f"Unexpected pruned branch reason '{node.branches}'"
         raise ValueError(msg)
-
-    def _print_tree_summary(self, nodes: list[FileImportTreeNode]) -> None:
-        stats: list[str] = self._get_tree_summary_stats(nodes)
-        click.echo(click.style(" | ".join(stats), fg="bright_black"))
 
     def _get_tree_summary_stats(self, nodes: list[FileImportTreeNode]) -> list[str]:
         stats: list[str] = []

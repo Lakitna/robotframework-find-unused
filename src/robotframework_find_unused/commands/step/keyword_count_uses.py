@@ -8,7 +8,7 @@ from robotframework_find_unused.visitors.robot import visit_robot_files
 from robotframework_find_unused.visitors.robot.keyword_visitor import RobotVisitorKeywords
 
 
-def cli_count_keyword_uses(
+def step_count_keyword_uses(
     file_paths: list[Path],
     keywords: list[KeywordData],
     downloaded_libraries: list[LibraryData],

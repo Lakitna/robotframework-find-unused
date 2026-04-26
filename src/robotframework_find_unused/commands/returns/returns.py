@@ -4,16 +4,16 @@ Implementation of the 'returns' command
 
 import click
 
-from robotframework_find_unused.commands.step.discover_files import cli_discover_file_paths
-from robotframework_find_unused.commands.step.keyword_count_uses import cli_count_keyword_uses
+from robotframework_find_unused.commands.step.discover_files import step_discover_file_paths
+from robotframework_find_unused.commands.step.keyword_count_uses import step_count_keyword_uses
 from robotframework_find_unused.commands.step.keyword_definitions import (
-    cli_step_get_custom_keyword_definitions,
+    step_step_get_custom_keyword_definitions,
 )
 from robotframework_find_unused.commands.step.keyword_filter import cli_filter_keywords
 from robotframework_find_unused.commands.step.lib_keyword_definitions import (
-    cli_step_get_downloaded_lib_keywords,
+    step_step_get_downloaded_lib_keywords,
 )
-from robotframework_find_unused.commands.step.parse_files import cli_step_parse_files_with_libdoc
+from robotframework_find_unused.commands.step.parse_files import step_step_parse_files_with_libdoc
 from robotframework_find_unused.common.cli import pretty_kw_name
 from robotframework_find_unused.common.const import KeywordData
 from robotframework_find_unused.common.sort import sort_keywords_by_name
@@ -22,19 +22,19 @@ from robotframework_find_unused.reporter.base.return_reporter import ReturnRepor
 from .options import ReturnOptions
 
 
-def cli_returns(options: ReturnOptions, reporter: ReturnReporter) -> None:
+def command_returns(options: ReturnOptions, reporter: ReturnReporter) -> None:
     """
-    Entry point for the CLI command
+    Entry point for the CLI command 'returns'
     """
     reporter.on_command_start()
 
-    file_paths = cli_discover_file_paths(options.source_path, reporter=reporter)
+    file_paths = step_discover_file_paths(options.source_path, reporter=reporter)
     if file_paths is None:
         return
 
-    files = cli_step_parse_files_with_libdoc(file_paths, reporter=reporter)
+    files = step_step_parse_files_with_libdoc(file_paths, reporter=reporter)
 
-    keywords = cli_step_get_custom_keyword_definitions(
+    keywords = step_step_get_custom_keyword_definitions(
         files,
         reporter=reporter,
         enrich_py_keywords=True,
@@ -42,13 +42,13 @@ def cli_returns(options: ReturnOptions, reporter: ReturnReporter) -> None:
     if len(keywords) == 0:
         return
 
-    downloaded_library_keywords = cli_step_get_downloaded_lib_keywords(
+    downloaded_library_keywords = step_step_get_downloaded_lib_keywords(
         file_paths,
         reporter=reporter,
         enrich_py_keywords=options.library_keywords != "exclude",
     )
 
-    counted_keywords = cli_count_keyword_uses(
+    counted_keywords = step_count_keyword_uses(
         file_paths,
         keywords,
         downloaded_library_keywords,

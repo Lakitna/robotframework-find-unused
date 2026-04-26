@@ -15,10 +15,10 @@ from robotframework_find_unused.commands import (
     KeywordOptions,
     ReturnOptions,
     VariableOptions,
-    cli_arguments,
-    cli_keywords,
-    cli_returns,
-    cli_variables,
+    command_arguments,
+    command_keywords,
+    command_returns,
+    command_variables,
     command_files,
 )
 from robotframework_find_unused.common.const import FilterOption
@@ -170,7 +170,7 @@ def keywords(  # noqa: PLR0913
         verbose=verbose,
     )
     reporter = KeywordCliReporter(options)
-    cli_keywords(options, reporter)
+    command_keywords(options, reporter)
 
 
 @cli.command(name="variables")
@@ -305,7 +305,7 @@ def variables(
         verbose=verbose,
     )
     reporter = VariableCliReporter(options)
-    cli_variables(options, reporter)
+    command_variables(options, reporter)
 
 
 @cli.command(name="arguments")
@@ -427,7 +427,7 @@ def arguments(  # noqa: PLR0913
         verbose=verbose,
     )
     reporter = ArgumentCliReporter(options)
-    cli_arguments(options, reporter)
+    command_arguments(options, reporter)
 
 
 @cli.command(name="returns")
@@ -532,7 +532,7 @@ def returns(  # noqa: PLR0913
         verbose=verbose,
     )
     reporter = ReturnCliReporter(options)
-    cli_returns(options, reporter)
+    command_returns(options, reporter)
 
 
 @cli.command(name="files")
