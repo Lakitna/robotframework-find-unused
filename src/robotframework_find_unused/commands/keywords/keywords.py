@@ -9,6 +9,7 @@ from robotframework_find_unused.commands.step.keyword_count_uses import step_cou
 from robotframework_find_unused.commands.step.keyword_definitions import (
     step_step_get_custom_keyword_definitions,
 )
+from robotframework_find_unused.commands.step.keyword_filter import step_filter_keywords
 from robotframework_find_unused.commands.step.lib_keyword_definitions import (
     step_step_get_downloaded_lib_keywords,
 )
@@ -47,5 +48,7 @@ def command_keywords(options: "KeywordOptions", reporter: "KeywordReporter") -> 
         downloaded_library_keywords,
         reporter=reporter,
     )
+
+    counted_keywords = step_filter_keywords(counted_keywords, reporter=reporter)
 
     reporter.on_command_end(counted_keywords)

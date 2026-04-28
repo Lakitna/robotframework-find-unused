@@ -5,6 +5,7 @@ import click
 from robotframework_find_unused.common.const import (
     DONE_MARKER,
     INDENT,
+    NOTE_MARKER,
     VERBOSE_NO,
     WARN_MARKER,
     KeywordData,
@@ -70,3 +71,11 @@ class PartialCliReporterCountKeywords(PartialReporter_CountKeywords):
         if self.options.verbose > VERBOSE_NO:
             for kw in unknown_keywords:
                 click.echo(f"{INDENT}{kw.name}")
+
+    def on_filter_keywords(
+        self,
+        keywords: list[KeywordData],
+        filtered_keywords: list[KeywordData],
+        descriptor: str,
+    ):
+        click.echo(f"{NOTE_MARKER} {descriptor}")

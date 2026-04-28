@@ -2,7 +2,6 @@ import sys
 
 import click
 
-from robotframework_find_unused.commands.step.keyword_filter import cli_filter_keywords
 from robotframework_find_unused.common.cli import pretty_kw_name
 from robotframework_find_unused.common.const import KeywordData
 from robotframework_find_unused.common.sort import sort_keywords_by_name
@@ -30,14 +29,6 @@ class KeywordCliReporter(
     """
 
     def on_command_end(self, counted_keywords: list[KeywordData]):
-        counted_keywords = cli_filter_keywords(
-            counted_keywords,
-            filter_deprecated=self.options.deprecated_keywords,
-            filter_private=self.options.private_keywords,
-            filter_library=self.options.library_keywords,
-            filter_glob=self.options.keyword_filter_glob,
-        )
-
         click.echo()
 
         if self.options.show_all_count:
