@@ -7,7 +7,7 @@ from typing import TYPE_CHECKING
 
 from robotframework_find_unused.commands.step.discover_files import step_discover_file_paths
 from robotframework_find_unused.commands.step.file_import_filter import step_filter_file_imports
-from robotframework_find_unused.commands.step.parse_file_use import step_step_parse_file_use
+from robotframework_find_unused.commands.step.parse_file_use import step_parse_file_use
 from robotframework_find_unused.common.pythonpath import apply_pythonpath
 
 if TYPE_CHECKING:
@@ -28,7 +28,7 @@ def command_files(options: "FileOptions", reporter: "FileReporter") -> None:
     if file_paths is None:
         return
 
-    files = step_step_parse_file_use(
+    files = step_parse_file_use(
         file_paths,
         Path(options.source_path),
         reporter=reporter,

@@ -11,7 +11,7 @@ if TYPE_CHECKING:
     )
 
 
-def step_step_get_downloaded_lib_keywords(
+def step_get_downloaded_lib_keywords(
     file_paths: "list[Path]",
     *,
     reporter: "PartialReporter_DownloadedKeywordDefinitions",

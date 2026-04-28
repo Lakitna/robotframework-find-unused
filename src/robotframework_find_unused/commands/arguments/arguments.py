@@ -7,13 +7,13 @@ from typing import TYPE_CHECKING
 from robotframework_find_unused.commands.step.discover_files import step_discover_file_paths
 from robotframework_find_unused.commands.step.keyword_count_uses import step_count_keyword_uses
 from robotframework_find_unused.commands.step.keyword_definitions import (
-    step_step_get_custom_keyword_definitions,
+    step_get_custom_keyword_definitions,
 )
 from robotframework_find_unused.commands.step.keyword_filter import step_filter_keywords
 from robotframework_find_unused.commands.step.lib_keyword_definitions import (
-    step_step_get_downloaded_lib_keywords,
+    step_get_downloaded_lib_keywords,
 )
-from robotframework_find_unused.commands.step.parse_files import step_step_parse_files_with_libdoc
+from robotframework_find_unused.commands.step.parse_files import step_parse_files_with_libdoc
 
 if TYPE_CHECKING:
     from robotframework_find_unused.reporter.base.argument_reporter import ArgumentReporter
@@ -31,13 +31,13 @@ def command_arguments(options: "ArgumentsOptions", reporter: "ArgumentReporter")
     if file_paths is None:
         return
 
-    files = step_step_parse_files_with_libdoc(file_paths, reporter=reporter)
+    files = step_parse_files_with_libdoc(file_paths, reporter=reporter)
 
-    keywords = step_step_get_custom_keyword_definitions(files, reporter=reporter)
+    keywords = step_get_custom_keyword_definitions(files, reporter=reporter)
     if len(keywords) == 0 and options.library_keywords == "exclude":
         return
 
-    downloaded_library_keywords = step_step_get_downloaded_lib_keywords(
+    downloaded_library_keywords = step_get_downloaded_lib_keywords(
         file_paths,
         reporter=reporter,
     )

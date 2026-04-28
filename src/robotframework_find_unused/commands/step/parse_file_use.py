@@ -7,7 +7,7 @@ from robotframework_find_unused.visitors.robot import visit_robot_files
 from robotframework_find_unused.visitors.robot.file_import import RobotVisitorFileImports
 
 
-def step_step_parse_file_use(file_paths: list[Path], source_path: Path, *, reporter: FileReporter):
+def step_parse_file_use(file_paths: list[Path], source_path: Path, *, reporter: FileReporter):
     """
     Parse files and keep the user up-to-date on progress
     """
