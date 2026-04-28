@@ -1,40 +1,34 @@
 from typing import cast
 
-import click
 from robot.libdocpkg.model import KeywordDoc, LibraryDoc
 
-from robotframework_find_unused.common.cli import pretty_kw_name
-from robotframework_find_unused.common.const import (
-    DONE_MARKER,
-    ERROR_MARKER,
-    INDENT,
-    VERBOSE_NO,
-    VERBOSE_SINGLE,
-    KeywordData,
-)
+from robotframework_find_unused.common.const import KeywordData
 from robotframework_find_unused.convert.convert_keyword import libdoc_keyword_to_keyword_data
+from robotframework_find_unused.reporter.base.partial.keyword_definitions import (
+    PartialReporter_CustomKeywordDefinitions,
+)
 from robotframework_find_unused.resolve.resolve_python_keyword_data import (
     enrich_python_keyword_data,
 )
 
 
-def cli_step_get_custom_keyword_definitions(
+def step_get_custom_keyword_definitions(
     files: list[LibraryDoc],
     *,
-    verbose: int,
+    reporter: PartialReporter_CustomKeywordDefinitions,
     enrich_py_keywords: bool = False,
 ):
     """
     Gather keyword definitions in the given scope with LibDoc and show progress
     """
-    click.echo("Gathering custom keyword definitions...")
+    reporter.on_get_custom_keyword_definitions_start(files)
 
     keywords = _get_custom_keyword_definitions(
         files,
         enrich_py_keywords=enrich_py_keywords,
     )
 
-    _log_keyword_stats(keywords, verbose)
+    reporter.on_get_custom_keyword_definitions_end(files, keywords)
     return keywords
 
 
@@ -82,30 +76,3 @@ def _get_custom_keyword_definitions(
                 )
 
     return keywords
-
-
-def _log_keyword_stats(keywords: list[KeywordData], verbose: int) -> None:
-    """
-    Output details on the given keywords to the user
-    """
-    click.echo(
-        (ERROR_MARKER if len(keywords) == 0 else DONE_MARKER)
-        + f" Found {len(keywords)} custom keyword definitions",
-    )
-
-    if verbose == VERBOSE_NO:
-        return
-
-    kw_types: dict[str, list[str]] = {}
-    for kw in keywords:
-        if kw.type not in kw_types:
-            kw_types[kw.type] = []
-        kw_types[kw.type].append(pretty_kw_name(kw))
-
-    for kw_type, kw_names in sorted(kw_types.items(), key=lambda x: len(x[1]), reverse=True):
-        click.echo(f"{INDENT}{len(kw_names)} keywords of type {kw_type}")
-
-        if verbose == VERBOSE_SINGLE:
-            continue
-        for name in kw_names:
-            click.echo(f"{INDENT}{INDENT}{name}")

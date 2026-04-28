@@ -1,3 +1,3 @@
 """
-CLI frontend steps
+Command steps
 """

@@ -90,3 +90,4 @@ ignore = [
 "test/atest/**" = ['D101', 'D102', 'INP001']
 "test/utest/**" = ['D101', 'D102', 'INP001']
 "./tasks.py" = ['T201', 'D103']
+"src/robotframework_find_unused/reporter/cli/**" = ["ARG002", "D102"]

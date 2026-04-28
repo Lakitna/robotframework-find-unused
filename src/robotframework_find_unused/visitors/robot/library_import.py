@@ -1,12 +1,11 @@
 from typing import TYPE_CHECKING, cast
 
-import click
 import robot.errors
 from robot.api.parsing import ModelVisitor
 from robot.libdoc import LibraryDocumentation
 from robot.libdocpkg.model import KeywordDoc, LibraryDoc
 
-from robotframework_find_unused.common.const import ERROR_MARKER, LibraryData
+from robotframework_find_unused.common.const import LibraryData
 from robotframework_find_unused.common.normalize import normalize_library_name
 from robotframework_find_unused.convert.convert_keyword import libdoc_keyword_to_keyword_data
 from robotframework_find_unused.resolve.resolve_python_keyword_data import (
@@ -16,6 +15,10 @@ from robotframework_find_unused.resolve.resolve_python_keyword_data import (
 if TYPE_CHECKING:
     from robot.api.parsing import LibraryImport
 
+    from robotframework_find_unused.reporter.base.partial.keyword_definitions import (
+        PartialReporter_DownloadedKeywordDefinitions,
+    )
+
 
 class RobotVisitorLibraryImports(ModelVisitor):
     """
@@ -24,7 +27,13 @@ class RobotVisitorLibraryImports(ModelVisitor):
 
     downloaded_libraries: dict[str, LibraryData]
 
-    def __init__(self, *, enrich_py_keywords: bool = False) -> None:
+    def __init__(
+        self,
+        reporter: "PartialReporter_DownloadedKeywordDefinitions",
+        *,
+        enrich_py_keywords: bool = False,
+    ) -> None:
+        self.reporter = reporter
         self.enrich_py_keywords = enrich_py_keywords
         self.downloaded_libraries = {}
         super().__init__()
@@ -51,11 +60,8 @@ class RobotVisitorLibraryImports(ModelVisitor):
 
         try:
             lib: LibraryDoc = LibraryDocumentation(lib_name)
-        except robot.errors.DataError:
-            click.echo(
-                f"{ERROR_MARKER} Failed to gather keywords from library `{lib_name}`",
-                err=True,
-            )
+        except robot.errors.DataError as e:
+            self.reporter.on_library_parse_error(e, lib_name)
 
             self.downloaded_libraries[normalized_lib_name] = LibraryData(
                 name=lib_name,

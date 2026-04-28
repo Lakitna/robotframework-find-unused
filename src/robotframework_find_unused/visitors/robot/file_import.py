@@ -1,13 +1,12 @@
 from pathlib import Path
 from typing import TYPE_CHECKING, Literal
 
-import click
 from robot.api.parsing import (
     ModelVisitor,
     TestCaseSection,
 )
 
-from robotframework_find_unused.common.const import ERROR_MARKER, FileUseData, FileUsedByData
+from robotframework_find_unused.common.const import FileUseData, FileUsedByData
 from robotframework_find_unused.common.impossible_state_error import ImpossibleStateError
 from robotframework_find_unused.common.normalize import normalize_file_path, normalize_keyword_name
 from robotframework_find_unused.convert.convert_path import to_relative_path
@@ -22,6 +21,8 @@ if TYPE_CHECKING:
         VariablesImport,
     )
 
+    from robotframework_find_unused.reporter.base.file_reporter import FileReporter
+
 
 class RobotVisitorFileImports(ModelVisitor):
     """
@@ -35,9 +36,15 @@ class RobotVisitorFileImports(ModelVisitor):
     current_working_file: FileUseData | None = None
     current_working_directory: Path | None = None
 
-    def __init__(self, root_directory: Path, discovered_files: set[Path] | None = None) -> None:
+    def __init__(
+        self,
+        root_directory: Path,
+        discovered_files: set[Path] | None,
+        reporter: "FileReporter",
+    ) -> None:
         self.root_directory = root_directory.absolute()
         self.discovered_files = discovered_files or set()
+        self.reporter = reporter
         self.files = {}
         self.init_files = {}
         super().__init__()
@@ -298,11 +305,9 @@ class RobotVisitorFileImports(ModelVisitor):
                 self.root_directory,
                 self.discovered_files,
             )
-        except ImportError:
+        except ImportError as e:
             from_path = to_relative_path(
                 self.root_directory,
                 self.current_working_file.path_absolute,
             )
-            click.echo(
-                f"{ERROR_MARKER} `{import_type}  {import_str}` <- could not find. From {from_path}",
-            )
+            self.reporter.on_file_import_error(e, import_type, import_str, from_path)

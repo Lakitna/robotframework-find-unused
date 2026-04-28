@@ -1,12 +1,19 @@
-import sys
-from typing import Literal
+from typing import TYPE_CHECKING
 
 import click
 
-from .const import NOTE_MARKER, VERBOSE_DOUBLE, FileUseType, KeywordData, VariableData
+if TYPE_CHECKING:
+    from robotframework_find_unused.common.const import FileUseType, KeywordData, VariableData
 
 
-def pretty_kw_name(keyword: KeywordData) -> str:
+DONE = "[ " + click.style("DONE", fg="green") + " ]"
+WARN = "[ " + click.style("WARNING", fg="yellow") + " ]"
+ERROR = "[ " + click.style("ERROR", fg="red") + " ]"
+NOTE = "[ " + click.style("NOTE", fg="cyan") + " ]"
+INDENT = "    "
+
+
+def pretty_kw_name(keyword: "KeywordData") -> str:
     """
     Format keyword name for output to the user
     """
@@ -21,7 +28,7 @@ def pretty_kw_name(keyword: KeywordData) -> str:
     return name
 
 
-def pretty_file_path(path: str, file_types: set[FileUseType]) -> str:  # noqa: PLR0911
+def pretty_file_path(path: str, file_types: "set[FileUseType]") -> str:  # noqa: PLR0911
     """
     Format file path for output to the user
     """
@@ -47,7 +54,7 @@ def pretty_file_path(path: str, file_types: set[FileUseType]) -> str:  # noqa: P
     raise ValueError(msg)
 
 
-def pretty_variable(var: VariableData) -> str:
+def pretty_variable(var: "VariableData") -> str:
     """
     Format variable for output to the user
     """
@@ -61,13 +68,3 @@ def pretty_variable(var: VariableData) -> str:
         out += click.style(f" -> {var.resolved_name}", fg="bright_black")
 
     return out
-
-
-def cli_hard_exit(verbose: int) -> Literal[255]:
-    """
-    Immediately hard exit app. Use when something went wrong.
-    """
-    if verbose < VERBOSE_DOUBLE:
-        click.echo(f"{NOTE_MARKER} Run with `--verbose --verbose` or `-vv` for more details")
-    sys.exit(255)
-    return 255

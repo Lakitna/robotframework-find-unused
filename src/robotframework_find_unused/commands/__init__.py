@@ -2,11 +2,16 @@
 CLI frontend
 """
 
-from .arguments import ArgumentsOptions, cli_arguments
-from .files import FileOptions, cli_files
-from .keywords import KeywordOptions, cli_keywords
-from .returns import ReturnOptions, cli_returns
-from .variables import VariableOptions, cli_variables
+from .arguments.arguments import command_arguments
+from .arguments.options import ArgumentsOptions
+from .files.files import command_files
+from .files.options import FileOptions
+from .keywords.keywords import command_keywords
+from .keywords.options import KeywordOptions
+from .returns.options import ReturnOptions
+from .returns.returns import command_returns
+from .variables.options import VariableOptions
+from .variables.variables import command_variables
 
 __all__ = [
     "ArgumentsOptions",
@@ -14,9 +19,9 @@ __all__ = [
     "KeywordOptions",
     "ReturnOptions",
     "VariableOptions",
-    "cli_arguments",
-    "cli_files",
-    "cli_keywords",
-    "cli_returns",
-    "cli_variables",
+    "command_arguments",
+    "command_files",
+    "command_keywords",
+    "command_returns",
+    "command_variables",
 ]
