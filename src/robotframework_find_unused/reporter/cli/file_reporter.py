@@ -11,7 +11,6 @@ from robotframework_find_unused.commands.step.file_import_tree import (
     FileImportTreeBuilder,
     FileImportTreeNode,
 )
-from robotframework_find_unused.common.cli import pretty_file_path
 from robotframework_find_unused.common.const import (
     DONE_MARKER,
     ERROR_MARKER,
@@ -27,6 +26,7 @@ from robotframework_find_unused.common.normalize import normalize_file_path
 from robotframework_find_unused.convert.convert_path import to_relative_path
 from robotframework_find_unused.reporter.base.file_reporter import FileReporter
 
+from .common import pretty_file_path
 from .partial.discover_files import PartialCliReporterDiscoverFiles
 
 

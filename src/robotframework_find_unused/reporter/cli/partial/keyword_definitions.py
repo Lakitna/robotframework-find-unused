@@ -5,7 +5,6 @@ import click
 from robot.errors import DataError
 from robot.libdocpkg.model import LibraryDoc
 
-from robotframework_find_unused.common.cli import pretty_kw_name
 from robotframework_find_unused.common.const import (
     DONE_MARKER,
     ERROR_MARKER,
@@ -20,6 +19,7 @@ from robotframework_find_unused.reporter.base.partial.keyword_definitions import
     PartialReporter_CustomKeywordDefinitions,
     PartialReporter_DownloadedKeywordDefinitions,
 )
+from robotframework_find_unused.reporter.cli.common import pretty_kw_name
 from robotframework_find_unused.visitors.robot.library_import import LibraryData
 
 

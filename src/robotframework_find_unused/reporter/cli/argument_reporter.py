@@ -2,11 +2,11 @@ import sys
 
 import click
 
-from robotframework_find_unused.common.cli import pretty_kw_name
 from robotframework_find_unused.common.const import INDENT, KeywordData
 from robotframework_find_unused.common.sort import sort_keywords_by_name
 from robotframework_find_unused.reporter.base.argument_reporter import ArgumentReporter
 
+from .common import pretty_kw_name
 from .partial.count_keywords import PartialCliReporterCountKeywords
 from .partial.discover_files import PartialCliReporterDiscoverFiles
 from .partial.keyword_definitions import (

@@ -5,7 +5,6 @@ from pathlib import Path
 import click
 import robot.errors
 
-from robotframework_find_unused.common.cli import pretty_variable
 from robotframework_find_unused.common.const import (
     DONE_MARKER,
     ERROR_MARKER,
@@ -17,6 +16,7 @@ from robotframework_find_unused.common.const import (
 )
 from robotframework_find_unused.reporter.base.variable_reporter import VariableReporter
 
+from .common import pretty_variable
 from .partial.discover_files import PartialCliReporterDiscoverFiles
 
 
