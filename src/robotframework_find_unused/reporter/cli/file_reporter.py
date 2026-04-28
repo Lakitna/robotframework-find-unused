@@ -7,7 +7,6 @@ from pathlib import Path
 import click
 
 from robotframework_find_unused.commands.files.options import FileOptions
-from robotframework_find_unused.commands.step.file_import_filter import step_filter_file_imports
 from robotframework_find_unused.commands.step.file_import_tree import (
     FileImportTreeBuilder,
     FileImportTreeNode,
