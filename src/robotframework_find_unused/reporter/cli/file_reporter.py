@@ -12,13 +12,8 @@ from robotframework_find_unused.commands.step.file_import_tree import (
     FileImportTreeNode,
 )
 from robotframework_find_unused.common.const import (
-    DONE_MARKER,
-    ERROR_MARKER,
-    INDENT,
-    NOTE_MARKER,
     VERBOSE_NO,
     VERBOSE_SINGLE,
-    WARN_MARKER,
     FileUseData,
     FileUsedByData,
 )
@@ -26,7 +21,14 @@ from robotframework_find_unused.common.normalize import normalize_file_path
 from robotframework_find_unused.convert.convert_path import to_relative_path
 from robotframework_find_unused.reporter.base.file_reporter import FileReporter
 
-from .common import pretty_file_path
+from .common import (
+    DONE,
+    ERROR,
+    INDENT,
+    NOTE,
+    WARN,
+    pretty_file_path,
+)
 from .partial.discover_files import PartialCliReporterDiscoverFiles
 
 
@@ -62,7 +64,7 @@ class FileCliReporter(FileReporter, PartialCliReporterDiscoverFiles):
         files: list[FileUseData],
     ):
         """When done counting file uses"""
-        click.echo(f"{DONE_MARKER} Parsed {len(files)} files")
+        click.echo(f"{DONE} Parsed {len(files)} files")
 
         if self.options.verbose == VERBOSE_NO:
             return
@@ -92,11 +94,11 @@ class FileCliReporter(FileReporter, PartialCliReporterDiscoverFiles):
 
     def on_error(self, error: Exception):
         """When an error is raised"""
-        click.echo(f"{ERROR_MARKER} {error}")
+        click.echo(f"{ERROR} {error}")
 
     def on_warn(self, warning: str):
         """When an warning is issues"""
-        click.echo(f"{WARN_MARKER} {warning}")
+        click.echo(f"{WARN} {warning}")
 
     def on_command_end(self, files: list[FileUseData]):
         """When the command has done all the things"""
@@ -148,7 +150,7 @@ class FileCliReporter(FileReporter, PartialCliReporterDiscoverFiles):
             log_lines = log_lines[:-1]
 
             click.echo(
-                f"{WARN_MARKER} {file_count} files used multiple times with different arguments:",
+                f"{WARN} {file_count} files used multiple times with different arguments:",
             )
             for line in log_lines:
                 click.echo(line)
@@ -234,7 +236,7 @@ class FileCliReporter(FileReporter, PartialCliReporterDiscoverFiles):
 
         if self.options.path_filter_glob:
             click.echo(
-                NOTE_MARKER
+                NOTE
                 + f" Only showing trees for suite files matching '{self.options.path_filter_glob}'",
             )
 
@@ -276,8 +278,7 @@ class FileCliReporter(FileReporter, PartialCliReporterDiscoverFiles):
         import_from_path: str,
     ):
         click.echo(
-            f"{ERROR_MARKER} `{import_type}  {import_str}` <- could not find. "
-            f"From {import_from_path}",
+            f"{ERROR} `{import_type}  {import_str}` <- could not find. From {import_from_path}",
         )
 
     def on_filter_files(
@@ -286,7 +287,7 @@ class FileCliReporter(FileReporter, PartialCliReporterDiscoverFiles):
         filtered_files: list[FileUseData],
         descriptor: str,
     ):
-        click.echo(f"{NOTE_MARKER} {descriptor}")
+        click.echo(f"{NOTE} {descriptor}")
 
     def _echo_file_use_tree(
         self,

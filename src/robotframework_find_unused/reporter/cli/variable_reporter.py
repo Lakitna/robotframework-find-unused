@@ -6,17 +6,19 @@ import click
 import robot.errors
 
 from robotframework_find_unused.common.const import (
-    DONE_MARKER,
-    ERROR_MARKER,
-    INDENT,
-    NOTE_MARKER,
     VERBOSE_NO,
     VERBOSE_SINGLE,
     VariableData,
 )
 from robotframework_find_unused.reporter.base.variable_reporter import VariableReporter
 
-from .common import pretty_variable
+from .common import (
+    DONE,
+    ERROR,
+    INDENT,
+    NOTE,
+    pretty_variable,
+)
 from .partial.discover_files import PartialCliReporterDiscoverFiles
 
 
@@ -40,16 +42,16 @@ class VariableCliReporter(VariableReporter, PartialCliReporterDiscoverFiles):
     ):
         if len(variables) == 0:
             click.echo(
-                f"{ERROR_MARKER} Found {len(variables)} unique non-local variables definitions",
+                f"{ERROR} Found {len(variables)} unique non-local variables definitions",
             )
             if self.options.verbose == VERBOSE_NO:
                 click.echo(
-                    f"{NOTE_MARKER} Run with `--verbose --verbose` or `-vv` for more details",
+                    f"{NOTE} Run with `--verbose --verbose` or `-vv` for more details",
                 )
             sys.exit(255)
             return
 
-        click.echo(f"{DONE_MARKER} Found {len(variables)} unique non-local variables definitions")
+        click.echo(f"{DONE} Found {len(variables)} unique non-local variables definitions")
 
         if self.options.verbose == VERBOSE_NO:
             return
@@ -93,16 +95,16 @@ class VariableCliReporter(VariableReporter, PartialCliReporterDiscoverFiles):
 
         if total_uses == 0:
             click.echo(
-                f"{ERROR_MARKER} Found {total_uses} variable uses of gathered variables",
+                f"{ERROR} Found {total_uses} variable uses of gathered variables",
             )
             if self.options.verbose == VERBOSE_NO:
                 click.echo(
-                    f"{NOTE_MARKER} Run with `--verbose --verbose` or `-vv` for more details",
+                    f"{NOTE} Run with `--verbose --verbose` or `-vv` for more details",
                 )
             sys.exit(255)
             return
 
-        click.echo(f"{DONE_MARKER} Found {total_uses} variable uses of gathered variables")
+        click.echo(f"{DONE} Found {total_uses} variable uses of gathered variables")
 
         if self.options.verbose == VERBOSE_NO:
             return
@@ -178,15 +180,14 @@ class VariableCliReporter(VariableReporter, PartialCliReporterDiscoverFiles):
     def on_file_import_error(self, error: Exception, import_str: str, import_from_path: str):
         if isinstance(error, ImportError):
             click.echo(
-                f"{ERROR_MARKER} `Variables  {import_str}` <- could not find. "
-                f"From {import_from_path}",
+                f"{ERROR} `Variables  {import_str}` <- could not find. From {import_from_path}",
             )
 
         if isinstance(error, robot.errors.DataError):
-            click.echo(f"{ERROR_MARKER} {error.message.splitlines()[0]}")
+            click.echo(f"{ERROR} {error.message.splitlines()[0]}")
             return
 
-        click.echo(f"{ERROR_MARKER} Failed to import variables from variables file.")
-        click.echo(f"{ERROR_MARKER} Something went very wrong. Details below:")
-        click.echo(f"{ERROR_MARKER} {error}")
+        click.echo(f"{ERROR} Failed to import variables from variables file.")
+        click.echo(f"{ERROR} Something went very wrong. Details below:")
+        click.echo(f"{ERROR} {error}")
         click.echo()

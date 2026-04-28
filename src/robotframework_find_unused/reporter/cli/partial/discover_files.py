@@ -5,16 +5,18 @@ from pathlib import Path
 import click
 
 from robotframework_find_unused.common.const import (
-    DONE_MARKER,
-    ERROR_MARKER,
-    INDENT,
-    NOTE_MARKER,
     VERBOSE_DOUBLE,
     VERBOSE_NO,
     VERBOSE_SINGLE,
 )
 from robotframework_find_unused.reporter.base.partial.discover_files import (
     PartialReporter_DiscoverFiles,
+)
+from robotframework_find_unused.reporter.cli.common import (
+    DONE,
+    ERROR,
+    INDENT,
+    NOTE,
 )
 
 
@@ -30,19 +32,19 @@ class PartialCliReporterDiscoverFiles(PartialReporter_DiscoverFiles):
     def on_discover_files_fail(self, root_folder: str, errors: list[str]):
         """When discovering files fails"""
         for err in errors:
-            click.echo(f"{ERROR_MARKER} {err}")
+            click.echo(f"{ERROR} {err}")
 
-        click.echo(f"{NOTE_MARKER} All files in Robocop config `exclude` are ignored")
-        click.echo(f"{NOTE_MARKER} All files listed in `.gitignore` files are ignored")
+        click.echo(f"{NOTE} All files in Robocop config `exclude` are ignored")
+        click.echo(f"{NOTE} All files listed in `.gitignore` files are ignored")
 
         if self.options.verbose < VERBOSE_DOUBLE:
             click.echo(
-                f"{NOTE_MARKER} Run with `--verbose --verbose` or `-vv` for more details",
+                f"{NOTE} Run with `--verbose --verbose` or `-vv` for more details",
             )
             sys.exit(255)
             return
 
-        click.echo(f"{NOTE_MARKER} All of the following files are excluded:")
+        click.echo(f"{NOTE} All of the following files are excluded:")
         for root, _dirs, files in os.walk(root_folder):
             for file in files:
                 click.echo(f"{INDENT}{Path(root, file).as_posix()}")
@@ -58,7 +60,7 @@ class PartialCliReporterDiscoverFiles(PartialReporter_DiscoverFiles):
         if self.options.verbose == VERBOSE_NO:
             return
 
-        click.echo(f"{DONE_MARKER} Discovered {len(discovered_files)} files")
+        click.echo(f"{DONE} Discovered {len(discovered_files)} files")
 
         if self.options.verbose == VERBOSE_SINGLE:
             return

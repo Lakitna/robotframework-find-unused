@@ -6,6 +6,13 @@ if TYPE_CHECKING:
     from robotframework_find_unused.common.const import FileUseType, KeywordData, VariableData
 
 
+DONE = "[ " + click.style("DONE", fg="green") + " ]"
+WARN = "[ " + click.style("WARNING", fg="yellow") + " ]"
+ERROR = "[ " + click.style("ERROR", fg="red") + " ]"
+NOTE = "[ " + click.style("NOTE", fg="cyan") + " ]"
+INDENT = "    "
+
+
 def pretty_kw_name(keyword: "KeywordData") -> str:
     """
     Format keyword name for output to the user

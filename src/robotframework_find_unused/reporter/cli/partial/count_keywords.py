@@ -3,15 +3,17 @@ from pathlib import Path
 import click
 
 from robotframework_find_unused.common.const import (
-    DONE_MARKER,
-    INDENT,
-    NOTE_MARKER,
     VERBOSE_NO,
-    WARN_MARKER,
     KeywordData,
 )
 from robotframework_find_unused.reporter.base.partial.count_keywords import (
     PartialReporter_CountKeywords,
+)
+from robotframework_find_unused.reporter.cli.common import (
+    DONE,
+    INDENT,
+    NOTE,
+    WARN,
 )
 from robotframework_find_unused.visitors.robot.library_import import LibraryData
 
@@ -38,8 +40,7 @@ class PartialCliReporterCountKeywords(PartialReporter_CountKeywords):
     ):
         total_uses = sum([kw.use_count for kw in counted_keywords])
         click.echo(
-            (WARN_MARKER if total_uses == 0 else DONE_MARKER)
-            + f" Processed {total_uses} keyword calls",
+            (WARN if total_uses == 0 else DONE) + f" Processed {total_uses} keyword calls",
         )
 
         if self.options.verbose > VERBOSE_NO:
@@ -57,7 +58,7 @@ class PartialCliReporterCountKeywords(PartialReporter_CountKeywords):
                 click.echo(f"{INDENT}{count} calls to keywords of type {kw_type}")
 
             click.echo(
-                (WARN_MARKER if len(counted_keywords) == 0 else DONE_MARKER)
+                (WARN if len(counted_keywords) == 0 else DONE)
                 + f" Found {len(counted_keywords)} unique keywords "
                 + click.style("(keyword definitions and calls)", fg="bright_black"),
             )
@@ -65,7 +66,7 @@ class PartialCliReporterCountKeywords(PartialReporter_CountKeywords):
         unknown_keywords = [kw for kw in counted_keywords if kw.type == "UNKNOWN"]
         if len(unknown_keywords) > 0:
             click.echo(
-                f"{WARN_MARKER} Found {len(unknown_keywords)} called keywords without a definition",
+                f"{WARN} Found {len(unknown_keywords)} called keywords without a definition",
             )
 
         if self.options.verbose > VERBOSE_NO:
@@ -78,4 +79,4 @@ class PartialCliReporterCountKeywords(PartialReporter_CountKeywords):
         filtered_keywords: list[KeywordData],
         descriptor: str,
     ):
-        click.echo(f"{NOTE_MARKER} {descriptor}")
+        click.echo(f"{NOTE} {descriptor}")

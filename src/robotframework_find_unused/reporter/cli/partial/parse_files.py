@@ -4,14 +4,16 @@ import click
 from robot.libdocpkg.model import LibraryDoc
 
 from robotframework_find_unused.common.const import (
-    DONE_MARKER,
-    INDENT,
     VERBOSE_NO,
     VERBOSE_SINGLE,
-    WARN_MARKER,
 )
 from robotframework_find_unused.reporter.base.partial.parse_files import (
     PartialReporter_ParseFiles,
+)
+from robotframework_find_unused.reporter.cli.common import (
+    DONE,
+    INDENT,
+    WARN,
 )
 
 
@@ -32,12 +34,12 @@ class PartialCliReporterParseFiles(PartialReporter_ParseFiles):
         """After all files have been parsed by Libdoc"""
         if len(parse_errors) > 0:
             click.echo(
-                f"{WARN_MARKER} Failed to parse {len(parse_errors)} files. Files will be ignored",
+                f"{WARN} Failed to parse {len(parse_errors)} files. Files will be ignored",
             )
             for error in parse_errors:
-                click.echo(f"{INDENT}{WARN_MARKER} {error}")
+                click.echo(f"{INDENT}{WARN} {error}")
 
-        click.echo(f"{DONE_MARKER} Parsed {len(files)} files")
+        click.echo(f"{DONE} Parsed {len(files)} files")
 
         if self.options.verbose == VERBOSE_NO:
             return

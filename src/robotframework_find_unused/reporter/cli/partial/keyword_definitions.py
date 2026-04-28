@@ -6,20 +6,22 @@ from robot.errors import DataError
 from robot.libdocpkg.model import LibraryDoc
 
 from robotframework_find_unused.common.const import (
-    DONE_MARKER,
-    ERROR_MARKER,
-    INDENT,
-    NOTE_MARKER,
     VERBOSE_NO,
     VERBOSE_SINGLE,
-    WARN_MARKER,
     KeywordData,
 )
 from robotframework_find_unused.reporter.base.partial.keyword_definitions import (
     PartialReporter_CustomKeywordDefinitions,
     PartialReporter_DownloadedKeywordDefinitions,
 )
-from robotframework_find_unused.reporter.cli.common import pretty_kw_name
+from robotframework_find_unused.reporter.cli.common import (
+    DONE,
+    ERROR,
+    INDENT,
+    NOTE,
+    WARN,
+    pretty_kw_name,
+)
 from robotframework_find_unused.visitors.robot.library_import import LibraryData
 
 
@@ -37,15 +39,15 @@ class PartialCliReporterCustomKeywordDefinitions(PartialReporter_CustomKeywordDe
         keywords: list[KeywordData],
     ):
         if len(keywords) == 0:
-            click.echo(f"{ERROR_MARKER} Found {len(keywords)} custom keyword definitions")
+            click.echo(f"{ERROR} Found {len(keywords)} custom keyword definitions")
             if self.options.verbose == VERBOSE_NO:
                 click.echo(
-                    f"{NOTE_MARKER} Run with `--verbose --verbose` or `-vv` for more details",
+                    f"{NOTE} Run with `--verbose --verbose` or `-vv` for more details",
                 )
             sys.exit(255)
             return
 
-        click.echo(f"{DONE_MARKER} Found {len(keywords)} custom keyword definitions")
+        click.echo(f"{DONE} Found {len(keywords)} custom keyword definitions")
 
         if self.options.verbose == VERBOSE_NO:
             return
@@ -79,7 +81,7 @@ class PartialCliReporterDownloadedKeywordDefinitions(PartialReporter_DownloadedK
         libraries: list[LibraryData],
     ):
         click.echo(
-            (WARN_MARKER if len(libraries) == 0 else DONE_MARKER)
+            (WARN if len(libraries) == 0 else DONE)
             + f" Found {len(libraries)} downloaded libraries",
         )
 
@@ -89,7 +91,7 @@ class PartialCliReporterDownloadedKeywordDefinitions(PartialReporter_DownloadedK
         for lib in libraries:
             if len(lib.keywords) == 0:
                 # Import error
-                click.echo(f"{INDENT}{lib.name}: {ERROR_MARKER}")
+                click.echo(f"{INDENT}{lib.name}: {ERROR}")
             else:
                 click.echo(f"{INDENT}{lib.name}: {len(lib.keywords)} keywords")
 
@@ -98,4 +100,4 @@ class PartialCliReporterDownloadedKeywordDefinitions(PartialReporter_DownloadedK
         error: DataError,
         lib_name: str,
     ):
-        click.echo(f"{ERROR_MARKER} Failed to gather keywords from library `{lib_name}`")
+        click.echo(f"{ERROR} Failed to gather keywords from library `{lib_name}`")
