@@ -1,13 +1,17 @@
 import fnmatch
 import sys
 from collections.abc import Generator
+from dataclasses import dataclass
 from pathlib import Path
 
 import click
 
 from robotframework_find_unused.commands.files.options import FileOptions
 from robotframework_find_unused.commands.step.file_import_filter import step_filter_file_imports
-from robotframework_find_unused.commands.step.file_import_tree import FileImportTreeBuilder
+from robotframework_find_unused.commands.step.file_import_tree import (
+    FileImportTreeBuilder,
+    FileImportTreeNode,
+)
 from robotframework_find_unused.common.cli import pretty_file_path
 from robotframework_find_unused.common.const import (
     DONE_MARKER,
@@ -25,6 +29,15 @@ from robotframework_find_unused.convert.convert_path import to_relative_path
 from robotframework_find_unused.reporter.base.file_reporter import FileReporter
 
 from .partial.discover_files import PartialCliReporterDiscoverFiles
+
+
+@dataclass
+class FileImportTreePrintLine:
+    """Datastructure for printing file trees"""
+
+    indent: int
+    text: str
+    color: str | None
 
 
 class FileCliReporter(FileReporter, PartialCliReporterDiscoverFiles):
@@ -254,7 +267,7 @@ class FileCliReporter(FileReporter, PartialCliReporterDiscoverFiles):
             click.echo()
             for tree in trees[0:-1]:
                 click.echo(normalize_file_path(tree.data.path_absolute))
-            tree_builder.cli_file_use_tree(trees[-1])
+            self._echo_file_use_tree(trees[-1], tree_builder)
 
     def on_file_import_error(
         self,
@@ -275,3 +288,141 @@ class FileCliReporter(FileReporter, PartialCliReporterDiscoverFiles):
         descriptor: str,
     ):
         click.echo(f"{NOTE_MARKER} {descriptor}")
+
+    def _echo_file_use_tree(
+        self,
+        tree: FileImportTreeNode,
+        tree_builder: FileImportTreeBuilder,
+    ) -> None:
+        """
+        Output the full tree to the user
+        """
+        nodes = tree_builder.flatten_tree(tree)
+
+        if len(nodes) == 1:
+            click.echo(
+                click.style("No imports to show...", fg="bright_black"),
+            )
+            return
+
+        print_lines = self._get_tree_print_lines(nodes, tree_builder)
+        for line in print_lines:
+            indent = click.style("│  " * line.indent, fg="bright_black")
+            text = click.style(line.text, fg=line.color) if line.color else line.text
+            click.echo(indent + text)
+
+        stats: list[str] = self._get_tree_summary_stats(nodes, tree_builder)
+        click.echo(click.style(" | ".join(stats), fg="bright_black"))
+
+    def _get_tree_print_lines(
+        self,
+        nodes: list[FileImportTreeNode],
+        tree_builder: FileImportTreeBuilder,
+    ) -> list[FileImportTreePrintLine]:
+        """
+        Gather every line for tree printing.
+        """
+        print_nodes = nodes.copy()
+        print_height = (
+            min(tree_builder.max_height, len(print_nodes))
+            if tree_builder.max_height > 0
+            else len(print_nodes)
+        )
+        print_lines: list[FileImportTreePrintLine] = []
+        while len(print_nodes) > 0:
+            if len(print_lines) >= print_height:
+                break
+
+            node = print_nodes.pop(0)
+
+            if isinstance(node.branches, str):
+                line = self._get_tree_print_line_pruned_node(node, prev_line=print_lines[-1])
+                if line is not None:
+                    print_lines.append(line)
+                continue
+
+            relative_path = node.relative_path_to_parent()
+            types = node.data.type
+            if len(types) == 0:
+                print_lines.append(
+                    FileImportTreePrintLine(
+                        indent=node.depth,
+                        text=f"{relative_path} [Unknown type]",
+                        color="bright_red",
+                    ),
+                )
+                continue
+
+            print_lines.append(
+                FileImportTreePrintLine(
+                    indent=node.depth,
+                    text=pretty_file_path(relative_path, node.data.type),
+                    color=None,
+                ),
+            )
+
+        if len(print_nodes) > 0:
+            print_lines.append(
+                FileImportTreePrintLine(
+                    indent=0,
+                    text=f"Not showing {len(print_nodes)} additional files...",
+                    color="bright_black",
+                ),
+            )
+
+        return print_lines
+
+    def _get_tree_print_line_pruned_node(
+        self,
+        node: FileImportTreeNode,
+        prev_line: FileImportTreePrintLine,
+    ) -> FileImportTreePrintLine | None:
+        """
+        Create tree print line for pruned node
+        """
+        relative_path = node.relative_path_to_parent()
+        if node.branches == "CIRCULAR":
+            return FileImportTreePrintLine(
+                indent=node.depth,
+                text=f"{relative_path} [Circular]",
+                color="yellow",
+            )
+        if node.branches == "MAX_DEPTH":
+            if prev_line.text == "...":
+                return None
+
+            return FileImportTreePrintLine(
+                indent=node.depth,
+                text="...",
+                color="bright_black",
+            )
+        if node.branches == "DEDUPED":
+            return FileImportTreePrintLine(
+                indent=node.depth,
+                text=f"{relative_path} [Already imported]",
+                color="bright_black",
+            )
+
+        msg = f"Unexpected pruned branch reason '{node.branches}'"
+        raise ValueError(msg)
+
+    def _get_tree_summary_stats(
+        self,
+        nodes: list[FileImportTreeNode],
+        tree_builder: FileImportTreeBuilder,
+    ) -> list[str]:
+        stats = tree_builder.get_stats_for_nodes(nodes)
+        stat_parts: list[str] = []
+
+        stat_parts.append(f"Tree height: {stats.height}")
+
+        if stats.max_depth_limited:
+            stat_parts.append(f"Limited by `--tree-max-depth {tree_builder.max_depth}`")
+            return stat_parts
+        stat_parts.append(f"Tree depth: {stats.max_depth}")
+
+        stat_parts.append(f"Unique files: {stats.unique_file_count}")
+        stat_parts.append(f"Circular imports: {stats.circular_count}")
+        stat_parts.append(f"Already imported: {stats.deduped_count}")
+
+        return stat_parts
