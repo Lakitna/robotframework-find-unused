@@ -4,8 +4,6 @@ CLI entry point
 
 # ruff: noqa: FBT001,D301
 
-import sys
-
 import click
 
 from robotframework_find_unused.__version__ import __version__
@@ -15,13 +13,18 @@ from robotframework_find_unused.commands import (
     KeywordOptions,
     ReturnOptions,
     VariableOptions,
-    cli_arguments,
-    cli_files,
-    cli_keywords,
-    cli_returns,
-    cli_variables,
+    command_arguments,
+    command_files,
+    command_keywords,
+    command_returns,
+    command_variables,
 )
 from robotframework_find_unused.common.const import FilterOption
+from robotframework_find_unused.reporter.cli.argument_reporter import ArgumentCliReporter
+from robotframework_find_unused.reporter.cli.file_reporter import FileCliReporter
+from robotframework_find_unused.reporter.cli.keyword_reporter import KeywordCliReporter
+from robotframework_find_unused.reporter.cli.return_reporter import ReturnCliReporter
+from robotframework_find_unused.reporter.cli.variable_reporter import VariableCliReporter
 
 click_choice_filter_option = click.Choice(
     ["include", "exclude", "only"],
@@ -164,8 +167,8 @@ def keywords(  # noqa: PLR0913
         show_all_count=show_count,
         verbose=verbose,
     )
-    exit_code = cli_keywords(options)
-    sys.exit(exit_code)
+    reporter = KeywordCliReporter(options)
+    command_keywords(options, reporter)
 
 
 @cli.command(name="variables")
@@ -299,8 +302,8 @@ def variables(
         pythonpath=pythonpath,
         verbose=verbose,
     )
-    exit_code = cli_variables(options)
-    sys.exit(exit_code)
+    reporter = VariableCliReporter(options)
+    command_variables(options, reporter)
 
 
 @cli.command(name="arguments")
@@ -421,8 +424,8 @@ def arguments(  # noqa: PLR0913
         show_all_count=show_count,
         verbose=verbose,
     )
-    exit_code = cli_arguments(options)
-    sys.exit(exit_code)
+    reporter = ArgumentCliReporter(options)
+    command_arguments(options, reporter)
 
 
 @cli.command(name="returns")
@@ -526,8 +529,8 @@ def returns(  # noqa: PLR0913
         show_all_count=show_count,
         verbose=verbose,
     )
-    exit_code = cli_returns(options)
-    sys.exit(exit_code)
+    reporter = ReturnCliReporter(options)
+    command_returns(options, reporter)
 
 
 @cli.command(name="files")
@@ -717,8 +720,8 @@ def files(  # noqa: PLR0913
         source_path=file_path,
         pythonpath=pythonpath,
     )
-    exit_code = cli_files(options)
-    sys.exit(exit_code)
+    reporter = FileCliReporter(options)
+    command_files(options, reporter)
 
 
 def run_cli():

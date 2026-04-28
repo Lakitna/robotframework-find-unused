@@ -5,21 +5,22 @@ Implementation of the 'files' command
 from dataclasses import dataclass
 from typing import Literal, Optional
 
-import click
-
-from robotframework_find_unused.common.cli import pretty_file_path
 from robotframework_find_unused.common.const import FileUseData
 from robotframework_find_unused.common.normalize import normalize_file_path
 from robotframework_find_unused.convert.convert_path import to_relative_path
 
 
 @dataclass
-class FileImportTreePrintLine:
-    """Datastructure for printing file trees"""
+class FileImportTreeStats:
+    """Datastructure for file tree statistics"""
 
-    indent: int
-    text: str
-    color: str | None
+    height: int
+    height_limited: bool
+    max_depth: int
+    max_depth_limited: bool
+    unique_file_count: int
+    circular_count: int
+    deduped_count: int
 
 
 @dataclass
@@ -212,138 +213,26 @@ class FileImportTreeBuilder:
         recurse(tree)
         return nodes
 
-    def print_file_use_tree(self, tree: FileImportTreeNode):
-        """
-        Output the full tree to the user
-        """
-        nodes = self.flatten_tree(tree)
-
-        if len(nodes) == 1:
-            click.echo(
-                click.style("No imports to show...", fg="bright_black"),
-            )
-            return
-
-        print_lines = self._get_tree_print_lines(nodes)
-        for line in print_lines:
-            indent = click.style("│  " * line.indent, fg="bright_black")
-            text = click.style(line.text, fg=line.color) if line.color else line.text
-            click.echo(indent + text)
-
-        self._print_tree_summary(nodes)
-
-    def _get_tree_print_lines(
-        self,
-        nodes: list[FileImportTreeNode],
-    ) -> list[FileImportTreePrintLine]:
-        """
-        Gather every line for tree printing.
-        """
-        print_nodes = nodes.copy()
-        print_height = (
-            min(self.max_height, len(print_nodes)) if self.max_height > 0 else len(print_nodes)
-        )
-        print_lines: list[FileImportTreePrintLine] = []
-        while len(print_nodes) > 0:
-            if len(print_lines) >= print_height:
-                break
-
-            node = print_nodes.pop(0)
-
-            if isinstance(node.branches, str):
-                line = self._get_tree_print_line_pruned_node(node, prev_line=print_lines[-1])
-                if line is not None:
-                    print_lines.append(line)
-                continue
-
-            relative_path = node.relative_path_to_parent()
-            types = node.data.type
-            if len(types) == 0:
-                print_lines.append(
-                    FileImportTreePrintLine(
-                        indent=node.depth,
-                        text=f"{relative_path} [Unknown type]",
-                        color="bright_red",
-                    ),
-                )
-                continue
-
-            print_lines.append(
-                FileImportTreePrintLine(
-                    indent=node.depth,
-                    text=pretty_file_path(relative_path, node.data.type),
-                    color=None,
-                ),
-            )
-
-        if len(print_nodes) > 0:
-            print_lines.append(
-                FileImportTreePrintLine(
-                    indent=0,
-                    text=f"Not showing {len(print_nodes)} additional files...",
-                    color="bright_black",
-                ),
-            )
-
-        return print_lines
-
-    def _get_tree_print_line_pruned_node(
-        self,
-        node: FileImportTreeNode,
-        prev_line: FileImportTreePrintLine,
-    ) -> FileImportTreePrintLine | None:
-        """
-        Create tree print line for pruned node
-        """
-        relative_path = node.relative_path_to_parent()
-        if node.branches == "CIRCULAR":
-            return FileImportTreePrintLine(
-                indent=node.depth,
-                text=f"{relative_path} [Circular]",
-                color="yellow",
-            )
-        if node.branches == "MAX_DEPTH":
-            if prev_line.text == "...":
-                return None
-
-            return FileImportTreePrintLine(
-                indent=node.depth,
-                text="...",
-                color="bright_black",
-            )
-        if node.branches == "DEDUPED":
-            return FileImportTreePrintLine(
-                indent=node.depth,
-                text=f"{relative_path} [Already imported]",
-                color="bright_black",
-            )
-
-        msg = f"Unexpected pruned branch reason '{node.branches}'"
-        raise ValueError(msg)
-
-    def _print_tree_summary(self, nodes: list[FileImportTreeNode]) -> None:
-        stats: list[str] = self._get_tree_summary_stats(nodes)
-        click.echo(click.style(" | ".join(stats), fg="bright_black"))
-
-    def _get_tree_summary_stats(self, nodes: list[FileImportTreeNode]) -> list[str]:
-        stats: list[str] = []
-
+    def get_stats_for_nodes(self, nodes: list[FileImportTreeNode]) -> FileImportTreeStats:
+        """Get basic stats on the tree nodes"""
         height = len(nodes)
-        stats.append(f"Tree height: {height}")
+        height_limited = self.max_height > 0 and self.max_height < height
 
         max_depth = max(*[node.depth for node in nodes])
-        if self.max_depth >= 0 and self.max_depth < max_depth:
-            stats.append(f"Limited by `--tree-max-depth {self.max_depth}`")
-            return stats
-        stats.append(f"Tree depth: {max_depth}")
+        max_depth_limited = self.max_depth >= 0 and self.max_depth < max_depth
 
         unique_file_count = len({node.data.id for node in nodes})
-        stats.append(f"Unique files: {unique_file_count}")
 
         circular_count = len([node for node in nodes if node.branches == "CIRCULAR"])
-        stats.append(f"Circular imports: {circular_count}")
 
         deduped_count = len([node for node in nodes if node.branches == "DEDUPED"])
-        stats.append(f"Already imported: {deduped_count}")
 
-        return stats
+        return FileImportTreeStats(
+            height=height,
+            height_limited=height_limited,
+            max_depth=max_depth,
+            max_depth_limited=max_depth_limited,
+            unique_file_count=unique_file_count,
+            circular_count=circular_count,
+            deduped_count=deduped_count,
+        )
