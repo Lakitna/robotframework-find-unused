@@ -6,7 +6,7 @@ from pathlib import Path
 import click
 
 from robotframework_find_unused.commands.files.options import FileOptions
-from robotframework_find_unused.commands.step.file_import_filter import cli_filter_file_imports
+from robotframework_find_unused.commands.step.file_import_filter import step_filter_file_imports
 from robotframework_find_unused.commands.step.file_import_tree import FileImportTreeBuilder
 from robotframework_find_unused.common.cli import pretty_file_path
 from robotframework_find_unused.common.const import (
@@ -182,15 +182,8 @@ class FileCliReporter(FileReporter, PartialCliReporterDiscoverFiles):
     def _cli_log_results(self, files: list[FileUseData]) -> None:
         click.echo()
 
+        # Suite files contain tests and are, therefore, always used.
         files = [f for f in files if "SUITE" not in f.type]
-        files = cli_filter_file_imports(
-            files,
-            filter_library=self.options.library_files,
-            filter_variable=self.options.variable_files,
-            filter_resource=self.options.resource_files,
-            filter_unused=self.options.unused_files,
-            filter_glob=self.options.path_filter_glob,
-        )
 
         cwd = Path.cwd().joinpath(self.options.source_path)
         if self.options.show_all_count:
@@ -274,3 +267,11 @@ class FileCliReporter(FileReporter, PartialCliReporterDiscoverFiles):
             f"{ERROR_MARKER} `{import_type}  {import_str}` <- could not find. "
             f"From {import_from_path}",
         )
+
+    def on_filter_files(
+        self,
+        files: list[FileUseData],
+        filtered_files: list[FileUseData],
+        descriptor: str,
+    ):
+        click.echo(f"{NOTE_MARKER} {descriptor}")

@@ -41,3 +41,11 @@ class FileReporter(PartialReporter_DiscoverFiles):
         import_from_path: str,
     ):
         """When a file can't be imported"""
+
+    def on_filter_files(
+        self,
+        files: "list[FileUseData]",
+        filtered_files: "list[FileUseData]",
+        descriptor: str,
+    ):
+        """When files are filtered from the output."""
