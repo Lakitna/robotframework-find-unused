@@ -12,9 +12,9 @@ Gathering downloaded library keyword definitions...
 [ DONE ] Found 1 downloaded libraries
     BuiltIn: [[MASK]] keywords
 Counting keyword usage...
-[ DONE ] Processed 9 keyword calls
-    4 calls to keywords of type CUSTOM_RESOURCE
-    3 calls to keywords of type LIBRARY
+[ DONE ] Processed 6 keyword calls
+    2 calls to keywords of type CUSTOM_RESOURCE
+    2 calls to keywords of type LIBRARY
     1 calls to keywords of type CUSTOM_SUITE
     1 calls to keywords of type UNKNOWN
 [ DONE ] Found 5 unique keywords (keyword definitions and calls)

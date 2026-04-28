@@ -6,12 +6,12 @@ Gathering custom keyword definitions...
 Gathering downloaded library keyword definitions...
 [ DONE ] Found 1 downloaded libraries
 Counting keyword usage...
-[ DONE ] Processed 9 keyword calls
+[ DONE ] Processed 6 keyword calls
 [ WARNING ] Found 1 called keywords without a definition
 [ NOTE ] Excluding downloaded library keywords
 
 use_count	keyword_name
 0	keywords.Beautiful Keyword
-1	Test.Test Template Keyword
+1	Test.Cute Keyword
 1	Undefined keyword
-4	keywords.Amazing Keyword
+2	keywords.Amazing Keyword

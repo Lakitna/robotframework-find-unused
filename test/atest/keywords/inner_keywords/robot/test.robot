@@ -20,3 +20,14 @@ Call multiple inner keywords with @args
     ...    BuiltIn.Skip
     ...    Skip
     ...    BuiltIn.Skip
+
+Using template
+    [Template]    Amazing Test Template
+    some data    Amazing Kw
+    Amazing Kw    Amazing Kw
+
+
+*** Keywords ***
+Amazing Test Template
+    [Arguments]    ${some_data}    ${some_keyword}
+    No Operation
