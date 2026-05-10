@@ -1,18 +1,30 @@
 Discovering files in `./robot` using Robocop config...
 Parsing file imports...
-[ DONE ] Parsed 6 files
-[ WARNING ] 2 files used multiple times with different arguments:
+[ WARNING ] File used multiple times with different arguments:
     Used file: ./alpha.py  AS  Aaa
     With arguments:
-        bar    foo
-        foo    bar
+        1. bar    foo
+        2. foo    bar
     Used by 2 files
 
     Used file: ./alpha.py  AS  Bbb
     With arguments:
-        [No arguments]
-        134
+        1. [No arguments]
+        2. 134
     Used by 2 files
+[ WARNING ] Library used multiple times with different arguments:
+    Used library: Telnet
+    With arguments:
+        1. timeout=10s
+        2. timeout=1s
+    Used by 2 files
+[ WARNING ] Library used multiple times with different arguments:
+    Used library: CacheLibrary
+    With arguments:
+        1. [No arguments]
+        2. file_size_warning_bytes=1000
+    Used by 2 files
+[ DONE ] Parsed 6 files
 
 import_count	file
 0	./delta.py
