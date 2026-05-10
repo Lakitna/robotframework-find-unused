@@ -17,21 +17,23 @@ def path_exists(path: Path) -> bool:
 def path_in_scope(path: Path, root_directory: Path) -> bool:
     """
     Return true if the path is in scope.
-
-    Out of scope if:
-    - Not a child of the root_directory
-    - In a virtual environment
     """
+    if path_in_venv(path):
+        return False
+
     try:
         path.relative_to(root_directory)
     except ValueError:
         # Is not child of root
         return False
 
-    parts = [p.casefold() for p in path.parts]
-    if "lib" in parts and "site-packages" in parts:  # noqa: SIM103
-        # Is a downloaded dependency
-        # We can only get here if root_directory contains a virtual environment
-        return False
-
     return True
+
+
+@cache
+def path_in_venv(path: Path) -> bool:
+    """
+    Return true if the path is inside a virtual environment.
+    """
+    parts = [p.casefold() for p in path.parts]
+    return bool("lib" in parts and "site-packages" in parts)

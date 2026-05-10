@@ -96,7 +96,7 @@ class RobotVisitorVariableDefinitions(ModelVisitor):
                 self.discovered_files,
             )
             if import_path:
-                self._import_variable_file(Path(import_path), node.args)
+                self._import_variable_file(Path(import_path.path), node.args)
         except Exception as e:  # noqa: BLE001
             from_path = to_relative_path(self.root_directory, self.current_working_file)
             self.reporter.on_file_import_error(e, node.name, from_path)

@@ -57,7 +57,7 @@ def step_filter_file_imports(
         pattern = reporter.options.path_filter_glob.lower()
         filtered_files = list(
             filter(
-                lambda path: fnmatch.fnmatchcase(path.path_absolute.as_posix(), pattern),
+                lambda path: fnmatch.fnmatchcase(path.resolved_to.path.as_posix(), pattern),
                 files,
             ),
         )
