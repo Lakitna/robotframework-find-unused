@@ -42,6 +42,9 @@ class FileReporter(PartialReporter_DiscoverFiles):
     ):
         """When a file can't be imported"""
 
+    def on_file_imports_with_different_args(self, file: "FileUseData"):
+        """When a file is imported multiple times with different args."""
+
     def on_filter_files(
         self,
         files: "list[FileUseData]",

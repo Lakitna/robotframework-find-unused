@@ -49,6 +49,8 @@ class FileCliReporter(FileReporter, PartialCliReporterDiscoverFiles):
     def __init__(self, options: FileOptions) -> None:
         super().__init__(options)
 
+        self.cwd = Path.cwd().joinpath(self.options.source_path)
+
     def on_count_file_uses_start(
         self,
         file_paths: list[Path],
@@ -100,10 +102,48 @@ class FileCliReporter(FileReporter, PartialCliReporterDiscoverFiles):
         """When an warning is issues"""
         click.echo(f"{WARN} {warning}")
 
+    def on_file_imports_with_different_args(self, file: "FileUseData"):
+        log_lines = []
+
+        if file.resolved_to.type in ("BUILTIN", "DOWNLOADED_LIBRARY"):
+            log_lines.append(f"{WARN} Library used multiple times with different arguments:")
+        else:
+            log_lines.append(f"{WARN} File used multiple times with different arguments:")
+
+        used_by_grouped_by_alias: dict[str | None, list[FileUsedByData]] = {}
+        for used_by in file.used_by:
+            if used_by.normalized_as_alias not in used_by_grouped_by_alias:
+                used_by_grouped_by_alias[used_by.normalized_as_alias] = []
+
+            used_by_grouped_by_alias[used_by.normalized_as_alias].append(used_by)
+
+        for used_by in used_by_grouped_by_alias.values():
+            distinct_args = set()
+            for f in used_by:
+                distinct_args.add(f.args)
+
+            if len(distinct_args) <= 1:
+                # Never imported with different arguments
+                continue
+
+            log_lines += list(
+                self._cli_log_file_import_warnings_lines_gen(
+                    file,
+                    used_by,
+                    distinct_args,
+                ),
+            )
+            log_lines.append("")
+
+        if log_lines:
+            # Remove trailing newline
+            log_lines = log_lines[:-1]
+
+            for line in log_lines:
+                click.echo(line)
+
     def on_command_end(self, files: list[FileUseData]):
         """When the command has done all the things"""
-        self._cli_log_file_import_warnings(files)
-
         if self.options.show_tree:
             self._cli_print_grouped_file_trees(files)
         self._cli_log_results(files)
@@ -112,52 +152,8 @@ class FileCliReporter(FileReporter, PartialCliReporterDiscoverFiles):
         exit_code = len(unused_files)
         sys.exit(min(exit_code, 200))
 
-    def _cli_log_file_import_warnings(self, files: list[FileUseData]) -> None:
-        cwd = Path.cwd().joinpath(self.options.source_path)
-
-        file_count = 0
-        log_lines = []
-        for file in files:
-            used_by_grouped_by_alias: dict[str | None, list[FileUsedByData]] = {}
-            for used_by in file.used_by:
-                if used_by.normalized_as_alias not in used_by_grouped_by_alias:
-                    used_by_grouped_by_alias[used_by.normalized_as_alias] = []
-
-                used_by_grouped_by_alias[used_by.normalized_as_alias].append(used_by)
-
-            for used_by in used_by_grouped_by_alias.values():
-                distinct_args = set()
-                for f in used_by:
-                    distinct_args.add(f.args)
-
-                if len(distinct_args) <= 1:
-                    # Never imported with different arguments
-                    continue
-
-                file_count += 1
-                log_lines += list(
-                    self._cli_log_file_import_warnings_lines_gen(
-                        cwd,
-                        file,
-                        used_by,
-                        distinct_args,
-                    ),
-                )
-                log_lines.append("")
-
-        if log_lines:
-            # Remove trailing newline
-            log_lines = log_lines[:-1]
-
-            click.echo(
-                f"{WARN} {file_count} files used multiple times with different arguments:",
-            )
-            for line in log_lines:
-                click.echo(line)
-
     def _cli_log_file_import_warnings_lines_gen(
         self,
-        cwd: Path,
         file: FileUseData,
         used_by: list[FileUsedByData],
         distinct_args: set[tuple[str, ...]],
@@ -166,17 +162,30 @@ class FileCliReporter(FileReporter, PartialCliReporterDiscoverFiles):
             return
         import_as_alias = used_by[0].as_alias
 
-        file_path = pretty_file_path(to_relative_path(cwd, file.path_absolute), file.type)
+        if file.resolved_to.type in ("FILE_PATH", "MODULE"):
+            file_path = to_relative_path(self.cwd, file.resolved_to.path)
+            file_type = "file"
+        elif file.resolved_to.type in ("BUILTIN", "DOWNLOADED_LIBRARY"):
+            file_path = file.resolved_to.import_string
+            file_type = "library"
+        else:
+            msg = f"Unexpected resolved file type '{file.resolved_to.type}'."
+            raise ValueError(msg)
+
+        file_path = pretty_file_path(file_path, file.type)
+
         if import_as_alias:
             file_path += "  AS  " + import_as_alias
-        yield f"{INDENT}Used file: {file_path}"
+        yield f"{INDENT}Used {file_type}: {file_path}"
 
         yield f"{INDENT}With arguments:"
-        for args in sorted(distinct_args):
+        for i, args in enumerate(sorted(distinct_args)):
+            num = click.style(f"{i + 1}. ", fg="bright_black")
+
             if len(args) == 0:
-                yield click.style(f"{INDENT}{INDENT}[No arguments]", fg="bright_black")
+                yield f"{INDENT}{INDENT}{num}{click.style('[No arguments]', fg='bright_black')}"
             else:
-                yield f"{INDENT}{INDENT}{'    '.join(args)}"
+                yield f"{INDENT}{INDENT}{num}{'    '.join(args)}"
 
         if self.options.verbose == VERBOSE_NO:
             yield f"{INDENT}Used by {len(used_by)} files"
