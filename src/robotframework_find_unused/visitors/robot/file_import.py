@@ -6,7 +6,7 @@ from robot.api.parsing import (
     TestCaseSection,
 )
 
-from robotframework_find_unused.common.const import FileUseData, FileUsedByData
+from robotframework_find_unused.common.const import FileUseData, FileUsedByData, ResolvedFileImport
 from robotframework_find_unused.common.impossible_state_error import ImpossibleStateError
 from robotframework_find_unused.common.normalize import normalize_file_path, normalize_keyword_name
 from robotframework_find_unused.convert.convert_path import to_relative_path
@@ -83,7 +83,11 @@ class RobotVisitorFileImports(ModelVisitor):
         """Register a file"""
         file = FileUseData(
             id=current_file_path_normalized,
-            path_absolute=current_working_file,
+            resolved_to=ResolvedFileImport(
+                type="FILE_PATH",
+                import_string=current_working_file.name,
+                path=current_working_file,
+            ),
             type={file_type},
             used_by=[],
         )
@@ -107,7 +111,7 @@ class RobotVisitorFileImports(ModelVisitor):
 
         root_dir_parts_len = len(self.root_directory.parts)
 
-        path = file.path_absolute
+        path = file.resolved_to.path
         while len(path.parts) > root_dir_parts_len:
             path = path.parent
             init_file = self.init_files.get(path, None)
@@ -248,7 +252,7 @@ class RobotVisitorFileImports(ModelVisitor):
 
     def _register_file_use(
         self,
-        file_path: Path,
+        resolved_import: ResolvedFileImport,
         import_args: tuple[str, ...],
         import_as: str | None,
         file_type: Literal["RESOURCE", "LIBRARY", "VARIABLE"],
@@ -257,8 +261,12 @@ class RobotVisitorFileImports(ModelVisitor):
             msg = "Registering import outside a .robot or .resource file"
             raise ImpossibleStateError(msg)
 
-        file_path = file_path.resolve()
-        normalized_path = normalize_file_path(file_path)
+        if isinstance(resolved_import.path, Path):
+            file_path = resolved_import.path.resolve()
+            file_id = normalize_file_path(file_path)
+        else:
+            file_id = resolved_import.import_string.casefold()
+
         normalized_import_as = normalize_keyword_name(import_as) if import_as else import_as
 
         file_used_by = FileUsedByData(
@@ -268,16 +276,16 @@ class RobotVisitorFileImports(ModelVisitor):
             args=import_args,
         )
 
-        if normalized_path in self.files:
-            existing = self.files[normalized_path]
+        if file_id in self.files:
+            existing = self.files[file_id]
 
             existing.type.add(file_type)
             existing.used_by.append(file_used_by)
             return
 
-        self.files[normalized_path] = FileUseData(
-            id=normalized_path,
-            path_absolute=file_path,
+        self.files[file_id] = FileUseData(
+            id=file_id,
+            resolved_to=resolved_import,
             type={file_type},
             used_by=[file_used_by],
         )
@@ -293,7 +301,7 @@ class RobotVisitorFileImports(ModelVisitor):
             "Variables",
             "Import Variables",
         ],
-    ) -> Path | None:
+    ) -> ResolvedFileImport | None:
         if self.current_working_directory is None or self.current_working_file is None:
             msg = "Found import outside a .robot or .resource file"
             raise ImpossibleStateError(msg)
@@ -306,8 +314,11 @@ class RobotVisitorFileImports(ModelVisitor):
                 self.discovered_files,
             )
         except ImportError as e:
+            source_dir = (
+                self.root_directory if self.root_directory.is_dir() else self.root_directory.parent
+            )
             from_path = to_relative_path(
-                self.root_directory,
-                self.current_working_file.path_absolute,
+                source_dir,
+                self.current_working_file.resolved_to.path,
             )
             self.reporter.on_file_import_error(e, import_type, import_str, from_path)

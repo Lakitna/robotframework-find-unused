@@ -76,11 +76,25 @@ class LibraryData:
 
 
 @dataclass
+class ResolvedFileImport:
+    """Data structure for resolved file imports"""
+
+    type: Literal[
+        "BUILTIN",
+        "DOWNLOADED_LIBRARY",
+        "FILE_PATH",
+        "MODULE",
+    ]
+    import_string: str
+    path: Path
+
+
+@dataclass
 class FileUseData:
     """Data structure for file imports"""
 
     id: str
-    path_absolute: Path
+    resolved_to: ResolvedFileImport
     type: set["FileUseType"]
     used_by: list["FileUsedByData"]
 
