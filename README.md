@@ -186,6 +186,27 @@ robotunused files --help
 | `-u`, `--unused`     | `include` / `exclude` / `only` | `include` | How to output unused file imports                                                                                                               |
 | `-v`, `--verbose`    |                                |           | Show more log output. When provided twice: Show even more log output                                                                            |
 
+## Limitations
+
+Every command has limitations. To see an up-to-date list of limitations for each command, use the
+`--help` flag. Every limitation also has a Github issue. If you find a limitation without issue,
+it's a bug or knowledge gap. Please open an issue so it can be addressed.
+
+The following is a list of generic limitations. These limitations apply to all commands.
+
+### Generic limitation 1: Less used filetypes are ignored
+
+Find Unused supports `.robot`, `.resource`, and `.py` files. It also supports `.json`, `.yaml`, and
+`.py` variables files.
+
+Anything else is unsupported. This includes older filetypes (like `.html` and `.tsv`) and less used
+filetypes (like `.rst` and `rbt`).
+
+### Generic limitation 2: No localization
+
+Robot Framework supports localization. Find unused does not support it. Any language other than
+English will produce unexpected results.
+
 ## Contributing
 
 I'm open to contributions. Please contact me in the issues.
