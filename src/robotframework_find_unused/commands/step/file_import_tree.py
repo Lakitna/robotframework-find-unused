@@ -52,11 +52,11 @@ class FileImportTreeNode:
         """
         if self.parent is None:
             # No parent, return absolute path
-            return normalize_file_path(self.data.path_absolute)
+            return normalize_file_path(self.data.resolved_to.path)
 
         return to_relative_path(
-            self.parent.data.path_absolute.parent,
-            self.data.path_absolute,
+            self.parent.data.resolved_to.path.parent,
+            self.data.resolved_to.path,
         )
 
     def __hash__(self) -> int:

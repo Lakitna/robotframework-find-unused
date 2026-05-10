@@ -6,8 +6,8 @@ from typing import Literal
 
 from robot.libraries import STDLIBS
 
-from robotframework_find_unused.common.const import VariableValue
-from robotframework_find_unused.common.path import path_exists, path_in_scope
+from robotframework_find_unused.common.const import ResolvedFileImport, VariableValue
+from robotframework_find_unused.common.path import path_exists, path_in_scope, path_in_venv
 
 from .resolve_variables import resolve_variables
 
@@ -27,7 +27,7 @@ class _AbstractImportStringResolver:
         relative_to: Path,
         discovered_files: set[Path],
         in_scope_directory: Path,
-    ) -> Path | Literal[False] | None:
+    ) -> ResolvedFileImport | Literal[False] | None:
         """
         Resolve import string.
 
@@ -74,7 +74,7 @@ class _FilePathResolver(_AbstractImportStringResolver):
         relative_to: Path,
         discovered_files: set[Path],
         in_scope_directory: Path,
-    ) -> Path | Literal[False] | None:
+    ) -> ResolvedFileImport | Literal[False] | None:
         pythonpath_paths_in_scope = self._get_pythonpath_paths_in_scope(in_scope_directory)
         relative_to_paths = [relative_to, *pythonpath_paths_in_scope]
 
@@ -115,7 +115,7 @@ class _ModulePathResolver(_AbstractImportStringResolver):
         relative_to: Path,  # noqa: ARG002
         discovered_files: set[Path],
         in_scope_directory: Path,
-    ) -> Path | Literal[False] | None:
+    ) -> ResolvedFileImport | Literal[False] | None:
         module_import_options = [import_str]
         if "." in import_str:
             module_import_options.append(import_str.rsplit(".", maxsplit=1)[0])
@@ -162,7 +162,7 @@ def resolve_import_string(
     relative_to: Path,
     in_scope_directory: Path,
     discovered_files: set[Path] | None = None,
-) -> Path | None:
+) -> ResolvedFileImport | None:
     """
     Resolve a file import string.
 

@@ -43,7 +43,11 @@ def _count_file_uses(
 
         files[path_normalized] = FileUseData(
             id=path_normalized,
-            path_absolute=path,
+            resolved_to=ResolvedFileImport(
+                type="FILE_PATH",
+                import_string=path.as_posix(),
+                path=path,
+            ),
             type=set(),
             used_by=[],
         )

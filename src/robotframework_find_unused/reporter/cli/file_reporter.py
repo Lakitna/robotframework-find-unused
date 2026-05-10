@@ -184,11 +184,11 @@ class FileCliReporter(FileReporter, PartialCliReporterDiscoverFiles):
             yield f"{INDENT}Used by {len(used_by)} files:"
             used_by_files_sorted = sorted(
                 used_by,
-                key=lambda f: f.file.path_absolute.as_posix(),
+                key=lambda f: f.file.resolved_to.path.as_posix(),
             )
             for used_by_file in used_by_files_sorted:
                 file_path = pretty_file_path(
-                    to_relative_path(cwd, used_by_file.file.path_absolute),
+                    to_relative_path(self.cwd, used_by_file.file.resolved_to.path),
                     used_by_file.file.type,
                 )
                 yield f"{INDENT}{INDENT}{file_path}"
@@ -207,7 +207,7 @@ class FileCliReporter(FileReporter, PartialCliReporterDiscoverFiles):
             click.echo("import_count\tfile")
             for file in sorted_files:
                 file_path = pretty_file_path(
-                    to_relative_path(cwd, file.path_absolute),
+                    to_relative_path(cwd, file.resolved_to.path),
                     file.type,
                 )
                 click.echo(
@@ -226,7 +226,7 @@ class FileCliReporter(FileReporter, PartialCliReporterDiscoverFiles):
             click.echo(f"Found {len(unused_files)} unused files:")
             for file in unused_files:
                 file_path = pretty_file_path(
-                    to_relative_path(cwd, file.path_absolute),
+                    to_relative_path(cwd, file.resolved_to.path),
                     file.type,
                 )
                 click.echo("  " + file_path)
@@ -243,7 +243,7 @@ class FileCliReporter(FileReporter, PartialCliReporterDiscoverFiles):
             pattern = self.options.path_filter_glob.lower()
             tree_root_files = list(
                 filter(
-                    lambda path: fnmatch.fnmatchcase(path.path_absolute.as_posix(), pattern),
+                    lambda path: fnmatch.fnmatchcase(path.resolved_to.path.as_posix(), pattern),
                     tree_root_files,
                 ),
             )
@@ -267,7 +267,7 @@ class FileCliReporter(FileReporter, PartialCliReporterDiscoverFiles):
         for trees in grouped_trees:
             click.echo()
             for tree in trees[0:-1]:
-                click.echo(normalize_file_path(tree.data.path_absolute))
+                click.echo(normalize_file_path(tree.data.resolved_to.path))
             self._echo_file_use_tree(trees[-1], tree_builder)
 
     def on_file_import_error(
