@@ -50,13 +50,23 @@ class _StandardLibResolver(_AbstractImportStringResolver):
 
     def resolve(
         self,
-        import_str: str,  # noqa: ARG002
+        import_str: str,
         relative_to: Path,  # noqa: ARG002
         discovered_files: set[Path],  # noqa: ARG002
         in_scope_directory: Path,  # noqa: ARG002
-    ) -> Path | None | Literal[False]:
-        # Standard lib is always out of scope.
-        return False
+    ) -> ResolvedFileImport | Literal[False] | None:
+        resolved = _resolve_module_path(
+            f"robot.libraries.{import_str}.{import_str}",
+        )
+
+        if not resolved:
+            return resolved
+
+        return ResolvedFileImport(
+            type="BUILTIN",
+            import_string=import_str,
+            path=resolved,
+        )
 
 
 class _FilePathResolver(_AbstractImportStringResolver):
@@ -84,11 +94,17 @@ class _FilePathResolver(_AbstractImportStringResolver):
             if not path_in_scope(abs_path, in_scope_directory):
                 return False
 
-            if abs_path in discovered_files:
-                return abs_path
+            resolved = ResolvedFileImport(
+                type="FILE_PATH",
+                import_string=import_str,
+                path=abs_path,
+            )
 
-            if path_exists(abs_path):
-                return abs_path
+            if resolved.path in discovered_files:
+                return resolved
+
+            if path_exists(resolved.path):
+                return resolved
 
         return None
 
@@ -120,34 +136,47 @@ class _ModulePathResolver(_AbstractImportStringResolver):
         if "." in import_str:
             module_import_options.append(import_str.rsplit(".", maxsplit=1)[0])
 
-        lib_path = None
         for opt in module_import_options:
-            lib_path = self._resolve_module_path(opt)
-            if not lib_path:
+            abs_path = _resolve_module_path(opt)
+            if not abs_path:
                 continue
 
-            if not path_in_scope(lib_path, in_scope_directory):
+            if path_in_venv(abs_path):
+                return ResolvedFileImport(
+                    type="DOWNLOADED_LIBRARY",
+                    import_string=import_str,
+                    path=abs_path,
+                )
+
+            resolved = ResolvedFileImport(
+                type="MODULE",
+                import_string=import_str,
+                path=abs_path,
+            )
+
+            if not path_in_scope(resolved.path, in_scope_directory):
                 return False
 
-            if lib_path in discovered_files:
-                return lib_path
+            if resolved.path in discovered_files:
+                return resolved
 
-            if path_exists(lib_path):
-                return lib_path
+            if path_exists(resolved.path):
+                return resolved
 
         return None
 
-    def _resolve_module_path(self, import_str: str) -> Path | None:
-        try:
-            spec = importlib.util.find_spec(*import_str.rsplit(".", maxsplit=1))
-        except (ModuleNotFoundError, ImportError):
-            # Is bad import or builtin library
-            return None
 
-        if not spec or not spec.origin:
-            return None
+def _resolve_module_path(import_str: str) -> Path | None:
+    try:
+        spec = importlib.util.find_spec(*import_str.rsplit(".", maxsplit=1))
+    except (ModuleNotFoundError, ImportError):
+        # Is bad import
+        return None
 
-        return Path(spec.origin)
+    if not spec or not spec.origin:
+        return None
+
+    return Path(spec.origin)
 
 
 _resolve_strategies: tuple[_AbstractImportStringResolver, ...] = (
