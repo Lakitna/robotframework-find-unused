@@ -1,13 +1,13 @@
 Discovering files in `./robot` using Robocop config...
 Parsing file imports...
 [ WARNING ] File used multiple times with different arguments:
-    Used file: ./alpha.py  AS  Aaa
+    Used file: ./alpha.py  AS  aaa
     With arguments:
         1. bar    foo
         2. foo    bar
-    Used by 2 files
-
-    Used file: ./alpha.py  AS  Bbb
+    Used by 3 files
+[ WARNING ] File used multiple times with different arguments:
+    Used file: ./alpha.py  AS  bbb
     With arguments:
         1. [No arguments]
         2. 134
@@ -31,4 +31,4 @@ import_count	file
 1	./Epsilon.py
 1	./resource.resource
 2	./beta.py
-5	./alpha.py
+6	./alpha.py

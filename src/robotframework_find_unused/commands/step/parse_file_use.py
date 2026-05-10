@@ -56,7 +56,7 @@ def _add_undiscovered_files(
             id=path_normalized,
             resolved_to=ResolvedFileImport(
                 type="FILE_PATH",
-                import_string=path.as_posix(),
+                import_string="",
                 path=path,
             ),
             type=set(),
@@ -75,10 +75,11 @@ def _raise_import_warnings(files: list[FileUseData], reporter: FileReporter) -> 
 
             used_by_grouped_by_alias[used_by.normalized_as_alias].append(used_by)
 
-        distinct_args = set()
-        for used_by_group in used_by_grouped_by_alias.values():
-            for f in used_by_group:
-                distinct_args.add(f.args)
+        for with_alias, used_by_group in used_by_grouped_by_alias.items():
+            with_distinct_args: set[tuple[str, ...]] = set()
 
-        if len(distinct_args) > 1:
-            reporter.on_file_imports_with_different_args(file)
+            for f in used_by_group:
+                with_distinct_args.add(f.args)
+
+            if len(with_distinct_args) > 1:
+                reporter.on_file_imports_with_different_args(file, with_alias, with_distinct_args)

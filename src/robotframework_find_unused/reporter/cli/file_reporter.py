@@ -15,7 +15,6 @@ from robotframework_find_unused.common.const import (
     VERBOSE_NO,
     VERBOSE_SINGLE,
     FileUseData,
-    FileUsedByData,
 )
 from robotframework_find_unused.common.normalize import normalize_file_path
 from robotframework_find_unused.convert.convert_path import to_relative_path
@@ -102,7 +101,12 @@ class FileCliReporter(FileReporter, PartialCliReporterDiscoverFiles):
         """When an warning is issues"""
         click.echo(f"{WARN} {warning}")
 
-    def on_file_imports_with_different_args(self, file: "FileUseData"):
+    def on_file_imports_with_different_args(
+        self,
+        file: "FileUseData",
+        as_alias: str | None,
+        distinct_args: set[tuple[str, ...]],
+    ):
         log_lines = []
 
         if file.resolved_to.type in ("BUILTIN", "DOWNLOADED_LIBRARY"):
@@ -110,35 +114,15 @@ class FileCliReporter(FileReporter, PartialCliReporterDiscoverFiles):
         else:
             log_lines.append(f"{WARN} File used multiple times with different arguments:")
 
-        used_by_grouped_by_alias: dict[str | None, list[FileUsedByData]] = {}
-        for used_by in file.used_by:
-            if used_by.normalized_as_alias not in used_by_grouped_by_alias:
-                used_by_grouped_by_alias[used_by.normalized_as_alias] = []
-
-            used_by_grouped_by_alias[used_by.normalized_as_alias].append(used_by)
-
-        for used_by in used_by_grouped_by_alias.values():
-            distinct_args = set()
-            for f in used_by:
-                distinct_args.add(f.args)
-
-            if len(distinct_args) <= 1:
-                # Never imported with different arguments
-                continue
-
-            log_lines += list(
-                self._cli_log_file_import_warnings_lines_gen(
-                    file,
-                    used_by,
-                    distinct_args,
-                ),
-            )
-            log_lines.append("")
+        log_lines += list(
+            self._cli_log_file_import_warnings_lines_gen(
+                file,
+                as_alias,
+                distinct_args,
+            ),
+        )
 
         if log_lines:
-            # Remove trailing newline
-            log_lines = log_lines[:-1]
-
             for line in log_lines:
                 click.echo(line)
 
@@ -155,13 +139,9 @@ class FileCliReporter(FileReporter, PartialCliReporterDiscoverFiles):
     def _cli_log_file_import_warnings_lines_gen(
         self,
         file: FileUseData,
-        used_by: list[FileUsedByData],
+        import_as_alias: str | None,
         distinct_args: set[tuple[str, ...]],
     ) -> Generator[str]:
-        if len(used_by) == 0:
-            return
-        import_as_alias = used_by[0].as_alias
-
         if file.resolved_to.type in ("FILE_PATH", "MODULE"):
             file_path = to_relative_path(self.cwd, file.resolved_to.path)
             file_type = "file"
@@ -187,6 +167,9 @@ class FileCliReporter(FileReporter, PartialCliReporterDiscoverFiles):
             else:
                 yield f"{INDENT}{INDENT}{num}{'    '.join(args)}"
 
+        used_by = [
+            f for f in file.used_by if str(f.as_alias).casefold() == str(import_as_alias).casefold()
+        ]
         if self.options.verbose == VERBOSE_NO:
             yield f"{INDENT}Used by {len(used_by)} files"
         else:
