@@ -10,6 +10,7 @@ import click
 from robotframework_find_unused.cli import cli
 
 README_PATH = Path("./README.md")
+PLACEHOLDER_MARKER = "UNRESOLVED_PLACEHOLDER"
 
 
 def build_readme():
@@ -70,14 +71,14 @@ def _remove_old_variable_content(content: str) -> str:
 
             out_lines.append(line)
             active_var_area_name = m.groups()[0]
-            out_lines.append("{{ " + str(active_var_area_name) + " }}")
+            out_lines.append(f"[[{PLACEHOLDER_MARKER}:{active_var_area_name}]]")
 
     return "\n".join(out_lines)
 
 
 def _set_new_variable_content(readme: str, variable: str, content: str) -> str:
     return readme.replace(
-        "{{ " + str(variable) + " }}",
+        f"[[{PLACEHOLDER_MARKER}:{variable}]]",
         content.strip(),
     )
 
