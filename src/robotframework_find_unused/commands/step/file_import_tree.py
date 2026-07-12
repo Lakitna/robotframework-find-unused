@@ -72,7 +72,7 @@ class FileImportTreeBuilder:
 
     _tree_cache: dict[int, FileImportTreeNode]
 
-    def __init__(self, max_depth: int = 5, max_height: int = -1) -> None:
+    def __init__(self, max_depth: int = 5, max_height: int = 0) -> None:
         self.max_depth = max_depth
         self.max_height = max_height
         self._tree_cache = {}
@@ -219,7 +219,7 @@ class FileImportTreeBuilder:
         height_limited = self.max_height > 0 and self.max_height < height
 
         max_depth = max(*[node.depth for node in nodes])
-        max_depth_limited = self.max_depth >= 0 and self.max_depth < max_depth
+        max_depth_limited = self.max_depth > 0 and self.max_depth < max_depth
 
         unique_file_count = len({node.data.id for node in nodes})
 

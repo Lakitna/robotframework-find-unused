@@ -244,7 +244,7 @@ class FileCliReporter(FileReporter, PartialCliReporterDiscoverFiles):
             f"Building {len(tree_root_files)} file import trees"
             + (
                 f" with max depth {self.options.tree_max_depth}"
-                if self.options.tree_max_depth >= 0
+                if self.options.tree_max_depth > 0
                 else ""
             )
             + "...",
