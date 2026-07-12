@@ -56,7 +56,7 @@ def cli():
     "-f",
     "--filter",
     default=None,
-    metavar="<GLOB>",
+    metavar="<GlobPattern>",
     type=click.UNPROCESSED,
     help="Only output keywords who's name match the glob pattern. Match without library prefix",
 )
@@ -97,7 +97,7 @@ def cli():
     "--verbose",
     default=False,
     count=True,
-    help="Show more log output. Can be used twice",
+    help="Show more log output. When provided twice: Show even more log output",
 )
 @click.argument("file_path", default=".")
 def keywords(  # noqa: PLR0913
@@ -183,7 +183,7 @@ def keywords(  # noqa: PLR0913
     "-f",
     "--filter",
     default=None,
-    metavar="<GLOB>",
+    metavar="<GlobPattern>",
     type=click.UNPROCESSED,
     help=(
         "Only show variables who's name match the glob pattern. "
@@ -213,7 +213,7 @@ def keywords(  # noqa: PLR0913
     "--verbose",
     default=False,
     count=True,
-    help="Show more log output. Can be used twice",
+    help="Show more log output. When provided twice: Show even more log output",
 )
 @click.argument("file_path", default=".")
 def variables(
@@ -318,7 +318,7 @@ def variables(
     "-f",
     "--filter",
     default=None,
-    metavar="<GLOB>",
+    metavar="<GlobPattern>",
     type=click.UNPROCESSED,
     help="Only output keywords who's name match the glob pattern. Match without library prefix",
 )
@@ -359,7 +359,7 @@ def variables(
     "--verbose",
     default=False,
     count=True,
-    help="Show more log output. Can be used twice",
+    help="Show more log output. When provided twice: Show even more log output",
 )
 @click.argument("file_path", default=".")
 def arguments(  # noqa: PLR0913
@@ -440,7 +440,7 @@ def arguments(  # noqa: PLR0913
     "-f",
     "--filter",
     default=None,
-    metavar="<GLOB>",
+    metavar="<GlobPattern>",
     type=click.UNPROCESSED,
     help="Only output keywords who's name match the glob pattern. Match without library prefix",
 )
@@ -479,9 +479,9 @@ def arguments(  # noqa: PLR0913
 @click.option(
     "-v",
     "--verbose",
-    default=False,
+    default=0,
     count=True,
-    help="Show more log output. Can be used twice",
+    help="Show more log output. When provided twice: Show even more log output",
 )
 @click.argument("file_path", default=".")
 def returns(  # noqa: PLR0913
@@ -550,20 +550,22 @@ def returns(  # noqa: PLR0913
 )
 @click.option(
     "--tree-max-depth",
-    default=-1,
-    type=click.INT,
+    default=0,
+    type=click.IntRange(min=0, max_open=True),
     help="Only applies when using `--show-tree`. Maximum tree depth.",
 )
 @click.option(
     "--tree-max-height",
-    default=-1,
-    type=click.INT,
+    default=0,
+    type=click.IntRange(min=0, max_open=True),
     help="Only applies when using `--show-tree`. Maximum tree height.",
 )
 @click.option(
     "-f",
     "--filter",
-    metavar="<GLOB>",
+    default=None,
+    metavar="<GlobPattern>",
+    type=click.UNPROCESSED,
     help="Only output files who's path match the glob pattern",
 )
 @click.option(
@@ -619,9 +621,9 @@ def returns(  # noqa: PLR0913
 @click.option(
     "-v",
     "--verbose",
-    default=False,
+    default=0,
     count=True,
-    help="Show more log output. Can be used twice",
+    help="Show more log output. When provided twice: Show even more log output",
 )
 @click.argument("file_path", default=".")
 def files(  # noqa: PLR0913

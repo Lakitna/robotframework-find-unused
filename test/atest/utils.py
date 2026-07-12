@@ -89,7 +89,8 @@ class AcceptanceTest:
 
         # Remove file path to the repository root
         repo_root = get_repo_root(Path(__file__))
-        output = output.replace(repo_root.as_posix(), "[[REPOSITORY_ROOT]]")
+        pattern = re.compile(repo_root.as_posix(), re.IGNORECASE)
+        output = pattern.sub("[[REPOSITORY_ROOT]]", output)
 
         # Remove the keyword use count from standard libraries
         builtin_libraries = [

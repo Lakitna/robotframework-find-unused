@@ -47,6 +47,7 @@ def build(c: Context):
             test,
             build_source,
             build_gifs,
+            build_readme,
         ),
     )
 
@@ -85,6 +86,11 @@ def build_gifs(c: Context):
 
 
 @task
+def build_readme(c: Context):
+    c.run("uv run python ./docs/build/readme_builder.py")
+
+
+@task
 def update_submodules(c: Context):
     print("Updating submodules")
     c.run("git submodule update --init --recursive")
@@ -109,6 +115,7 @@ ns = Collection(
     build,
     build_gifs,
     build_source,
+    build_readme,
     set_version,
     set_version_pyproject,
     set_version_python,
