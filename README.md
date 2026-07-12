@@ -52,15 +52,17 @@ robotunused keywords --help
 
 #### Available options
 
+<!--<command_keywords_cli_options>-->
 | flag                     | option                         | default   | description                                                                          |
 | ------------------------ | ------------------------------ | --------- | ------------------------------------------------------------------------------------ |
 | `-c`, `--show-count`     |                                |           | Output usage count for all keywords instead of only unused keywords                  |
-| `-f`, `--filter`         | Glob pattern                   |           | Only output keywords who's name match the glob pattern. Match without library prefix |
+| `-f`, `--filter`         | <GlobPattern>                  |           | Only output keywords who's name match the glob pattern. Match without library prefix |
 | `-d`, `--deprecated`     | `include` / `exclude` / `only` | `include` | How to output deprecated keywords                                                    |
 | `-p`, `--private`        | `include` / `exclude` / `only` | `include` | How to output private keywords                                                       |
 | `-l`, `--library`        | `include` / `exclude` / `only` | `exclude` | How to output keywords from downloaded libraries                                     |
 | `-u`, `--unused-library` | `include` / `exclude`          | `exclude` | How to output unused keywords from downloaded libraries                              |
 | `-v`, `--verbose`        |                                |           | Show more log output. When provided twice: Show even more log output                 |
+<!--</command_keywords_cli_options>-->
 
 ### Find unused keyword arguments
 
@@ -84,15 +86,17 @@ robotunused arguments --help
 
 #### Available options
 
+<!--<command_arguments_cli_options>-->
 | flag                 | option                         | default   | description                                                                          |
 | -------------------- | ------------------------------ | --------- | ------------------------------------------------------------------------------------ |
 | `-c`, `--show-count` |                                |           | Show usage count for all arguments instead of only unused arguments                  |
-| `-f`, `--filter`     | Glob pattern                   |           | Only output keywords who's name match the glob pattern. Match without library prefix |
+| `-f`, `--filter`     | <GlobPattern>                  |           | Only output keywords who's name match the glob pattern. Match without library prefix |
 | `-d`, `--deprecated` | `include` / `exclude` / `only` | `include` | How to output deprecated keywords                                                    |
 | `-p`, `--private`    | `include` / `exclude` / `only` | `include` | How to output private keywords                                                       |
 | `-l`, `--library`    | `include` / `exclude` / `only` | `exclude` | How to output keywords from downloaded libraries                                     |
 | `-u`, `--unused`     | `include` / `exclude` / `only` | `exclude` | How to output unused keywords                                                        |
 | `-v`, `--verbose`    |                                |           | Show more log output. When provided twice: Show even more log output                 |
+<!--</command_arguments_cli_options>-->
 
 ### Find unused keyword return statements
 
@@ -117,17 +121,19 @@ robotunused returns --help
 
 #### Available options
 
+<!--<command_returns_cli_options>-->
 | flag                 | option                         | default   | description                                                                          |
 | -------------------- | ------------------------------ | --------- | ------------------------------------------------------------------------------------ |
 | `-c`, `--show-count` |                                |           | Output usage count for all keywords instead of only keywords with unused returns     |
-| `-f`, `--filter`     | Glob pattern                   |           | Only output keywords who's name match the glob pattern. Match without library prefix |
+| `-f`, `--filter`     | <GlobPattern>                  |           | Only output keywords who's name match the glob pattern. Match without library prefix |
 | `-d`, `--deprecated` | `include` / `exclude` / `only` | `include` | How to output deprecated keywords                                                    |
 | `-p`, `--private`    | `include` / `exclude` / `only` | `include` | How to output private keywords                                                       |
 | `-l`, `--library`    | `include` / `exclude` / `only` | `exclude` | How to output keywords from downloaded libraries                                     |
 | `-u`, `--unused`     | `include` / `exclude` / `only` | `exclude` | How to output unused keywords                                                        |
 | `-v`, `--verbose`    |                                |           | Show more log output. When provided twice: Show even more log output                 |
+<!--</command_returns_cli_options>-->
 
-### Find unused global variables
+### Find unused variables
 
 ![Variables command demo gif](./docs/gif/variables/variables.gif)
 
@@ -147,11 +153,14 @@ robotunused variables --help
 
 #### Available options
 
-| flag                 | option       | default | description                                                                                          |
-| -------------------- | ------------ | ------- | ---------------------------------------------------------------------------------------------------- |
-| `-c`, `--show-count` |              |         | Show usage count for all variables instead of only unused variables                                  |
-| `-f`, `--filter`     | Glob pattern |         | Only show variables who's name match the glob pattern. Matching without {brackets} and $@&% prefixes |
-| `-v`, `--verbose`    |              |         | Show more log output. When provided twice: Show even more log output                                 |
+<!--<command_variables_cli_options>-->
+| flag                 | option        | default | description                                                                                                                                                                                                                                                                                                                     |
+| -------------------- | ------------- | ------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `-c`, `--show-count` |               |         | Show usage count for all variables instead of only unused variables                                                                                                                                                                                                                                                             |
+| `-f`, `--filter`     | <GlobPattern> |         | Only show variables who's name match the glob pattern. Matching without {brackets} and $@&% prefixes                                                                                                                                                                                                                            |
+| `--pythonpath`       | <path>        |         | Same as --pythonpath in Robotframework: Additional locations (directories, ZIPs) where to search libraries and other extensions when they are imported. Multiple paths can be given by separating them with a colon (`:`) or by using this option several times. Given path can also be a glob pattern matching multiple paths. |
+| `-v`, `--verbose`    |               |         | Show more log output. When provided twice: Show even more log output                                                                                                                                                                                                                                                            |
+<!--</command_variables_cli_options>-->
 
 ### Find unused files
 
@@ -173,18 +182,21 @@ robotunused files --help
 
 #### Available options
 
-| flag                 | option                         | default   | description                                                                                                                                     |
-| -------------------- | ------------------------------ | --------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
-| `-c`, `--show-count` |                                |           | Show usage count for all files instead of only unused variables                                                                                 |
-| `-t`, `--show-tree`  |                                |           | Also show full import tree for every `.robot` file                                                                                              |
-| `--tree-max-depth`   | Positive integer               | `None`    | Only when `--show-tree`: Limit import tree depth                                                                                                |
-| `--tree-max-height`  | Positive integer               | `None`    | Only when `--show-tree`: Limit import tree height                                                                                               |
-| `-f`, `--filter`     | Glob pattern                   |           | Only show files who's path matches the glob pattern. When used with `--show-tree`: Only show trees for suite files that match the glob pattern. |
-| `-r`, `--resource`   | `include` / `exclude` / `only` | `include` | How to output resource file imports                                                                                                             |
-| `-l`, `--library`    | `include` / `exclude` / `only` | `include` | How to output (custom) library file imports                                                                                                     |
-| `-V`, `--variable`   | `include` / `exclude` / `only` | `include` | How to output variable file imports                                                                                                             |
-| `-u`, `--unused`     | `include` / `exclude` / `only` | `include` | How to output unused file imports                                                                                                               |
-| `-v`, `--verbose`    |                                |           | Show more log output. When provided twice: Show even more log output                                                                            |
+<!--<command_files_cli_options>-->
+| flag                 | option                         | default   | description                                                                                                                                                                                                                                                                                                                     |
+| -------------------- | ------------------------------ | --------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `-c`, `--show-count` |                                |           | Output usage count for all files instead of only unused files                                                                                                                                                                                                                                                                   |
+| `-t`, `--show-tree`  |                                |           | Output file import trees for every .robot file                                                                                                                                                                                                                                                                                  |
+| `--tree-max-depth`   | Positive integer (x>=0)        | `0`       | Only applies when using `--show-tree`. Maximum tree depth.                                                                                                                                                                                                                                                                      |
+| `--tree-max-height`  | Positive integer (x>=0)        | `0`       | Only applies when using `--show-tree`. Maximum tree height.                                                                                                                                                                                                                                                                     |
+| `-f`, `--filter`     | <GlobPattern>                  |           | Only output files who's path match the glob pattern                                                                                                                                                                                                                                                                             |
+| `-r`, `--resource`   | `include` / `exclude` / `only` | `include` | How to output resource file imports                                                                                                                                                                                                                                                                                             |
+| `-l`, `--library`    | `include` / `exclude` / `only` | `include` | How to output (custom) library file imports                                                                                                                                                                                                                                                                                     |
+| `-V`, `--variable`   | `include` / `exclude` / `only` | `include` | How to output variable file imports                                                                                                                                                                                                                                                                                             |
+| `-u`, `--unused`     | `include` / `exclude` / `only` | `include` | How to output unused file imports                                                                                                                                                                                                                                                                                               |
+| `--pythonpath`       | <path>                         |           | Same as --pythonpath in Robotframework: Additional locations (directories, ZIPs) where to search libraries and other extensions when they are imported. Multiple paths can be given by separating them with a colon (`:`) or by using this option several times. Given path can also be a glob pattern matching multiple paths. |
+| `-v`, `--verbose`    |                                |           | Show more log output. When provided twice: Show even more log output                                                                                                                                                                                                                                                            |
+<!--</command_files_cli_options>-->
 
 ## Limitations
 
