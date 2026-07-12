@@ -68,6 +68,7 @@ class RobotVisitorLibraryImports(ModelVisitor):
                 name_normalized=normalized_lib_name,
                 keywords=[],
                 keyword_names_normalized=set(),
+                import_error=e,
             )
             return
 
@@ -98,4 +99,5 @@ class RobotVisitorLibraryImports(ModelVisitor):
             name_normalized=normalized_lib_name,
             keywords=keywords,
             keyword_names_normalized=keyword_names_normalized,
+            import_error=False,
         )

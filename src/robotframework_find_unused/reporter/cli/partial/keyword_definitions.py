@@ -89,9 +89,10 @@ class PartialCliReporterDownloadedKeywordDefinitions(PartialReporter_DownloadedK
             return
 
         for lib in libraries:
-            if len(lib.keywords) == 0:
-                # Import error
+            if lib.import_error:
                 click.echo(f"{INDENT}{lib.name}: {ERROR}")
+            elif len(lib.keywords) == 0:
+                click.echo(f"{INDENT}{lib.name}: {len(lib.keywords)} keywords {WARN}")
             else:
                 click.echo(f"{INDENT}{lib.name}: {len(lib.keywords)} keywords")
 
@@ -100,4 +101,4 @@ class PartialCliReporterDownloadedKeywordDefinitions(PartialReporter_DownloadedK
         error: DataError,
         lib_name: str,
     ):
-        click.echo(f"{ERROR} Failed to gather keywords from library `{lib_name}`")
+        click.echo(f"{ERROR} Failed to gather keywords from library `{lib_name}`: {error}")

@@ -4,6 +4,7 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Literal, TypeAlias
 
+import robot.errors
 from robot.libdocpkg.model import ArgumentSpec
 
 VERBOSE_NO = 0
@@ -73,6 +74,7 @@ class LibraryData:
     name_normalized: str
     keywords: list[KeywordData]
     keyword_names_normalized: set[str]
+    import_error: Literal[False] | robot.errors.DataError
 
 
 @dataclass
