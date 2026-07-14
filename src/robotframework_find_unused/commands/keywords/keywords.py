@@ -96,7 +96,7 @@ def command_keywords(options: "KeywordOptions", reporter: "KeywordReporter") -> 
     # gefx = nx.generate_gexf(G)
     # for l in nx.generate_gexf(G):
     #     print(l)
-    with open("./tmp.gexf", "w+") as f:
+    with open("./graph.gexf", "w+") as f:
         f.writelines(nx.generate_gexf(G))
 
     # plt.show()
