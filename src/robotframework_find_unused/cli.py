@@ -4,6 +4,8 @@ CLI entry point
 
 # ruff: noqa: FBT001,D301
 
+import sys
+
 import click
 
 from robotframework_find_unused.__version__ import __version__
@@ -167,6 +169,9 @@ def keywords(  # noqa: PLR0913
         show_all_count=show_count,
         verbose=verbose,
     )
+    # Empty argv to prevent libraries from trying to interpret robotunused arguments
+    sys.argv = [sys.argv[0]]
+
     reporter = KeywordCliReporter(options)
     command_keywords(options, reporter)
 
@@ -302,6 +307,9 @@ def variables(
         pythonpath=pythonpath,
         verbose=verbose,
     )
+    # Empty argv to prevent libraries from trying to interpret robotunused arguments
+    sys.argv = [sys.argv[0]]
+
     reporter = VariableCliReporter(options)
     command_variables(options, reporter)
 
@@ -424,6 +432,9 @@ def arguments(  # noqa: PLR0913
         show_all_count=show_count,
         verbose=verbose,
     )
+    # Empty argv to prevent libraries from trying to interpret robotunused arguments
+    sys.argv = [sys.argv[0]]
+
     reporter = ArgumentCliReporter(options)
     command_arguments(options, reporter)
 
@@ -529,6 +540,9 @@ def returns(  # noqa: PLR0913
         show_all_count=show_count,
         verbose=verbose,
     )
+    # Empty argv to prevent libraries from trying to interpret robotunused arguments
+    sys.argv = [sys.argv[0]]
+
     reporter = ReturnCliReporter(options)
     command_returns(options, reporter)
 
@@ -722,6 +736,9 @@ def files(  # noqa: PLR0913
         source_path=file_path,
         pythonpath=pythonpath,
     )
+    # Empty argv to prevent libraries from trying to interpret robotunused arguments
+    sys.argv = [sys.argv[0]]
+
     reporter = FileCliReporter(options)
     command_files(options, reporter)
 
