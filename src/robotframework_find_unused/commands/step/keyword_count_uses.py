@@ -1,5 +1,7 @@
 from typing import TYPE_CHECKING
 
+import networkx as nx
+
 from robotframework_find_unused.commands.keywords.options import KeywordOptions
 from robotframework_find_unused.visitors.robot import visit_robot_files
 from robotframework_find_unused.visitors.robot.keyword_visitor import RobotVisitorKeywords
@@ -18,6 +20,7 @@ def step_count_keyword_uses(
     keywords: "list[KeywordData]",
     downloaded_libraries: "list[LibraryData]",
     *,
+    graph: nx.DiGraph,
     reporter: "PartialReporter_CountKeywords",
 ):
     """
@@ -25,7 +28,7 @@ def step_count_keyword_uses(
     """
     reporter.on_count_keyword_uses_start(file_paths, keywords, downloaded_libraries)
 
-    visitor = RobotVisitorKeywords(keywords, downloaded_libraries)
+    visitor = RobotVisitorKeywords(keywords, downloaded_libraries, graph)
     visit_robot_files(file_paths, visitor)
     counted_keywords = list(visitor.keywords.values())
 

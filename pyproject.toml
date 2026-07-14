@@ -15,6 +15,7 @@ classifiers = [
 requires-python = ">=3.10"
 dependencies = [
     "click (>=8.1.7,<9.0.0)",
+    "networkx>=3.4.2",
     "robotframework (>=6.1.1)",
     "robotframework-robocop (>=6.0.0)",
     # Required for robocop 6 and 7: https://github.com/MarketSquare/robotframework-robocop/issues/1679

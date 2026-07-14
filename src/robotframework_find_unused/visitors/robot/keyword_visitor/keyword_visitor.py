@@ -2,6 +2,7 @@ from collections.abc import Iterable
 from dataclasses import dataclass
 from typing import Any, Literal
 
+import networkx as nx
 from robot.api.parsing import (
     File,
     Keyword,
@@ -55,8 +56,12 @@ class RobotVisitorKeywords(ModelVisitor):
         self,
         custom_keywords: list[KeywordData],
         downloaded_library_keywords: list[LibraryData],
+        graph: nx.DiGraph,
     ) -> None:
         self.kw_matcher = KeywordDefinitionManager(custom_keywords, downloaded_library_keywords)
+        self.graph = graph
+
+        self.parent_kw: None | str = None
 
     @property
     def keywords(self):  # noqa: D102
@@ -65,6 +70,7 @@ class RobotVisitorKeywords(ModelVisitor):
     def visit_File(self, node: File):  # noqa: N802
         """Visit new file"""
         self.suite_template_keyword = None
+        self.parent_kw = None
 
         return self.generic_visit(node)
 
@@ -72,6 +78,8 @@ class RobotVisitorKeywords(ModelVisitor):
         """Keyword definition"""
         keyword = self.kw_matcher.get_keyword_definition(node.name)
         keyword.returns = self._get_keyword_returns(node)
+
+        self.parent_kw = keyword.normalized_name
 
         return self.generic_visit(node)
 
@@ -93,6 +101,8 @@ class RobotVisitorKeywords(ModelVisitor):
         if keyword_name_token:
             self._count_keyword_call(str(keyword_name_token), args=[])
 
+        self.parent_kw = None
+
         return self.generic_visit(node)
 
     def visit_Teardown(self, node: Teardown):  # noqa: N802
@@ -101,11 +111,15 @@ class RobotVisitorKeywords(ModelVisitor):
         if keyword_name_token:
             self._count_keyword_call(str(keyword_name_token), args=[])
 
+        self.parent_kw = None
+
         return self.generic_visit(node)
 
     def visit_TestSetup(self, node: TestSetup):  # noqa: N802
         """Count keyword use in test setup"""
         self._count_keyword_call(node.name, node.args)
+
+        self.parent_kw = None
 
         return self.generic_visit(node)
 
@@ -113,11 +127,15 @@ class RobotVisitorKeywords(ModelVisitor):
         """Count keyword use in suite setup"""
         self._count_keyword_call(node.name, node.args)
 
+        self.parent_kw = None
+
         return self.generic_visit(node)
 
     def visit_TestTeardown(self, node: TestTeardown):  # noqa: N802
         """Count keyword use in test teardown"""
         self._count_keyword_call(node.name, node.args)
+
+        self.parent_kw = None
 
         return self.generic_visit(node)
 
@@ -125,12 +143,16 @@ class RobotVisitorKeywords(ModelVisitor):
         """Count keyword use in suite teardown"""
         self._count_keyword_call(node.name, node.args)
 
+        self.parent_kw = None
+
         return self.generic_visit(node)
 
     def visit_TestTemplate(self, node: TestTemplate):  # noqa: N802
         """Count keyword use in test template setting"""
         if not node.value:
             return self.generic_visit(node)
+
+        self.parent_kw = None
 
         self.suite_template_keyword = node.value
         self._count_keyword_call(
@@ -143,6 +165,8 @@ class RobotVisitorKeywords(ModelVisitor):
 
     def visit_TestCase(self, node: TestCase):  # noqa: N802
         """Count templated test cases"""
+        self.parent_kw = None
+
         test_template_keyword = None
         template_args_set = []
         for child in node.body:
@@ -198,6 +222,8 @@ class RobotVisitorKeywords(ModelVisitor):
             self._count_keyword_call(inner.keyword, inner.args)
 
         if count_arguments:
+            if self.parent_kw:
+                self.graph.add_edge(self.parent_kw, keyword.normalized_name)
             self._count_keyword_call_args(keyword, args)
 
     def _get_keyword_reference_in_argument(
