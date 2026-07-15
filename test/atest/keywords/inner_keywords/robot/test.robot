@@ -21,6 +21,20 @@ Call multiple inner keywords with @args
     ...    Skip
     ...    BuiltIn.Skip
 
+With equally named positional and named arguments
+    Run Keyword
+    ...    Cute
+
+    Run Keyword
+    ...    Cute
+    ...    foo
+    ...    message=Hello, world
+
+    Run Keyword
+    ...    Cute
+    ...    name=foo
+    ...    something=Hello, world
+
 Using template
     [Template]    Amazing Test Template
     some data    Amazing Kw

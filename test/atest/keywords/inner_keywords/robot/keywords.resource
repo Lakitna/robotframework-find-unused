@@ -8,3 +8,8 @@ Amazing Kw
 Beautiful
     [Arguments]    ${inner_keyword}    @{args}
     No Operation
+
+Cute
+    [Arguments]    ${name}    ${something}
+    Log  ${name}
+    Log  ${something}
