@@ -13,11 +13,11 @@ Counting keyword usage...
 Test.Keyword With ${embedded} Arguments
     use_count	argument
     2		required
-    0		optional_unsed=${True}
+    0		optional_unused=${True}
     1		optional_used=${True}
 
 Test.Keyword With Arguments
     use_count	argument
     2		required
-    0		optional_unsed=${True}
+    0		optional_unused=${True}
     1		optional_used=${True}

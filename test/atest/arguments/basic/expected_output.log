@@ -12,8 +12,8 @@ Counting keyword usage...
 
 Test.Keyword With ${embedded} Arguments
     Unchanged arguments: 1 of 3
-        optional_unsed=${True}
+        optional_unused=${True}
 
 Test.Keyword With Arguments
     Unchanged arguments: 1 of 3
-        optional_unsed=${True}
+        optional_unused=${True}

@@ -9,9 +9,9 @@ Use some Arguments
 
 *** Keywords ***
 Keyword With Arguments
-    [Arguments]    ${required}    ${optional_unsed}=${True}    ${optional_used}=${True}
+    [Arguments]    ${required}    ${optional_unused}=${True}    ${optional_used}=${True}
     No Operation
 
 Keyword With ${embedded} Arguments
-    [Arguments]    ${required}    ${optional_unsed}=${True}    ${optional_used}=${True}
+    [Arguments]    ${required}    ${optional_unused}=${True}    ${optional_used}=${True}
     No Operation

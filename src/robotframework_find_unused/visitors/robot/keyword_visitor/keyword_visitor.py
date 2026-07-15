@@ -339,17 +339,28 @@ class RobotVisitorKeywords(ModelVisitor):
         positional_args: list[str] = []
         named_args: list[tuple[str, Any]] = []
 
+        available_positional_args = list(kw_args.positional)
         for arg in call_args:
-            if "=" not in arg:
-                positional_args.append(arg)
-                continue
+            arg_parts = arg.split("=", 1)
 
-            (named_arg_name, named_arg_val) = arg.split("=", 1)
-            if named_arg_name in kw_args.argument_names:
-                # It's a correct named argument
-                named_args.append((named_arg_name, named_arg_val))
-            else:
-                positional_args.append(arg)
+            if len(arg_parts) > 1 and len(arg_parts[0]) > 0:
+                (named_arg_name, named_arg_val) = arg_parts
+
+                if named_arg_name in available_positional_args:
+                    # Positional arg used as named arg
+                    available_positional_args.remove(named_arg_name)
+                    named_args.append((named_arg_name, named_arg_val))
+                    continue
+
+                if named_arg_name in kw_args.named_only:
+                    # It's a recognized named argument
+                    named_args.append((named_arg_name, named_arg_val))
+                    continue
+
+            if available_positional_args:
+                available_positional_args.pop(0)
+
+            positional_args.append(arg)
 
         return (positional_args, named_args)
 
@@ -383,6 +394,8 @@ class RobotVisitorKeywords(ModelVisitor):
 
         for name, val in called_with_kwargs:
             if isinstance(val, DefaultValue):
+                continue
+            if name not in kw.argument_use_count:
                 continue
             kw.argument_use_count[name] += 1
 
