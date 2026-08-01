@@ -45,6 +45,7 @@ jobs:
       - name: Lint
         run: |
           uv run ruff check
+          uv run ty check
 
       - name: Test
         run: |

@@ -102,6 +102,7 @@ def update_submodules(c: Context):
 @task
 def lint(c: Context):
     c.run("uv run ruff check")
+    c.run("uv run ty check")
 
 
 @task
