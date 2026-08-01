@@ -25,6 +25,8 @@ class ReturnReporter(
     Base reporter class for return command.
     """
 
+    options: "ReturnOptions"
+
     def __init__(self, options: "ReturnOptions") -> None:
         self.options = options
 

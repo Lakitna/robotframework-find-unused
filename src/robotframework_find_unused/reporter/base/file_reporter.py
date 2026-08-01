@@ -13,6 +13,8 @@ class FileReporter(PartialReporter_DiscoverFiles):
     Base reporter class for files command.
     """
 
+    options: "FileOptions"
+
     def __init__(self, options: "FileOptions") -> None:
         self.options = options
 

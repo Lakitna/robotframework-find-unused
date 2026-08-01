@@ -14,6 +14,8 @@ class VariableReporter(PartialReporter_DiscoverFiles):
     Base reporter class for variable command.
     """
 
+    options: "VariableOptions"
+
     def __init__(self, options: "VariableOptions") -> None:
         self.options = options
 

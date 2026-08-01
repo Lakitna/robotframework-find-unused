@@ -99,7 +99,7 @@ class RobotVisitorVariableUses(ModelVisitor):
 
         return self.generic_visit(node)
 
-    def visit_For(self, node: "For"):  # pyright: ignore[reportIncompatibleMethodOverride] # noqa: N802
+    def visit_For(self, node: "For"):  # pyright: ignore[reportIncompatibleMethodOverride] # noqa: N802  # ty: ignore[invalid-method-override]
         """
         Look for used variables in for loop conditions.
         """
@@ -107,7 +107,7 @@ class RobotVisitorVariableUses(ModelVisitor):
 
         return self.generic_visit(node)
 
-    def visit_If(self, node: "If"):  # pyright: ignore[reportIncompatibleMethodOverride] # noqa: N802
+    def visit_If(self, node: "If"):  # pyright: ignore[reportIncompatibleMethodOverride] # noqa: N802  # ty: ignore[invalid-method-override]
         """
         Look for used variables in if/else/elseif statement conditions.
         """

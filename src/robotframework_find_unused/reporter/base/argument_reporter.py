@@ -25,6 +25,8 @@ class ArgumentReporter(
     Base reporter class for keyword command.
     """
 
+    options: "ArgumentsOptions"
+
     def __init__(self, options: "ArgumentsOptions") -> None:
         self.options = options
 
