@@ -71,12 +71,12 @@ def _discover_file_paths_robocop(input_path: str) -> list[Path]:
 
     Works for Robocop 8.x.x and up
     """
-    from robocop.config.builder import (
+    from robocop.config.builder import (  # type: ignore  # noqa: PGH003  # ty: ignore[unused-type-ignore-comment, unused-ignore-comment]
         RawConfig,  # type: ignore  # noqa: PGH003  # ty: ignore[unused-type-ignore-comment, unused-ignore-comment]
-        RawFileFiltersOptions,  # type: ignore  # noqa: PGH003 # ty: ignore[unused-type-ignore-comment, unused-ignore-comment]
+        RawFileFiltersOptions,  # type: ignore  # noqa: PGH003  # ty: ignore[unused-type-ignore-comment, unused-ignore-comment]
     )
-    from robocop.config.manager import (
-        ConfigManager,  # type: ignore  # noqa: PGH003 # ty: ignore[unused-type-ignore-comment, unused-ignore-comment]
+    from robocop.config.manager import (  # type: ignore  # noqa: PGH003  # ty: ignore[unused-type-ignore-comment, unused-ignore-comment]
+        ConfigManager,  # type: ignore  # noqa: PGH003  # ty: ignore[unused-type-ignore-comment, unused-ignore-comment]
     )
 
     config_manager = ConfigManager(

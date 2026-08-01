@@ -20,7 +20,8 @@ if TYPE_CHECKING:
     from robot.api.parsing import (
         File,
         KeywordCall,
-        Var,
+        # Ignore comments required for supporting robotframework<7
+        Var,  # ty: ignore[unresolved-import, unused-ignore-comment, unused-ignore-comment]
         VariableSection,
         VariablesImport,
     )
