@@ -102,6 +102,7 @@ def update_submodules(c: Context):
 @task
 def lint(c: Context):
     c.run("uv run ruff check")
+    c.run("uv run ty check")
 
 
 @task
@@ -144,14 +145,16 @@ def _run_multiple_tasks(
     print(f"Running {len(tasks)} tasks...")
 
     for t in tasks:
+        t_name = str(getattr(t, "__name__", "[unknown]"))
+
         print()
-        print("--- task " + t.__name__ + " ---")
+        print("--- task " + t_name + " ---")
         print()
 
         try:
             t(c, *args, **kwargs)
         except Exception:
-            print("FAILED task " + t.__name__)
+            print("FAILED task " + t_name)
             raise
 
     print()

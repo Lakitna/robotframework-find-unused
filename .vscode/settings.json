@@ -9,4 +9,5 @@
             "source.fixAll.markdownlint": "always",
         },
     },
+    "editor.inlineSuggest.enabled": false,
 }

@@ -25,6 +25,8 @@ class KeywordReporter(
     Base reporter class for keyword command.
     """
 
+    options: "KeywordOptions"
+
     def __init__(self, options: "KeywordOptions") -> None:
         self.options = options
 

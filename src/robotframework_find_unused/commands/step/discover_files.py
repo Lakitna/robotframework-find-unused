@@ -49,7 +49,10 @@ def _discover_file_paths_robocop_6_7(input_path: str) -> list[Path]:
 
     Only works for Robocop 6.x.x and 7.x.x
     """
-    from robocop.config import ConfigManager, FileFiltersOptions  # type: ignore  # noqa: PGH003
+    from robocop.config import (
+        ConfigManager,  # type: ignore  # noqa: PGH003  # ty: ignore[unused-type-ignore-comment, unused-ignore-comment]
+        FileFiltersOptions,  # type: ignore  # noqa: PGH003  # ty: ignore[unused-type-ignore-comment, unused-ignore-comment]
+    )
 
     robocop_config = ConfigManager(sources=[input_path])
 
@@ -68,11 +71,13 @@ def _discover_file_paths_robocop(input_path: str) -> list[Path]:
 
     Works for Robocop 8.x.x and up
     """
-    from robocop.config.builder import (
-        RawConfig,  # type: ignore  # noqa: PGH003
-        RawFileFiltersOptions,  # type: ignore  # noqa: PGH003
+    from robocop.config.builder import (  # type: ignore  # noqa: PGH003  # ty: ignore[unused-type-ignore-comment, unused-ignore-comment]
+        RawConfig,  # type: ignore  # noqa: PGH003  # ty: ignore[unused-type-ignore-comment, unused-ignore-comment]
+        RawFileFiltersOptions,  # type: ignore  # noqa: PGH003  # ty: ignore[unused-type-ignore-comment, unused-ignore-comment]
     )
-    from robocop.config.manager import ConfigManager  # type: ignore  # noqa: PGH003
+    from robocop.config.manager import (  # type: ignore  # noqa: PGH003  # ty: ignore[unused-type-ignore-comment, unused-ignore-comment]
+        ConfigManager,  # type: ignore  # noqa: PGH003  # ty: ignore[unused-type-ignore-comment, unused-ignore-comment]
+    )
 
     config_manager = ConfigManager(
         sources=[input_path],
